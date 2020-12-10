@@ -47,33 +47,6 @@ from femtools import geomtools
 # TODO somehow set units at beginning and every time a value is retrieved use this identifier
 # this would lead to support of unit system, force might be retrieved in base writer!
 
-
-# the following text will be at the end of the main FrontISTR input file
-units_information = """***********************************************************
-**  About units:
-**  See fistr manual, fistr does not know about any unit.
-**  Golden rule: The user must make sure that the numbers he provides have consistent units.
-**  The user is the FreeCAD FrontISTR writer module ;-)
-**
-**  The unit system which is used at Guido Dhodts company: mm, N, s, K
-**  Since Length and Mass are connected by Force, if Length is mm the Mass is in t to get N
-**  The following units are used to write to inp file:
-**
-**  Length: mm (this includes the mesh geometry)
-**  Mass: t
-**  TimeSpan: s
-**  Temperature: K
-**
-**  This leads to:
-**  Force: N
-**  Pressure: N/mm^2
-**  Density: t/mm^2
-**  Gravity: mm/s^2
-**  Thermal conductivity: t*mm/K*s^3
-**  Specific Heat: kJ/t/K = mm^2/s^2/K
-"""
-
-
 class FemInputWriterfistr(writerbase.FemInputWriter):
     def __init__(
         self,
@@ -93,6 +66,10 @@ class FemInputWriterfistr(writerbase.FemInputWriter):
         )
         self.mesh_name = self.mesh_object.Name
         self.include = join(self.dir_name, self.mesh_name)
+
+        self.msh_name = self.include + ".msh"
+        self.cnt_name = self.include + ".cnt"
+        self.dat_name = "hecmw_ctrl.dat"
         self.file_name = self.include + ".inp"
         self.FluidInletoutlet_ele = []
         self.fluid_inout_nodes_file = join(
@@ -116,7 +93,6 @@ class FemInputWriterfistr(writerbase.FemInputWriter):
     def write_FrontISTR_input_file(self):
         timestart = time.process_time()
         FreeCAD.Console.PrintMessage("Start writing FrontISTR input file\n")
-        FreeCAD.Console.PrintMessage("Write fistr input file to: {}\n".format(self.file_name))
         FreeCAD.Console.PrintLog(
             "writerbasefistr --> self.mesh_name  -->  " + self.mesh_name + "\n"
         )
@@ -127,7 +103,7 @@ class FemInputWriterfistr(writerbase.FemInputWriter):
             "writerbasefistr --> self.include  -->  " + self.mesh_name + "\n"
         )
         FreeCAD.Console.PrintLog(
-            "writerbasefistr --> self.file_name  -->  " + self.file_name + "\n"
+            "writerbasefistr --> self.include  -->  " + self.include + "\n"
         )
 
         self.write_FrontISTR_input()
@@ -138,7 +114,7 @@ class FemInputWriterfistr(writerbase.FemInputWriter):
         )
         if self.femelement_count_test is True:
             FreeCAD.Console.PrintMessage(writing_time_string + " \n\n")
-            return self.file_name
+            return self.include
         else:
             FreeCAD.Console.PrintMessage(writing_time_string + " \n")
             FreeCAD.Console.PrintError(
@@ -172,30 +148,6 @@ class FemInputWriterfistr(writerbase.FemInputWriter):
         self.write_materials(inpfileMain)
         self.write_constraints_initialtemperature(inpfileMain)
         self.write_femelementsets(inpfileMain)
-
-        # Fluid sections:
-        # Inlet and Outlet requires special element definition
-        # some data from the elsets are needed thus this can not be moved
-        # to mesh writing TODO it would be much better if this would be
-        # at mesh writing as the mesh will be changed
-        if self.fluidsection_objects:
-            if is_fluid_section_inlet_outlet(self.fistr_elsets) is True:
-                if self.split_inpfile is True:
-                    meshtools.use_correct_fluidinout_ele_def(
-                        self.FluidInletoutlet_ele,
-                        # use mesh file split, see write_mesh method split_mesh_file_path
-                        join(self.dir_name, self.mesh_name + "_femesh.inp"),
-                        self.fluid_inout_nodes_file
-                    )
-                else:
-                    inpfileMain.close()
-                    meshtools.use_correct_fluidinout_ele_def(
-                        self.FluidInletoutlet_ele,
-                        self.file_name,
-                        self.fluid_inout_nodes_file
-                    )
-                    # inpfileMain = io.open(self.file_name, "a", encoding="utf-8")
-                    inpfileMain = codecs.open(self.file_name, "a", encoding="utf-8")
 
         # constraints independent from steps
         self.write_constraints_planerotation(inpfileMain)
@@ -1345,7 +1297,6 @@ class FemInputWriterfistr(writerbase.FemInputWriter):
         ))
         f.write("**\n")
         f.write("**\n")
-        f.write(units_information)
         f.write("**\n")
 
     # ********************************************************************************************
