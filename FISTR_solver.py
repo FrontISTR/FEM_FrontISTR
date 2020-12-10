@@ -21,7 +21,6 @@
 #*                                                                         *
 #***************************************************************************
 
-
 __title__="FreeCAD FrontISTR Command Class"
 __author__ = "FrontISTR Commons"
 __url__ = "https://www.frontistr.com/"
