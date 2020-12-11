@@ -293,8 +293,10 @@ class FemToolsFISTR(QtCore.QRunnable, QtCore.QObject):
         """
         if inp_file_name is not None:
             self.inp_file_name = inp_file_name
+            self.cnt_file_name = inp_file_name+".cnt"
         else:
             self.inp_file_name = os.path.join(self.working_dir, (self.base_name + ".inp"))
+            self.cnt_file_name = os.path.join(self.working_dir, (self.base_name + ".cnt"))
 
     def setup_working_dir(self, param_working_dir=None, create=False):
         """Set working dir for solver execution.
@@ -376,11 +378,15 @@ class FemToolsFISTR(QtCore.QRunnable, QtCore.QObject):
                 self.working_dir
             )
             self.inp_file_name = inp_writer.write_FrontISTR_input_file()
-        except Exception:
+        except Exception as e:
             FreeCAD.Console.PrintError(
                 "Unexpected error when writing FrontISTR input file: {}\n"
                 .format(sys.exc_info()[0])
             )
+            FreeCAD.Console.PrintError("[x] Type: {type}".format(type=type(e))+"\n")
+            FreeCAD.Console.PrintError("[x] Args: {args}".format(args=e.args)+"\n")
+            FreeCAD.Console.PrintError("[x] Message: {message}".format(message=e.message)+"\n")
+            FreeCAD.Console.PrintError("[x] Error: {error}".format(error=e)+"\n")
             raise
 
     def setup_fistr(self, fistr_binary=None, fistr_binary_sig="FrontISTR"):
@@ -407,10 +413,14 @@ class FemToolsFISTR(QtCore.QRunnable, QtCore.QObject):
         if fistr_std_location:
             if system() == "Windows":
                 fistr_path = FreeCAD.getHomePath() + "bin/fistr1.exe"
+                partitioner_path = FreeCAD.getHomePath() + "bin/hecmw_part1.exe"
+                mpiexec_path = FreeCAD.getHomePath() + "bin/mpiexec.exe"
                 FreeCAD.ParamGet(
                     "User parameter:BaseApp/Preferences/Mod/Fem/FrontISTR"
                 ).SetString("fistrBinaryPath", fistr_path)
                 self.fistr_binary = fistr_path
+                self.partitioner_binary = partitioner_path
+                self.mpiexec_binary = mpiexec_path
             elif system() in ("Linux", "Darwin"):
                 p1 = subprocess.Popen(["which", "fistr"], stdout=subprocess.PIPE)
                 if p1.wait() == 0:
@@ -486,6 +496,16 @@ class FemToolsFISTR(QtCore.QRunnable, QtCore.QObject):
                 if FreeCAD.GuiUp:
                     QtGui.QMessageBox.critical(None, error_title, error_message)
                 raise Exception(error_message)
+            else:
+                FreeCAD.Console.PrintError(
+                    "Unexpected error when executing FrontISTR: {}\n"
+                    .format(sys.exc_info()[0])
+                )
+                FreeCAD.Console.PrintError("[x] Type: {type}".format(type=type(e))+"\n")
+                FreeCAD.Console.PrintError("[x] Args: {args}".format(args=e.args)+"\n")
+                FreeCAD.Console.PrintError("[x] Message: {message}".format(message=e.message)+"\n")
+                FreeCAD.Console.PrintError("[x] Error: {error}".format(error=e)+"\n")                
+                
         except Exception as e:
             FreeCAD.Console.PrintError("{}\n".format(e))
             error_message = (
@@ -503,7 +523,7 @@ class FemToolsFISTR(QtCore.QRunnable, QtCore.QObject):
         import multiprocessing
         self.fistr_stdout = ""
         self.fistr_stderr = ""
-        ont_backup = os.environ.get("OMP_NUM_THREADS")
+        #ont_backup = os.environ.get("OMP_NUM_THREADS")
         self.fistr_prefs = FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/Fem/FrontISTR")
         # If number of CPU's specified
         num_cpu_pref = self.fistr_prefs.GetInt("AnalysisNumCPUs", 1)
@@ -519,6 +539,9 @@ class FemToolsFISTR(QtCore.QRunnable, QtCore.QObject):
         cwd = QtCore.QDir.currentPath()
         f = QtCore.QFileInfo(self.inp_file_name)
         QtCore.QDir.setCurrent(f.path())
+        cmd = self.partitioner_binary+" & "
+        cmd += self.mpiexec_binary+" -np "+'%d'%self.solver.n_process+" "+self.fistr_binary
+        FreeCAD.Console.PrintMessage(cmd+"\n") #tmp
         p = subprocess.Popen(
             [self.fistr_binary, "-i ", f.baseName()],
             stdout=subprocess.PIPE,

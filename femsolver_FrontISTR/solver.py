@@ -152,19 +152,6 @@ def add_attributes(obj, fistr_prefs):
     ehl = fistr_prefs.GetFloat("EigenmodeHighLimit", 1000000.0)
     obj.EigenmodeHighLimit = (ehl, 0.0, 1000000.0, 10000.0)
 
-    help_string_IterationsThermoMechMaximum = (
-        "Maximum Number of thermo mechanical iterations "
-        "in each time step before stopping jobs"
-    )
-    obj.addProperty(
-        "App::PropertyIntegerConstraint",
-        "IterationsThermoMechMaximum",
-        "Fem",
-        help_string_IterationsThermoMechMaximum
-    )
-    niter = fistr_prefs.GetInt("AnalysisMaxIterations", 200)
-    obj.IterationsThermoMechMaximum = niter
-
     obj.addProperty(
         "App::PropertyFloatConstraint",
         "TimeInitialStep",
@@ -192,112 +179,13 @@ def add_attributes(obj, fistr_prefs):
     sted = fistr_prefs.GetBool("StaticAnalysis", True)
     obj.ThermoMechSteadyState = sted
 
-    obj.addProperty(
-        "App::PropertyBool",
-        "IterationsControlParameterTimeUse",
-        "Fem",
-        "Use the user defined time incrementation control parameter"
-    )
-    use_non_fistr_iterations_param = fistr_prefs.GetInt("UseNonfistrIterationParam", False)
-    obj.IterationsControlParameterTimeUse = use_non_fistr_iterations_param
-
-    obj.addProperty(
-        "App::PropertyBool",
-        "SplitInputWriter",
-        "Fem",
-        "Split writing of fistr input file"
-    )
-    split = fistr_prefs.GetBool("SplitInputWriter", False)
-    obj.SplitInputWriter = split
-
-    fistr_default_time_incrementation_control_parameter = {
-        # iteration parameter
-        "I_0": 4,
-        "I_R": 8,
-        "I_P": 9,
-        "I_C": 200,  # fistr default = 16
-        "I_L": 10,
-        "I_G": 400,  # fistr default = 4
-        "I_S": None,
-        "I_A": 200,  # fistr default = 5
-        "I_J": None,
-        "I_T": None,
-        # cutback parameter
-        "D_f": 0.25,
-        "D_C": 0.5,
-        "D_B": 0.75,
-        "D_A": 0.85,
-        "D_S": None,
-        "D_H": None,
-        "D_D": 1.5,
-        "W_G": None}
-    p = fistr_default_time_incrementation_control_parameter
-    p_iter = "{0},{1},{2},{3},{4},{5},{6},{7},{8},{9}".format(
-        p["I_0"],
-        p["I_R"],
-        p["I_P"],
-        p["I_C"],
-        p["I_L"],
-        p["I_G"],
-        "",
-        p["I_A"],
-        "",
-        ""
-    )
-    p_cutb = "{0},{1},{2},{3},{4},{5},{6},{7}".format(
-        p["D_f"],
-        p["D_C"],
-        p["D_B"],
-        p["D_A"],
-        "",
-        "",
-        p["D_D"],
-        ""
-    )
-    obj.addProperty(
-        "App::PropertyString",
-        "IterationsControlParameterIter",
-        "Fem",
-        "User defined time incrementation iterations control parameter"
-    )
-    obj.IterationsControlParameterIter = p_iter
-    obj.addProperty(
-        "App::PropertyString",
-        "IterationsControlParameterCutb",
-        "Fem",
-        "User defined time incrementation cutbacks control parameter"
-    )
-    obj.IterationsControlParameterCutb = p_cutb
-
-    stringIterationsUserDefinedIncrementations = (
-        "Set to True to switch off the fistr automatic incrementation completely "
-        "(fistr parameter DIRECT). Use with care. Analysis may not converge!"
-    )
-    obj.addProperty(
-        "App::PropertyBool",
-        "IterationsUserDefinedIncrementations",
-        "Fem",
-        stringIterationsUserDefinedIncrementations
-    )
-    obj.IterationsUserDefinedIncrementations = False
-
-    help_string_IterationsUserDefinedTimeStepLength = (
-        "Set to True to use the user defined time steps. "
-        "The time steps are set with TimeInitialStep and TimeEnd"
-    )
-    obj.addProperty(
-        "App::PropertyBool",
-        "IterationsUserDefinedTimeStepLength",
-        "Fem",
-        help_string_IterationsUserDefinedTimeStepLength
-    )
-    obj.IterationsUserDefinedTimeStepLength = False
-
     known_fistr_solver_types = [
-        "default",
-        "spooles",
-        "iterativescaling",
-        "iterativecholesky"
+        "CG",
+        "BiCGSTAB",
+        "GMRES",
+        "GPBiCG",
+        "MUMPS",
+        "DIRECTmkl"
     ]
     obj.addProperty(
         "App::PropertyEnumeration",
@@ -309,6 +197,24 @@ def add_attributes(obj, fistr_prefs):
     solver_type = fistr_prefs.GetInt("Solver", 0)
     obj.MatrixSolverType = known_fistr_solver_types[solver_type]
 
+    known_fistr_precond_types = [
+        "AMG",
+        "SSOR",
+        "DIAGNAL_SCALING",
+        "Block ILU(0)",
+        "Block ILU(1)",
+        "Block ILU(2)"
+    ]
+    obj.addProperty(
+        "App::PropertyEnumeration",
+        "MatrixPrecondType",
+        "Fem",
+        "Type of preconditioner to use"
+    )
+    obj.MatrixPrecondType = known_fistr_precond_types
+    precond_type = fistr_prefs.GetInt("Precond", 0)
+    obj.MatrixPrecondType = known_fistr_precond_types[precond_type]
+
     obj.addProperty(
         "App::PropertyBool",
         "BeamShellResultOutput3D",
@@ -318,3 +224,20 @@ def add_attributes(obj, fistr_prefs):
     dimout = fistr_prefs.GetBool("BeamShellOutput", False)
     obj.BeamShellResultOutput3D = dimout
 
+    obj.addProperty(
+        "App::PropertyIntegerConstraint",
+        "SUBSTEPS",
+        "Fem",
+        "Number of increment for each step"
+    )
+    n_substeps = fistr_prefs.GetInt("SUBSTEPS", 1)
+    obj.SUBSTEPS = n_substeps
+
+    obj.addProperty(
+        "App::PropertyIntegerConstraint",
+        "n_process",
+        "Fem",
+        "Number of process for palallel execution"
+    )
+    n_process = fistr_prefs.GetInt("n_process", 4)
+    obj.n_process = n_process

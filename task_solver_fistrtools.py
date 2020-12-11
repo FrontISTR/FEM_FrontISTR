@@ -87,7 +87,7 @@ class _TaskPanel:
         QtCore.QObject.connect(
             self.form.pb_edit_inp,
             QtCore.SIGNAL("clicked()"),
-            self.editFrontISTRInputFile
+            self.editFrontISTRCntFile
         )
         QtCore.QObject.connect(
             self.form.pb_run_fistr,
@@ -259,17 +259,12 @@ class _TaskPanel:
         else:
             self.FrontISTRError()
 
-        self.form.pb_run_fistr.setText("Re-run FrontISTR")
+        self.form.pb_run_fistr.stText("Re-run FrontISTR")
         self.femConsoleMessage("Loading result sets...")
         self.form.l_time.setText("Time: {0:4.1f}: ".format(time.time() - self.Start))
         self.fea.reset_mesh_purge_results_checked()
         self.fea.inp_file_name = self.fea.inp_file_name
 
-        # check if fistr is greater than 2.10, if not do not read results
-        # https://forum.freecadweb.org/viewtopic.php?f=18&t=23548#p183829 Point 3
-        # https://forum.freecadweb.org/viewtopic.php?f=18&t=23548&start=20#p183909
-        # https://forum.freecadweb.org/viewtopic.php?f=18&t=23548&start=30#p185027
-        # https://github.com/FreeCAD/FreeCAD/commit/3dd1c9f
         majorVersion, minorVersion = self.fea.get_fistr_version()
         if majorVersion == 2 and minorVersion <= 10:
             message = (
@@ -283,10 +278,10 @@ class _TaskPanel:
             raise
 
         QApplication.setOverrideCursor(Qt.WaitCursor)
-        try:
-            self.fea.load_results()
-        except Exception:
-            FreeCAD.Console.PrintError("loading results failed\n")
+        #try:
+        #    self.fea.load_results()
+        #except Exception:
+        #    FreeCAD.Console.PrintError("loading results failed\n")
 
         QApplication.restoreOverrideCursor()
         self.form.l_time.setText("Time: {0:4.1f}: ".format(time.time() - self.Start))
@@ -332,40 +327,48 @@ class _TaskPanel:
         if self.ext_editor_process.state() != QtCore.QProcess.Running:
             self.ext_editor_process.start(ext_editor_path, [filename])
 
-    def editFrontISTRInputFile(self):
-        print("editFrontISTRInputFile {}".format(self.fea.inp_file_name))
+    def editFrontISTRCntFile(self):
+        print("editFrontISTRCntFile {}".format(self.fea.cnt_file_name))
         fistr_prefs = FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/Fem/FrontISTR")
         if fistr_prefs.GetBool("UseInternalEditor", True):
-            FemGui.open(self.fea.inp_file_name)
+            FemGui.open(self.fea.cnt_file_name)
         else:
             ext_editor_path = fistr_prefs.GetString("ExternalEditorPath", "")
             if ext_editor_path:
-                self.start_ext_editor(ext_editor_path, self.fea.inp_file_name)
+                self.start_ext_editor(ext_editor_path, self.fea.cnt_file_name)
             else:
                 print(
                     "External editor is not defined in FEM preferences. "
                     "Falling back to internal editor"
                 )
-                FemGui.open(self.fea.inp_file_name)
+                FemGui.open(self.fea.cnt_file_name)
 
     def runFrontISTR(self):
         # print("runFrontISTR")
         self.Start = time.time()
 
         self.femConsoleMessage("FrontISTR binary: {}".format(self.fea.fistr_binary))
-        self.femConsoleMessage("FrontISTR input file: {}".format(self.fea.inp_file_name))
         self.femConsoleMessage("Run FrontISTR...")
 
-        FreeCAD.Console.PrintMessage(
-            "run FrontISTR at: {} with: {}\n"
-            .format(self.fea.fistr_binary, self.fea.inp_file_name)
-        )
-        # change cwd because fistr may crash if directory has no write permission
-        # there is also a limit of the length of file names so jump to the document directory
+        # parallel settings
+        n_pe = "%d"%self.fea.solver.n_process
+        
+        # work dir
         self.cwd = QtCore.QDir.currentPath()
-        fi = QtCore.QFileInfo(self.fea.inp_file_name)
-        QtCore.QDir.setCurrent(fi.path())
-        self.FrontISTR.start(self.fea.fistr_binary, ["-i", fi.baseName()])
+        fi = QtCore.QFileInfo(self.fea.cnt_file_name)
+        work_dir = fi.path()
+        QtCore.QDir.setCurrent(work_dir)
+
+        FreeCAD.Console.PrintMessage(
+            "run FrontISTR at: {}, n_process ={}\n"
+            .format(work_dir, n_pe)
+        )
+
+        # execute partitioner by subprocess
+        # It may make user wait, but calling partitioner from self.FrontISTR.start causes error
+        import subprocess
+        subprocess.call(self.fea.partitioner_binary, cwd=work_dir)
+        self.FrontISTR.start(self.fea.mpiexec_binary,["-n",n_pe,self.fea.fistr_binary])
 
         QApplication.restoreOverrideCursor()
 

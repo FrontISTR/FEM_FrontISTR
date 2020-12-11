@@ -110,7 +110,7 @@
         <bool>false</bool>
        </property>
        <property name="text">
-        <string>Edit input file</string>
+        <string>Edit cnt file</string>
        </property>
       </widget>
      </item>
