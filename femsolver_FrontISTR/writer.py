@@ -1647,7 +1647,8 @@ class FemInputWriterfistr(writerbase.FemInputWriter):
             if fistr_elset["fistr_elset"]:
                 if "beamsection_obj"in fistr_elset:  # beam mesh
                     beamsec_obj = fistr_elset["beamsection_obj"]
-                    elsetdef = "ELSET=" + fistr_elset["fistr_elset_name"] + ", "
+                    elsetdef = "ELSET=ALL, "
+                    #elsetdef = "ELSET=" + fistr_elset["fistr_elset_name"] + ", "
                     material = "MATERIAL=" + fistr_elset["mat_obj_name"]
                     normal = fistr_elset["beam_normal"]
                     if beamsec_obj.SectionType == "Rectangular":
@@ -1689,40 +1690,18 @@ class FemInputWriterfistr(writerbase.FemInputWriter):
                     f.write(section_def)
                     f.write(section_geo)
                     f.write(section_nor)
-                elif "fluidsection_obj"in fistr_elset:  # fluid mesh
-                    fluidsec_obj = fistr_elset["fluidsection_obj"]
-                    elsetdef = "ELSET=" + fistr_elset["fistr_elset_name"] + ", "
-                    material = "MATERIAL=" + fistr_elset["mat_obj_name"]
-                    if fluidsec_obj.SectionType == "Liquid":
-                        section_type = fluidsec_obj.LiquidSectionType
-                        if (section_type == "PIPE INLET") or (section_type == "PIPE OUTLET"):
-                            section_type = "PIPE INOUT"
-                        section_def = "*FLUID SECTION, {}TYPE={}, {}\n".format(
-                            elsetdef,
-                            section_type,
-                            material
-                        )
-                        section_geo = liquid_section_def(fluidsec_obj, section_type)
-                    """
-                    # deactivate as it would result in section_def and section_geo not defined
-                    # deactivated in the App and Gui object and thus in the task panel as well
-                    elif fluidsec_obj.SectionType == "Gas":
-                        section_type = fluidsec_obj.GasSectionType
-                    elif fluidsec_obj.SectionType == "Open Channel":
-                        section_type = fluidsec_obj.ChannelSectionType
-                    """
-                    f.write(section_def)
-                    f.write(section_geo)
                 elif "shellthickness_obj"in fistr_elset:  # shell mesh
                     shellth_obj = fistr_elset["shellthickness_obj"]
-                    elsetdef = "ELSET=" + fistr_elset["fistr_elset_name"] + ", "
+                    elsetdef = "ELSET=ALL, "
+                    #elsetdef = "ELSET=" + fistr_elset["fistr_elset_name"] + ", "
                     material = "MATERIAL=" + fistr_elset["mat_obj_name"]
                     section_def = "*SHELL SECTION, " + elsetdef + material + "\n"
                     section_geo = str(shellth_obj.Thickness.getValueAs("mm")) + "\n"
                     f.write(section_def)
                     f.write(section_geo)
                 else:  # solid mesh
-                    elsetdef = "ELSET=" + fistr_elset["fistr_elset_name"] + ", "
+                    elsetdef = "ELSET=ALL, "
+                    #elsetdef = "ELSET=" + fistr_elset["fistr_elset_name"] + ", "
                     material = "MATERIAL=" + fistr_elset["mat_obj_name"]
                     section_def = "*SOLID SECTION, " + elsetdef + material + "\n"
                     f.write(section_def)
