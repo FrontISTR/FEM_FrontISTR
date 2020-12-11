@@ -123,105 +123,79 @@ class FemInputWriterfistr(writerbase.FemInputWriter):
             return ""
 
     def write_FrontISTR_input(self):
-        if self.solver_obj.SplitInputWriter is True:
-            self.split_inpfile = True
-        else:
-            self.split_inpfile = False
 
-        # mesh
-        inpfileMain = self.write_mesh(self.split_inpfile)
-
+        # mesh file
+        mshfile = self.write_mesh()
+        
         # element and material sets
-        self.write_element_sets_material_and_femelement_type(inpfileMain)
+        self.write_element_sets_material_and_femelement_type(mshfile)
 
         # node sets and surface sets
-        self.write_node_sets_constraints_fixed(inpfileMain, self.split_inpfile)
-        self.write_node_sets_constraints_displacement(inpfileMain, self.split_inpfile)
-        self.write_node_sets_constraints_planerotation(inpfileMain, self.split_inpfile)
-        self.write_surfaces_constraints_contact(inpfileMain, self.split_inpfile)
-        self.write_surfaces_constraints_tie(inpfileMain, self.split_inpfile)
-        self.write_surfaces_constraints_sectionprint(inpfileMain, self.split_inpfile)
-        self.write_node_sets_constraints_transform(inpfileMain, self.split_inpfile)
-        self.write_node_sets_constraints_temperature(inpfileMain, self.split_inpfile)
+        self.write_node_sets_constraints_fixed(mshfile)
+        self.write_node_sets_constraints_displacement(mshfile)
+        self.write_node_sets_constraints_planerotation(mshfile)
+        self.write_surfaces_constraints_contact(mshfile)
+        self.write_surfaces_constraints_tie(mshfile)
+        self.write_surfaces_constraints_sectionprint(mshfile)
+        self.write_node_sets_constraints_transform(mshfile)
+        self.write_node_sets_constraints_temperature(mshfile)
 
         # materials and fem element types
-        self.write_materials(inpfileMain)
-        self.write_constraints_initialtemperature(inpfileMain)
-        self.write_femelementsets(inpfileMain)
+        self.write_materials(mshfile)
+        self.write_constraints_initialtemperature(mshfile)
+        self.write_femelementsets(mshfile)
+
+        #tmp
+        mshfile.close()
+        return
 
         # constraints independent from steps
-        self.write_constraints_planerotation(inpfileMain)
-        self.write_constraints_contact(inpfileMain)
-        self.write_constraints_tie(inpfileMain)
-        self.write_constraints_transform(inpfileMain)
+        self.write_constraints_planerotation(mshfile)
+        self.write_constraints_contact(mshfile)
+        self.write_constraints_tie(mshfile)
+        self.write_constraints_transform(mshfile)
 
         # step begin
-        self.write_step_begin(inpfileMain)
+        self.write_step_begin(mshfile)
 
         # constraints dependent from steps
-        self.write_constraints_fixed(inpfileMain)
-        self.write_constraints_displacement(inpfileMain)
-        self.write_constraints_sectionprint(inpfileMain)
-        self.write_constraints_selfweight(inpfileMain)
-        self.write_constraints_force(inpfileMain, self.split_inpfile)
-        self.write_constraints_pressure(inpfileMain, self.split_inpfile)
-        self.write_constraints_temperature(inpfileMain)
-        self.write_constraints_heatflux(inpfileMain, self.split_inpfile)
-        self.write_constraints_fluidsection(inpfileMain)
+        self.write_constraints_fixed(mshfile)
+        self.write_constraints_displacement(mshfile)
+        self.write_constraints_sectionprint(mshfile)
+        self.write_constraints_selfweight(mshfile)
+        self.write_constraints_force(mshfile)
+        self.write_constraints_pressure(mshfile)
+        self.write_constraints_temperature(mshfile)
+        self.write_constraints_heatflux(mshfile)
+        self.write_constraints_fluidsection(mshfile)
 
         # output and step end
-        self.write_outputs_types(inpfileMain)
-        self.write_step_end(inpfileMain)
+        self.write_outputs_types(mshfile)
+        self.write_step_end(mshfile)
 
         # footer
-        self.write_footer(inpfileMain)
-        inpfileMain.close()
+        self.write_footer(mshfile)
+        mshfile.close()
 
     # ********************************************************************************************
     # mesh
-    def write_mesh(self, inpfile_split=None):
+    def write_mesh(self):
         # write mesh to file
         element_param = 1  # highest element order only
         group_param = False  # do not write mesh group data
-        if inpfile_split is True:
-            write_name = "femesh"
-            file_name_splitt = self.mesh_name + "_" + write_name + ".inp"
-            split_mesh_file_path = join(self.dir_name, file_name_splitt)
 
-            self.femmesh.writeABAQUS(
-                split_mesh_file_path,
-                element_param,
-                group_param
-            )
+        self.femmesh.writeABAQUS(
+            self.msh_name,
+            element_param,
+            group_param
+        )
 
-            # Check to see if fluid sections are in analysis and use D network element type
-            if self.fluidsection_objects:
-                meshtools.write_D_network_element_to_inputfile(split_mesh_file_path)
+        mshfile = codecs.open(self.msh_name, "a", encoding="utf-8")
+        # delete **Define element set Eall 
+        mshfile.seek(-58, os.SEEK_END)
+        mshfile.truncate()
 
-            # inpfile = io.open(self.file_name, "w", encoding="utf-8")
-            inpfile = codecs.open(self.file_name, "w", encoding="utf-8")
-            inpfile.write("***********************************************************\n")
-            inpfile.write("** {}\n".format(write_name))
-            inpfile.write("*INCLUDE,INPUT={}\n".format(file_name_splitt))
-
-        else:
-            self.femmesh.writeABAQUS(
-                self.file_name,
-                element_param,
-                group_param
-            )
-
-            # Check to see if fluid sections are in analysis and use D network element type
-            if self.fluidsection_objects:
-                # inpfile is closed
-                meshtools.write_D_network_element_to_inputfile(self.file_name)
-
-            # reopen file with "append" to add all the rest
-            # inpfile = io.open(self.file_name, "a", encoding="utf-8")
-            inpfile = codecs.open(self.file_name, "a", encoding="utf-8")
-            inpfile.write("\n\n")
-
-        return inpfile
+        return mshfile
 
     # ********************************************************************************************
     # constraints fixed
@@ -394,82 +368,10 @@ class FemInputWriterfistr(writerbase.FemInputWriter):
         if not self.planerotation_objects:
             return
         # write for all analysis types
-
-        # get nodes
-        self.get_constraints_planerotation_nodes()
-
-        write_name = "constraints_planerotation_node_sets"
-        f.write("\n***********************************************************\n")
-        f.write("** {}\n".format(write_name.replace("_", " ")))
-        f.write("** written by {} function\n".format(sys._getframe().f_code.co_name))
-
-        if inpfile_split is True:
-            file_name_splitt = self.mesh_name + "_" + write_name + ".inp"
-            f.write("** {}\n".format(write_name.replace("_", " ")))
-            f.write("*INCLUDE,INPUT={}\n".format(file_name_splitt))
-            inpfile_splitt = open(join(self.dir_name, file_name_splitt), "w")
-            self.write_node_sets_nodes_constraints_planerotation(inpfile_splitt)
-            inpfile_splitt.close()
-        else:
-            self.write_node_sets_nodes_constraints_planerotation(f)
-
-    def write_node_sets_nodes_constraints_planerotation(self, f):
-        # write nodes to file
-        if not self.femnodes_mesh:
-            self.femnodes_mesh = self.femmesh.Nodes
-        # info about self.constraint_conflict_nodes:
-        # is used to check if MPC and constraint fixed and
-        # constraint displacement share same nodes
-        # because MPC"s and constraints fixed and
-        # constraints displacement can't share same nodes.
-        # Thus call write_node_sets_constraints_planerotation has to be
-        # after constraint fixed and constraint displacement
-        for femobj in self.planerotation_objects:
-            # femobj --> dict, FreeCAD document object is femobj["Object"]
-            l_nodes = femobj["Nodes"]
-            fric_obj = femobj["Object"]
-            f.write("** " + fric_obj.Label + "\n")
-            f.write("*NSET,NSET=" + fric_obj.Name + "\n")
-            # Code to extract nodes and coordinates on the PlaneRotation support face
-            nodes_coords = []
-            for node in l_nodes:
-                nodes_coords.append((
-                    node,
-                    self.femnodes_mesh[node].x,
-                    self.femnodes_mesh[node].y,
-                    self.femnodes_mesh[node].z
-                ))
-            node_planerotation = meshtools.get_three_non_colinear_nodes(nodes_coords)
-            for i in range(len(l_nodes)):
-                if l_nodes[i] not in node_planerotation:
-                    node_planerotation.append(l_nodes[i])
-            MPC_nodes = []
-            for i in range(len(node_planerotation)):
-                cnt = 0
-                for j in range(len(self.constraint_conflict_nodes)):
-                    if node_planerotation[i] == self.constraint_conflict_nodes[j]:
-                        cnt = cnt + 1
-                if cnt == 0:
-                    MPC = node_planerotation[i]
-                    MPC_nodes.append(MPC)
-            for i in range(len(MPC_nodes)):
-                f.write(str(MPC_nodes[i]) + ",\n")
-
-    def write_constraints_planerotation(self, f):
-        if not self.planerotation_objects:
-            return
-        # write for all analysis types
-
-        # write constraint to file
-        f.write("\n***********************************************************\n")
-        f.write("** PlaneRotation Constraints\n")
-        f.write("** written by {} function\n".format(sys._getframe().f_code.co_name))
-        for femobj in self.planerotation_objects:
-            # femobj --> dict, FreeCAD document object is femobj["Object"]
-            f.write("** " + femobj["Object"].Label + "\n")
-            fric_obj_name = femobj["Object"].Name
-            f.write("*MPC\n")
-            f.write("PLANE," + fric_obj_name + "\n")
+        FreeCAD.Console.PrintLog(
+            "FrontISTR Addon does not support planerotation. \n"
+        )
+        return
 
     # ********************************************************************************************
     # constraints contact
@@ -477,6 +379,10 @@ class FemInputWriterfistr(writerbase.FemInputWriter):
         if not self.contact_objects:
             return
         # write for all analysis types
+        FreeCAD.Console.PrintLog(
+            "FrontISTR Addon does not support contact analysis. \n"
+        )
+        return
 
         # get faces
         self.get_constraints_contact_faces()
@@ -547,6 +453,10 @@ class FemInputWriterfistr(writerbase.FemInputWriter):
         if not self.tie_objects:
             return
         # write for all analysis types
+        FreeCAD.Console.PrintLog(
+            "FrontISTR Addon does not support tie. \n"
+        )
+        return
 
         # get faces
         self.get_constraints_tie_faces()
@@ -1274,36 +1184,10 @@ class FemInputWriterfistr(writerbase.FemInputWriter):
             # f.write("S \n")
 
     # ********************************************************************************************
-    # footer
-    def write_footer(self, f):
-        f.write("\n***********************************************************\n")
-        f.write("** FrontISTR Input file\n")
-        f.write("** written by {} function\n".format(
-            sys._getframe().f_code.co_name
-        ))
-        f.write("**   written by    --> FreeCAD {}.{}.{}\n".format(
-            self.fc_ver[0],
-            self.fc_ver[1],
-            self.fc_ver[2]
-        ))
-        f.write("**   written on    --> {}\n".format(
-            time.ctime()
-        ))
-        f.write("**   file name     --> {}\n".format(
-            os.path.basename(self.document.FileName)
-        ))
-        f.write("**   analysis name --> {}\n".format(
-            self.analysis.Name
-        ))
-        f.write("**\n")
-        f.write("**\n")
-        f.write("**\n")
-
-    # ********************************************************************************************
     # material and fem element type
     def write_element_sets_material_and_femelement_type(self, f):
         f.write("\n***********************************************************\n")
-        f.write("** Element sets for materials and FEM element type (solid, shell, beam, fluid)\n")
+        f.write("** Element sets for materials and FEM element type (solid, shell, beam)\n")
         f.write("** written by {} function\n".format(sys._getframe().f_code.co_name))
 
         # in any case if we have beams, we're going to need the element ids for the rotation elsets
@@ -1318,8 +1202,6 @@ class FemInputWriterfistr(writerbase.FemInputWriter):
             self.get_element_geometry2D_elements()
         if len(self.beamsection_objects) > 1:
             self.get_element_geometry1D_elements()
-        if len(self.fluidsection_objects) > 1:
-            self.get_element_fluid1D_elements()
 
         # get the element ids for material objects and write them into the material object
         if len(self.material_objects) > 1:
@@ -1342,10 +1224,6 @@ class FemInputWriterfistr(writerbase.FemInputWriter):
                 self.get_fistr_elsets_single_mat_single_beam()
             elif len(self.beamsection_objects) > 1:
                 self.get_fistr_elsets_single_mat_multiple_beam()
-            if len(self.fluidsection_objects) == 1:
-                self.get_fistr_elsets_single_mat_single_fluid()
-            elif len(self.fluidsection_objects) > 1:
-                self.get_fistr_elsets_single_mat_multiple_fluid()
         elif len(self.material_objects) > 1:
             if self.femmesh.Volumes:
                 # we only could do this for volumes, if a mseh contains volumes
@@ -1364,47 +1242,18 @@ class FemInputWriterfistr(writerbase.FemInputWriter):
                 self.get_fistr_elsets_multiple_mat_single_beam()
             elif len(self.beamsection_objects) > 1:
                 self.get_fistr_elsets_multiple_mat_multiple_beam()
-            if len(self.fluidsection_objects) == 1:
-                self.get_fistr_elsets_multiple_mat_single_fluid()
-            elif len(self.fluidsection_objects) > 1:
-                self.get_fistr_elsets_multiple_mat_multiple_fluid()
-
-        # TODO: some elementIDs are collected for 1D-Flow calculation,
-        # this should be a def somewhere else, preferable inside the get_fistr_elsets_... methods
-        for fistr_elset in self.fistr_elsets:
-            # use six to be sure to be Python 2.7 and 3.x compatible
-            if fistr_elset["fistr_elset"] \
-                    and not isinstance(fistr_elset["fistr_elset"], six.string_types):
-                if "fluidsection_obj"in fistr_elset:
-                    fluidsec_obj = fistr_elset["fluidsection_obj"]
-                    if fluidsec_obj.SectionType == "Liquid":
-                        if (fluidsec_obj.LiquidSectionType == "PIPE INLET") \
-                                or (fluidsec_obj.LiquidSectionType == "PIPE OUTLET"):
-                            elsetchanged = False
-                            counter = 0
-                            for elid in fistr_elset["fistr_elset"]:
-                                counter = counter + 1
-                                if (elsetchanged is False) \
-                                        and (fluidsec_obj.LiquidSectionType == "PIPE INLET"):
-                                    # 3rd index is to track which line nr the element is defined
-                                    self.FluidInletoutlet_ele.append(
-                                        [str(elid), fluidsec_obj.LiquidSectionType, 0]
-                                    )
-                                    elsetchanged = True
-                                elif (fluidsec_obj.LiquidSectionType == "PIPE OUTLET") \
-                                        and (counter == len(fistr_elset["fistr_elset"])):
-                                    # 3rd index is to track which line nr the element is defined
-                                    self.FluidInletoutlet_ele.append(
-                                        [str(elid), fluidsec_obj.LiquidSectionType, 0]
-                                    )
 
         # write fistr_elsets to file
         for fistr_elset in self.fistr_elsets:
-            f.write("*ELSET,ELSET=" + fistr_elset["fistr_elset_name"] + "\n")
             # use six to be sure to be Python 2.7 and 3.x compatible
             if isinstance(fistr_elset["fistr_elset"], six.string_types):
-                f.write(fistr_elset["fistr_elset"] + "\n")
+                elsetname = fistr_elset["fistr_elset"]
+                if elsetname in fistr_elset.keys():
+                    f.write("*ELSET,ELSET=" + fistr_elset["fistr_elset_name"] + "\n")
+                    for elid in fistr_elset[elsetname]:
+                        f.write(str(elid) + ",\n")
             else:
+                f.write("*ELSET,ELSET=" + fistr_elset["fistr_elset_name"] + "\n")
                 for elid in fistr_elset["fistr_elset"]:
                     f.write(str(elid) + ",\n")
 
