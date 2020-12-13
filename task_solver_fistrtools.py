@@ -99,16 +99,16 @@ class _TaskPanel:
             QtCore.SIGNAL("clicked()"),
             self.select_static_analysis
         )
-        QtCore.QObject.connect(
-            self.form.rb_frequency_analysis,
-            QtCore.SIGNAL("clicked()"),
-            self.select_frequency_analysis
-        )
-        QtCore.QObject.connect(
-            self.form.rb_thermomech_analysis,
-            QtCore.SIGNAL("clicked()"),
-            self.select_thermomech_analysis
-        )
+#        QtCore.QObject.connect(
+#            self.form.rb_frequency_analysis,
+#            QtCore.SIGNAL("clicked()"),
+#            self.select_frequency_analysis
+#        )
+#        QtCore.QObject.connect(
+#            self.form.rb_thermomech_analysis,
+#            QtCore.SIGNAL("clicked()"),
+#            self.select_thermomech_analysis
+#        )
         QtCore.QObject.connect(
             self.form.rb_check_mesh,
             QtCore.SIGNAL("clicked()"),
@@ -254,7 +254,7 @@ class _TaskPanel:
 
         self.Timer.stop()
 
-        if self.printFrontISTRstdout():
+        if self.printFrontISTRstderr():
             self.FrontISTRNoError()
         else:
             self.FrontISTRError()
@@ -331,7 +331,8 @@ class _TaskPanel:
         print("editFrontISTRCntFile {}".format(self.fea.cnt_file_name))
         fistr_prefs = FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/Fem/FrontISTR")
         if fistr_prefs.GetBool("UseInternalEditor", True):
-            FemGui.open(self.fea.cnt_file_name)
+            #FemGui.open(self.fea.cnt_file_name)
+            FemGui.open(cnt_file)
         else:
             ext_editor_path = fistr_prefs.GetString("ExternalEditorPath", "")
             if ext_editor_path:
@@ -358,6 +359,7 @@ class _TaskPanel:
         fi = QtCore.QFileInfo(self.fea.cnt_file_name)
         work_dir = fi.path()
         QtCore.QDir.setCurrent(work_dir)
+        logfile = work_dir + "/fistr.log"
 
         FreeCAD.Console.PrintMessage(
             "run FrontISTR at: {}, n_process ={}\n"
@@ -368,7 +370,7 @@ class _TaskPanel:
         # It may make user wait, but calling partitioner from self.FrontISTR.start causes error
         import subprocess
         subprocess.call(self.fea.partitioner_binary, cwd=work_dir)
-        self.FrontISTR.start(self.fea.mpiexec_binary,["-n",n_pe,self.fea.fistr_binary])
+        self.FrontISTR.start(self.fea.mpiexec_binary,["-n",n_pe,"-logfile",logfile,self.fea.fistr_binary])
 
         QApplication.restoreOverrideCursor()
 
