@@ -378,6 +378,7 @@ class FemToolsFISTR(QtCore.QRunnable, QtCore.QObject):
                 self.working_dir
             )
             self.inp_file_name = inp_writer.write_FrontISTR_input_file()
+            self.cnt_file_name = self.inp_file_name+".cnt.txt"
         except Exception as e:
             FreeCAD.Console.PrintError(
                 "Unexpected error when writing FrontISTR input file: {}\n"

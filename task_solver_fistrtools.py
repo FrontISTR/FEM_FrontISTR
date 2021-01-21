@@ -331,8 +331,7 @@ class _TaskPanel:
         print("editFrontISTRCntFile {}".format(self.fea.cnt_file_name))
         fistr_prefs = FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/Fem/FrontISTR")
         if fistr_prefs.GetBool("UseInternalEditor", True):
-            #FemGui.open(self.fea.cnt_file_name)
-            FemGui.open(cnt_file)
+            FemGui.open(self.fea.cnt_file_name)
         else:
             ext_editor_path = fistr_prefs.GetString("ExternalEditorPath", "")
             if ext_editor_path:
