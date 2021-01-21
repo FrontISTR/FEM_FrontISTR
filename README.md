@@ -44,7 +44,7 @@ FrontISTR(japanese web site): https://www.frontistr.com/
 2. Download or git clone this repository to C:/Users/user_name/AppData/Roaming/FreeCAD/Mod/FEM_FrontISTR
     - The procedure will be automated when FEM_FrontISTR is registerd to FreeCAD addon manager.
 3. Download [FrontISTR v5.1.1 Windows x64 executable(MPI ver.)](https://www.frontistr.com/download/link.php?release/x86_64-w64-mingw32-msmpi/FrontISTR-v5.1.1.zip).
-4. Extract FrontISTR_v5.1.1.zip and move all .exe files to ${YOUR_FreeCAD_DIR}/bin.
+4. Extract FrontISTR_v5.1.1.zip and move all files to ${YOUR_FreeCAD_DIR}/bin.
 
 ### Linux
 
