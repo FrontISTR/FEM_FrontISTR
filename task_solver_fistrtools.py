@@ -294,12 +294,12 @@ class _TaskPanel:
 
         self.Timer.stop()
 
-        if self.printFrontISTRstderr():
+        if self.printFrontISTRstdout():
             self.FrontISTRNoError()
         else:
             self.FrontISTRError()
 
-        self.form.pb_run_fistr.stText("Re-run FrontISTR")
+        self.form.pb_run_fistr.setText("Re-run FrontISTR")
         self.femConsoleMessage("Loading result sets...")
         self.form.l_time.setText("Time: {0:4.1f}: ".format(time.time() - self.Start))
         self.fea.reset_mesh_purge_results_checked()
