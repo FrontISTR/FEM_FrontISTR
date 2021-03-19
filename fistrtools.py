@@ -553,8 +553,13 @@ class FemToolsFISTR(QtCore.QRunnable, QtCore.QObject):
         )
         self.fistr_stdout, self.fistr_stderr = p.communicate()
         if sys.version_info.major >= 3:
-            self.fistr_stdout = self.fistr_stdout.decode()
-            self.fistr_stderr = self.fistr_stderr.decode()
+            if system() == "Windows":
+                # TODO: encoding autodetection doesn't work on Windows yet
+                encoding = 'cp932'
+            else:
+                encoding = 'utf-8'
+            self.fistr_stdout = self.fistr_stdout.decode(encoding)
+            self.fistr_stderr = self.fistr_stderr.decode(encoding)
         os.putenv("OMP_NUM_THREADS", ont_backup)
         QtCore.QDir.setCurrent(cwd)
         return p.returncode
