@@ -522,9 +522,10 @@ class FemToolsFISTR(QtCore.QRunnable, QtCore.QObject):
 
     def start_fistr(self):
         import multiprocessing
+        from platform import system
         self.fistr_stdout = ""
         self.fistr_stderr = ""
-        #ont_backup = os.environ.get("OMP_NUM_THREADS")
+        ont_backup = os.environ.get("OMP_NUM_THREADS")
         self.fistr_prefs = FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/Fem/FrontISTR")
         # If number of CPU's specified
         num_cpu_pref = self.fistr_prefs.GetInt("AnalysisNumCPUs", 1)
