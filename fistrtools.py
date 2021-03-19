@@ -202,7 +202,7 @@ class FemToolsFISTR(QtCore.QRunnable, QtCore.QObject):
     def find_solver(self):
         found_solver_for_use = False
         for m in self.analysis.Group:
-            if femutils.is_of_type(m, "Fem::SolverfistrTools"):
+            if femutils.is_of_type(m, "Fem::SolverFISTRTools"):
                 # we are going to explicitly check for the fistr tools solver type only,
                 # thus it is possible to have lots of framework solvers inside the analysis anyway
                 # for some methods no solver is needed (purge_results) --> solver could be none
