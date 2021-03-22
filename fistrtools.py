@@ -470,6 +470,7 @@ class FemToolsFISTR(QtCore.QRunnable, QtCore.QObject):
         try:
             p = subprocess.Popen(
                 [self.fistr_binary],
+                cwd=self.working_dir,
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
                 shell=False,
@@ -546,6 +547,7 @@ class FemToolsFISTR(QtCore.QRunnable, QtCore.QObject):
         FreeCAD.Console.PrintMessage(cmd+"\n") #tmp
         p = subprocess.Popen(
             [self.fistr_binary, "-i ", f.baseName()],
+            cwd=self.working_dir,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             shell=False,
@@ -578,6 +580,7 @@ class FemToolsFISTR(QtCore.QRunnable, QtCore.QObject):
         # Now extract the version number
         p = subprocess.Popen(
             [self.fistr_binary, "-v"],
+            cwd=self.working_dir,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             shell=False,
