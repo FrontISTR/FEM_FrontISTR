@@ -69,7 +69,7 @@ doc.recompute()
 
 # run step by step
 import fistrtools
-fea = fistrtools.FemToolsFISTR()
+fea = fistrtools.FemToolsFISTR(solver=solver_object)
 fea.update_objects()
 fea.setup_working_dir()
 fea.setup_fistr()
@@ -77,14 +77,8 @@ message = fea.check_prerequisites()
 if not message:
     fea.purge_results()
     fea.write_inp_file()
-    # on error at inp file writing, the inp file path "" was returned (even if the file was written)
-    # if we would write the inp file anyway, we need to again set it manually
-    # fea.inp_file_name = '/tmp/FEMWB/FEMMeshGmsh.inp'
     fea.fistr_run()
     fea.load_results()
 else:
     FreeCAD.Console.PrintError("Houston, we have a problem! {}\n".format(message))  # in report view
     print("Houston, we have a problem! {}\n".format(message))  # in python console
-
-fea.purge_results()
-fea.run()
