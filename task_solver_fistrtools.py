@@ -408,7 +408,7 @@ class _TaskPanel:
         # execute partitioner by subprocess
         # It may make user wait, but calling partitioner from self.FrontISTR.start causes error
         import subprocess
-        subprocess.call(self.fea.partitioner_binary, cwd=work_dir)
+        subprocess.call(self.fea.partitioner_binary, cwd=self.fea.working_dir)
         self.FrontISTR.start(self.fea.mpiexec_binary,["-n",n_pe,"-logfile",logfile,self.fea.fistr_binary])
 
         QApplication.restoreOverrideCursor()
