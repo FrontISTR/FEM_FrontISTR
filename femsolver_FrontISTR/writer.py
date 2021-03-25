@@ -859,20 +859,20 @@ class FemInputWriterfistr(writerbase.FemInputWriter):
             # setup preconditioiner
             if self.solver_obj.MatrixPrecondType == "SSOR":
                 linearsolver += ",PRECOND=1"
-            elif self.solver_obj.MatrixPrecondType == "DIAGNAL_SCALING":
+            elif self.solver_obj.MatrixPrecondType == "DIAG":
                 linearsolver += ",PRECOND=3"
             elif self.solver_obj.MatrixPrecondType == "AMG":
                 linearsolver += ",PRECOND=5"
-            elif self.solver_obj.MatrixPrecondType == "Block ILU(0)":
+            elif self.solver_obj.MatrixPrecondType == "ILU0":
                 linearsolver += ",PRECOND=10"
-            elif self.solver_obj.MatrixPrecondType == "Block ILU(1)":
+            elif self.solver_obj.MatrixPrecondType == "ILU1":
                 linearsolver += ",PRECOND=11"
-            elif self.solver_obj.MatrixPrecondType == "Block ILU(2)":
+            elif self.solver_obj.MatrixPrecondType == "ILU2":
                 linearsolver += ",PRECOND=12"
-        
+
         linearsolver += ",ITERLOG=NO,TIMELOG=YES"
         f.write(linearsolver+"\n")
-        
+
         # control under construction( currently set fixed value)
         f.write(" 5000, 1"+"\n")
         f.write(" 1.0e-08, 1.0, 0.0"+"\n")

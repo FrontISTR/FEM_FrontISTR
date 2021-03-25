@@ -148,17 +148,17 @@ def add_attributes(obj, fistr_prefs):
     obj.MatrixSolverType = known_fistr_solver_types[solver_type]
 
     known_fistr_precond_types = [
-        "AMG",
         "SSOR",
-        "DIAGNAL_SCALING",
-        "Block ILU(0)",
-        "Block ILU(1)",
-        "Block ILU(2)"
+        "DIAG",
+        "AMG",
+        "ILU0",
+        "ILU1",
+        "ILU2"
     ]
     obj.addProperty(
         "App::PropertyEnumeration",
         "MatrixPrecondType",
-        "Fem",
+        "General",
         "Type of preconditioner to use"
     )
     obj.MatrixPrecondType = known_fistr_precond_types
