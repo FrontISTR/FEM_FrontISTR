@@ -101,15 +101,15 @@ def add_attributes(obj, fistr_prefs):
     analysis_type = fistr_prefs.GetInt("AnalysisType", 0)
     obj.AnalysisType = ANALYSIS_TYPES[analysis_type]
 
-    choices_material_nonlinear = ["linear", "nonlinear"]
+    choices_nonlinear = ["yes", "no"]
     obj.addProperty(
         "App::PropertyEnumeration",
-        "MaterialNonlinearity",
-        "Fem",
+        "Nonlinearity",
+        "General",
         "Set material nonlinearity (needs geometrical nonlinearity)"
     )
-    obj.MaterialNonlinearity = choices_material_nonlinear
-    obj.MaterialNonlinearity = choices_material_nonlinear[0]
+    obj.Nonlinearity = choices_material_nonlinear
+    obj.Nonlinearity = choices_material_nonlinear[1]
 
     obj.addProperty(
         "App::PropertyFloatConstraint",
