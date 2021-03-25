@@ -1,5 +1,5 @@
 # new document
-doc = App.newDocument("Scripted_CalculiX_Cantilever3D")
+doc = App.newDocument("Scripted_FrontISTR_Cantilever3D")
 
 # part
 import Part
