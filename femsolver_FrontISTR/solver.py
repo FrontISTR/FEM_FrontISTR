@@ -216,15 +216,6 @@ def add_attributes(obj, fistr_prefs):
     obj.MatrixPrecondType = known_fistr_precond_types[precond_type]
 
     obj.addProperty(
-        "App::PropertyBool",
-        "BeamShellResultOutput3D",
-        "Fem",
-        "Output 3D results for 1D and 2D analysis "
-    )
-    dimout = fistr_prefs.GetBool("BeamShellOutput", False)
-    obj.BeamShellResultOutput3D = dimout
-
-    obj.addProperty(
         "App::PropertyIntegerConstraint",
         "SUBSTEPS",
         "Fem",
