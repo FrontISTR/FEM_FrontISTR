@@ -818,10 +818,12 @@ class FemInputWriterfistr(writerbase.FemInputWriter):
         # analysis line --> analysis type
         if self.analysis_type == "static":
             analysis_type = "STATIC"
-        elif self.analysis_type == "frequency":
-            analysis_type = "FREQUENCY"
-        elif self.analysis_type == "thermomech":
-            analysis_type = "STATIC"
+        elif self.analysis_type == "heat":
+            analysis_type = "HEAT"
+        elif self.analysis_type == "eigen":
+            analysis_type = "EIGEN"
+        elif self.analysis_type == "dynamic":
+            analysis_type = "DYNAMIC"
         elif self.analysis_type == "check":
             analysis_type = "ELEMCHECK"
         solution = "!SOLUTION, TYPE="+analysis_type

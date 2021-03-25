@@ -41,7 +41,7 @@ from femtools import femutils
 if FreeCAD.GuiUp:
     import FemGui
 
-ANALYSIS_TYPES = ["static", "frequency", "thermomech", "check"]
+ANALYSIS_TYPES = ["static", "heat", "eigen", "dynamic", "check"]
 
 
 def create(doc, name="SolverFrontISTR"):
@@ -94,7 +94,7 @@ def add_attributes(obj, fistr_prefs):
     obj.addProperty(
         "App::PropertyEnumeration",
         "AnalysisType",
-        "Fem",
+        "General",
         "Type of the analysis"
     )
     obj.AnalysisType = ANALYSIS_TYPES
