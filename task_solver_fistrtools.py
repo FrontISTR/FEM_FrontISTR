@@ -220,6 +220,46 @@ class _TaskPanel:
         else:
             return True
 
+    def printFrontISTRstderr(self):
+        out = self.FrontISTR.readAllStandardError()
+        if out.isEmpty():
+            self.femConsoleMessage("FrontISTR stderr is empty", "#FF0000")
+            return False
+
+        if sys.version_info.major >= 3:
+            # https://forum.freecadweb.org/viewtopic.php?f=18&t=39195
+            # convert QByteArray to a binary string an decode it to "utf-8"
+            out = out.data().decode()  # "utf-8" can be omitted
+            # print(type(out))
+            # print(out)
+        else:
+            try:
+                out = unicode(out, "utf-8", "replace")
+                rx = QtCore.QRegExp("\\*ERROR.*\\n\\n")
+                # print(rx)
+                rx.setMinimal(True)
+                pos = rx.indexIn(out)
+                while not pos < 0:
+                    match = rx.cap(0)
+                    FreeCAD.Console.PrintError(match.strip().replace("\n", " ") + "\n")
+                    pos = rx.indexIn(out, pos + 1)
+            except UnicodeDecodeError:
+                self.femConsoleMessage("Error converting stderr from FrontISTR", "#FF0000")
+        out = os.linesep.join([s for s in out.splitlines() if s])
+        out = out.replace("\n", "<br>")
+        # print(out)
+        self.femConsoleMessage(out)
+
+        if "*ERROR in e_c3d: nonpositive jacobian" in out:
+            error_message = (
+                "\n\nFrontISTR returned an error due to "
+                "nonpositive jacobian determinant in at least one element\n"
+                "Use the run button on selected solver to get a better error output.\n"
+            )
+            FreeCAD.Console.PrintError(error_message)
+
+        return True
+
     def UpdateText(self):
         if(self.FrontISTR.state() == QtCore.QProcess.ProcessState.Running):
             self.form.l_time.setText("Time: {0:4.1f}: ".format(time.time() - self.Start))
@@ -368,7 +408,7 @@ class _TaskPanel:
         # execute partitioner by subprocess
         # It may make user wait, but calling partitioner from self.FrontISTR.start causes error
         import subprocess
-        subprocess.call(self.fea.partitioner_binary, cwd=work_dir)
+        subprocess.call(self.fea.partitioner_binary, cwd=self.fea.working_dir)
         self.FrontISTR.start(self.fea.mpiexec_binary,["-n",n_pe,"-logfile",logfile,self.fea.fistr_binary])
 
         QApplication.restoreOverrideCursor()
