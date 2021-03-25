@@ -112,33 +112,6 @@ def add_attributes(obj, fistr_prefs):
     obj.MaterialNonlinearity = choices_material_nonlinear[0]
 
     obj.addProperty(
-        "App::PropertyIntegerConstraint",
-        "EigenmodesCount",
-        "Fem",
-        "Number of modes for frequency calculations"
-    )
-    noem = fistr_prefs.GetInt("EigenmodesCount", 30)
-    obj.EigenmodesCount = (noem, 1, 100, 1)
-
-    obj.addProperty(
-        "App::PropertyFloatConstraint",
-        "EigenmodeLowLimit",
-        "Fem",
-        "Low frequency limit for eigenmode calculations"
-    )
-    ell = fistr_prefs.GetFloat("EigenmodeLowLimit", 0.0)
-    obj.EigenmodeLowLimit = (ell, 0.0, 1000000.0, 10000.0)
-
-    obj.addProperty(
-        "App::PropertyFloatConstraint",
-        "EigenmodeHighLimit",
-        "Fem",
-        "High frequency limit for eigenmode calculations"
-    )
-    ehl = fistr_prefs.GetFloat("EigenmodeHighLimit", 1000000.0)
-    obj.EigenmodeHighLimit = (ehl, 0.0, 1000000.0, 10000.0)
-
-    obj.addProperty(
         "App::PropertyFloatConstraint",
         "TimeInitialStep",
         "Fem",
