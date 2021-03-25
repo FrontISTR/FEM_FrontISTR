@@ -826,7 +826,7 @@ class FemInputWriterfistr(writerbase.FemInputWriter):
             analysis_type = "ELEMCHECK"
         solution = "!SOLUTION, TYPE="+analysis_type
         # nonlinear
-        if self.solver_obj.GeometricalNonlinearity == "nonlinear":
+        if self.solver_obj.Nonlinearity == "nonlinear":
             solution += ", NONLINEAR"
         f.write(solution+"\n")
         

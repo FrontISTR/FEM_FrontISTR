@@ -101,20 +101,6 @@ def add_attributes(obj, fistr_prefs):
     analysis_type = fistr_prefs.GetInt("AnalysisType", 0)
     obj.AnalysisType = ANALYSIS_TYPES[analysis_type]
 
-    choices_geom_nonlinear = ["linear", "nonlinear"]
-    obj.addProperty(
-        "App::PropertyEnumeration",
-        "GeometricalNonlinearity",
-        "Fem",
-        "Set geometrical nonlinearity"
-    )
-    obj.GeometricalNonlinearity = choices_geom_nonlinear
-    nonlinear_geom = fistr_prefs.GetBool("NonlinearGeometry", False)
-    if nonlinear_geom is True:
-        obj.GeometricalNonlinearity = choices_geom_nonlinear[1]  # nonlinear
-    else:
-        obj.GeometricalNonlinearity = choices_geom_nonlinear[0]  # linear
-
     choices_material_nonlinear = ["linear", "nonlinear"]
     obj.addProperty(
         "App::PropertyEnumeration",
