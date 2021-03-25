@@ -835,7 +835,7 @@ class FemInputWriterfistr(writerbase.FemInputWriter):
         # CONTROLS line
         linearsolver="!SOLVER"
         # setup linear equation solver
-        solver_type = "None"
+        solver_type = ""
         if self.solver_obj.MatrixSolverType == "CG":
             linearsolver += ",METHOD=CG"
             solver_type = "iterative"
@@ -851,7 +851,7 @@ class FemInputWriterfistr(writerbase.FemInputWriter):
         elif self.solver_obj.MatrixSolverType == "MUMPS":
             linearsolver += ",METHOD=MUMPS"
             solver_type = "direct"
-        elif self.solver_obj.MatrixSolverType == "DIRECTmkl":
+        elif self.solver_obj.MatrixSolverType == "DIRECT":
             linearsolver += ",METHOD=DIRECTmkl"
             solver_type = "direct"
 

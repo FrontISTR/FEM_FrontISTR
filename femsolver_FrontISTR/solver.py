@@ -135,12 +135,12 @@ def add_attributes(obj, fistr_prefs):
         "GMRES",
         "GPBiCG",
         "MUMPS",
-        "DIRECTmkl"
+        "DIRECT"
     ]
     obj.addProperty(
         "App::PropertyEnumeration",
         "MatrixSolverType",
-        "Fem",
+        "General",
         "Type of solver to use"
     )
     obj.MatrixSolverType = known_fistr_solver_types
