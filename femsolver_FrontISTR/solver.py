@@ -108,8 +108,8 @@ def add_attributes(obj, fistr_prefs):
         "General",
         "Set material nonlinearity (needs geometrical nonlinearity)"
     )
-    obj.Nonlinearity = choices_material_nonlinear
-    obj.Nonlinearity = choices_material_nonlinear[1]
+    obj.Nonlinearity = choices_nonlinear
+    obj.Nonlinearity = choices_nonlinear[1]
 
     obj.addProperty(
         "App::PropertyFloatConstraint",
