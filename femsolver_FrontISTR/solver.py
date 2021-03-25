@@ -177,7 +177,7 @@ def add_attributes(obj, fistr_prefs):
     obj.addProperty(
         "App::PropertyIntegerConstraint",
         "n_process",
-        "Fem",
+        "General",
         "Number of process for palallel execution"
     )
     n_process = fistr_prefs.GetInt("n_process", 4)
