@@ -202,7 +202,7 @@ class FemToolsFISTR(QtCore.QRunnable, QtCore.QObject):
     def find_solver(self):
         found_solver_for_use = False
         for m in self.analysis.Group:
-            if femutils.is_of_type(m, "Fem::SolverfistrTools"):
+            if femutils.is_of_type(m, "Fem::SolverFISTRTools"):
                 # we are going to explicitly check for the fistr tools solver type only,
                 # thus it is possible to have lots of framework solvers inside the analysis anyway
                 # for some methods no solver is needed (purge_results) --> solver could be none
@@ -470,6 +470,7 @@ class FemToolsFISTR(QtCore.QRunnable, QtCore.QObject):
         try:
             p = subprocess.Popen(
                 [self.fistr_binary],
+                cwd=self.working_dir,
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
                 shell=False,
@@ -522,9 +523,10 @@ class FemToolsFISTR(QtCore.QRunnable, QtCore.QObject):
 
     def start_fistr(self):
         import multiprocessing
+        from platform import system
         self.fistr_stdout = ""
         self.fistr_stderr = ""
-        #ont_backup = os.environ.get("OMP_NUM_THREADS")
+        ont_backup = os.environ.get("OMP_NUM_THREADS")
         self.fistr_prefs = FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/Fem/FrontISTR")
         # If number of CPU's specified
         num_cpu_pref = self.fistr_prefs.GetInt("AnalysisNumCPUs", 1)
@@ -545,6 +547,7 @@ class FemToolsFISTR(QtCore.QRunnable, QtCore.QObject):
         FreeCAD.Console.PrintMessage(cmd+"\n") #tmp
         p = subprocess.Popen(
             [self.fistr_binary, "-i ", f.baseName()],
+            cwd=self.working_dir,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             shell=False,
@@ -552,8 +555,13 @@ class FemToolsFISTR(QtCore.QRunnable, QtCore.QObject):
         )
         self.fistr_stdout, self.fistr_stderr = p.communicate()
         if sys.version_info.major >= 3:
-            self.fistr_stdout = self.fistr_stdout.decode()
-            self.fistr_stderr = self.fistr_stderr.decode()
+            if system() == "Windows":
+                # TODO: encoding autodetection doesn't work on Windows yet
+                encoding = 'cp932'
+            else:
+                encoding = 'utf-8'
+            self.fistr_stdout = self.fistr_stdout.decode(encoding)
+            self.fistr_stderr = self.fistr_stderr.decode(encoding)
         os.putenv("OMP_NUM_THREADS", ont_backup)
         QtCore.QDir.setCurrent(cwd)
         return p.returncode
@@ -572,6 +580,7 @@ class FemToolsFISTR(QtCore.QRunnable, QtCore.QObject):
         # Now extract the version number
         p = subprocess.Popen(
             [self.fistr_binary, "-v"],
+            cwd=self.working_dir,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             shell=False,
@@ -798,8 +807,9 @@ class FemToolsFISTR(QtCore.QRunnable, QtCore.QObject):
     def load_results(self):
         FreeCAD.Console.PrintMessage("We will load the fistr frd and dat result file.\n")
         self.results_present = False
-        self.load_results_fistrfrd()
-        self.load_results_fistrdat()
+        # TODO: frd/dat files are CalculiX specific. comment out for now
+        # self.load_results_fistrfrd()
+        # self.load_results_fistrdat()
 
     def load_results_fistrfrd(self):
         """Load results of fistr calculations from .frd file.
