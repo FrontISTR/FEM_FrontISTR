@@ -129,15 +129,6 @@ def add_attributes(obj, fistr_prefs):
     eni = fistr_prefs.GetFloat("AnalysisTime", 1.0)
     obj.TimeEnd = eni
 
-    obj.addProperty(
-        "App::PropertyBool",
-        "ThermoMechSteadyState",
-        "Fem",
-        "Choose between steady state thermo mech or transient thermo mech analysis"
-    )
-    sted = fistr_prefs.GetBool("StaticAnalysis", True)
-    obj.ThermoMechSteadyState = sted
-
     known_fistr_solver_types = [
         "CG",
         "BiCGSTAB",
