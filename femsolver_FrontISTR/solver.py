@@ -162,7 +162,7 @@ def add_attributes(obj, fistr_prefs):
 
     choices_timelog = ["yes", "no"]
     obj.addProperty(
-        "App:PropertyEnumeration",
+        "App::PropertyEnumeration",
         "MatrixSolverTimeLog",
         "General",
         "Output execution summary of iterative solver"
