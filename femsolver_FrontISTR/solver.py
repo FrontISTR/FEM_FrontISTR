@@ -111,24 +111,6 @@ def add_attributes(obj, fistr_prefs):
     obj.Nonlinearity = choices_nonlinear
     obj.Nonlinearity = choices_nonlinear[1]
 
-    obj.addProperty(
-        "App::PropertyFloatConstraint",
-        "TimeInitialStep",
-        "Fem",
-        "Initial time steps"
-    )
-    ini = fistr_prefs.GetFloat("AnalysisTimeInitialStep", 1.0)
-    obj.TimeInitialStep = ini
-
-    obj.addProperty(
-        "App::PropertyFloatConstraint",
-        "TimeEnd",
-        "Fem",
-        "End time analysis"
-    )
-    eni = fistr_prefs.GetFloat("AnalysisTime", 1.0)
-    obj.TimeEnd = eni
-
     known_fistr_solver_types = [
         "CG",
         "BiCGSTAB",
@@ -199,6 +181,24 @@ def add_attributes(obj, fistr_prefs):
     )
     n_substeps = fistr_prefs.GetInt("SUBSTEPS", 1)
     obj.SUBSTEPS = n_substeps
+
+    obj.addProperty(
+        "App::PropertyFloatConstraint",
+        "TimeInitialStep",
+        "Fem",
+        "Initial time steps"
+    )
+    ini = fistr_prefs.GetFloat("AnalysisTimeInitialStep", 1.0)
+    obj.TimeInitialStep = ini
+
+    obj.addProperty(
+        "App::PropertyFloatConstraint",
+        "TimeEnd",
+        "Fem",
+        "End time analysis"
+    )
+    eni = fistr_prefs.GetFloat("AnalysisTime", 1.0)
+    obj.TimeEnd = eni
 
     obj.addProperty(
         "App::PropertyIntegerConstraint",
