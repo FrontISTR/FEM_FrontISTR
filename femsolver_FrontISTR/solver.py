@@ -178,6 +178,19 @@ def add_attributes(obj, fistr_prefs):
         iter_log = "no"
     obj.MatrixSolverIterLog = iter_log
 
+    choices_timelog = ["yes", "no"]
+    obj.addProperty(
+        "App:PropertyEnumeration",
+        "MatrixSolverTimeLog",
+        "General",
+        "Output execution summary of iterative solver"
+    )
+    obj.MatrixSolverTimeLog = choices_timelog
+    time_log = fistr_prefs.GetString("MatrixSolverTimeLog", "yes")
+    if time_log is not "no":
+        time_log = "yes"
+    obj.MatrixSolverTimeLog = time_log
+
     obj.addProperty(
         "App::PropertyIntegerConstraint",
         "SUBSTEPS",

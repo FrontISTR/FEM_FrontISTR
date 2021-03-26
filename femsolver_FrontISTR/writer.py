@@ -874,7 +874,10 @@ class FemInputWriterfistr(writerbase.FemInputWriter):
             linearsolver += ",ITERLOG=YES"
         else:
             linearsolver += ",ITERLOG=NO"
-        linearsolver += ",TIMELOG=YES"
+        if self.solver_obj.MatrixSolverTimeLog == "yes":
+            linearsolver += ",TIMELOG=YES"
+        else:
+            linearsolver += ",TIMELOG=NO"
         f.write(linearsolver+"\n")
 
         # control under construction( currently set fixed value)
