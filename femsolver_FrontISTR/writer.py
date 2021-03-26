@@ -870,7 +870,11 @@ class FemInputWriterfistr(writerbase.FemInputWriter):
             elif self.solver_obj.MatrixPrecondType == "ILU2":
                 linearsolver += ",PRECOND=12"
 
-        linearsolver += ",ITERLOG=NO,TIMELOG=YES"
+        if self.solver_obj.MatrixSolverIterLog == "yes":
+            linearsolver += ",ITERLOG=YES"
+        else:
+            linearsolver += ",ITERLOG=NO"
+        linearsolver += ",TIMELOG=YES"
         f.write(linearsolver+"\n")
 
         # control under construction( currently set fixed value)

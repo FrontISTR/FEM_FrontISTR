@@ -165,6 +165,19 @@ def add_attributes(obj, fistr_prefs):
     precond_type = fistr_prefs.GetInt("Precond", 0)
     obj.MatrixPrecondType = known_fistr_precond_types[precond_type]
 
+    choices_iterlog = ["yes", "no"]
+    obj.addProperty(
+        "App::PropertyEnumeration",
+        "MatrixSolverIterLog",
+        "General",
+        "Output convergence history of iterative solver"
+    )
+    obj.MatrixSolverIterLog = choices_iterlog
+    iter_log = fistr_prefs.GetString("MatrixSolverIterLog", "no")
+    if iter_log is not "yes":
+        iter_log = "no"
+    obj.MatrixSolverIterLog = iter_log
+
     obj.addProperty(
         "App::PropertyIntegerConstraint",
         "SUBSTEPS",
