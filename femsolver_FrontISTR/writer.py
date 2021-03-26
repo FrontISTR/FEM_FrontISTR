@@ -833,7 +833,7 @@ class FemInputWriterfistr(writerbase.FemInputWriter):
         f.write(solution+"\n")
 
         # CONTROLS line
-        linearsolver="!SOLVER"
+        linearsolver = "!SOLVER"
         # setup linear equation solver
         solver_type = ""
         if self.solver_obj.MatrixSolverType == "CG":
