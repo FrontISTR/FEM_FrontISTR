@@ -92,6 +92,15 @@ class ViewProxy(solverbase.ViewProxy):
 def add_attributes(obj, fistr_prefs):
 
     obj.addProperty(
+        "App::PropertyIntegerConstraint",
+        "n_process",
+        "General",
+        "Number of process for palallel execution"
+    )
+    n_process = fistr_prefs.GetInt("n_process", 4)
+    obj.n_process = n_process
+
+    obj.addProperty(
         "App::PropertyEnumeration",
         "AnalysisType",
         "General",
@@ -218,12 +227,3 @@ def add_attributes(obj, fistr_prefs):
     )
     eni = fistr_prefs.GetFloat("AnalysisTime", 1.0)
     obj.TimeEnd = eni
-
-    obj.addProperty(
-        "App::PropertyIntegerConstraint",
-        "n_process",
-        "General",
-        "Number of process for palallel execution"
-    )
-    n_process = fistr_prefs.GetInt("n_process", 4)
-    obj.n_process = n_process
