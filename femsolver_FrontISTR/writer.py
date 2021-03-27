@@ -880,8 +880,12 @@ class FemInputWriterfistr(writerbase.FemInputWriter):
             linearsolver += ",TIMELOG=NO"
         f.write(linearsolver+"\n")
 
-        # control under construction( currently set fixed value)
-        f.write(" 5000, 1"+"\n")
+        # iteration number setting
+        solveriter  = " "
+        solveriter += self.solver_obj.MatrixSolverNumIter
+        solveriter += ", 1\n"
+        f.write(solveriter)
+
         f.write(" 1.0e-08, 1.0, 0.0"+"\n")
 
     # ********************************************************************************************

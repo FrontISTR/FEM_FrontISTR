@@ -175,6 +175,15 @@ def add_attributes(obj, fistr_prefs):
 
     obj.addProperty(
         "App::PropertyIntegerConstraint",
+        "MatrixSolverNumIter",
+        "General",
+        "Maximum number of iteration (iterative solver only)"
+    )
+    num_iter = fistr_prefs.GetInt("MatrixSolverNumIter", 5000)
+    obj.MatrixSolverNumIter = num_iter
+
+    obj.addProperty(
+        "App::PropertyIntegerConstraint",
         "SUBSTEPS",
         "Fem",
         "Number of increment for each step"
