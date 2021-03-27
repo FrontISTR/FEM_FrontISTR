@@ -182,6 +182,16 @@ def add_attributes(obj, fistr_prefs):
     num_iter = fistr_prefs.GetInt("MatrixSolverNumIter", 5000)
     obj.MatrixSolverNumIter = num_iter
 
+    # Use String instead of Float since string representations of Python/Fortran are different
+    obj.addProperty(
+        "App::PropertyString",
+        "MatrixSolverResidual",
+        "General",
+        "Convergence threshold of iterative solver"
+    )
+    solver_threshold = fistr_prefs.GetString("MatrixSolverResidual", "1.0E-6")
+    obj.MatrixSolverResidual = solver_threshold
+
     obj.addProperty(
         "App::PropertyIntegerConstraint",
         "SUBSTEPS",

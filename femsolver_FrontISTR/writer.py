@@ -886,7 +886,11 @@ class FemInputWriterfistr(writerbase.FemInputWriter):
         solveriter += ", 1\n"
         f.write(solveriter)
 
-        f.write(" 1.0e-08, 1.0, 0.0"+"\n")
+        # residual setting
+        solverres  = " "
+        solverres += self.solver_obj.MatrixSolverResidual
+        solverres += ", 1.0, 0.0\n"
+        f.write(solverres)
 
     # ********************************************************************************************
     # output types
