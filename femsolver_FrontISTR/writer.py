@@ -914,7 +914,10 @@ class FemInputWriterfistr(writerbase.FemInputWriter):
             stepline += " INC_TYPE=FIXED"
         stepline += ", SUBSTEPS="+"%d"%self.solver_obj.SUBSTEPS
         f.write(stepline+"\n")
-        
+
+        timeline = " {:e}, {:e}".format(self.solver_obj.InitialTimeIncrement,
+                                        self.solver_obj.TimeEnd)
+        f.write(timeline + "\n")
         if self.isactive_load:
             f.write("LOAD,1\n")
         if self.isactive_boundary:

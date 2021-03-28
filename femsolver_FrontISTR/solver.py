@@ -213,6 +213,24 @@ def add_attributes(obj, fistr_prefs):
     obj.IncrementType = increment_type
 
     obj.addProperty(
+        "App::PropertyFloatConstraint",
+        "TimeEnd",
+        "Static",
+        "Analysis Time End"
+    )
+    time_end = fistr_prefs.GetFloat("TimeEnd", 1.0)
+    obj.TimeEnd = time_end
+
+    obj.addProperty(
+        "App::PropertyFloatConstraint",
+        "InitialTimeIncrement",
+        "Static",
+        "Initial Time Increment"
+    )
+    time_increment = fistr_prefs.GetFloat("InitialTimeIncrement", 1.0)
+    obj.InitialTimeIncrement = time_increment
+
+    obj.addProperty(
         "App::PropertyIntegerConstraint",
         "SUBSTEPS",
         "Fem",
