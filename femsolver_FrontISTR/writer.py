@@ -908,6 +908,10 @@ class FemInputWriterfistr(writerbase.FemInputWriter):
     def write_step(self, f):
         f.write("### STEP Control ###\n")
         stepline = "!STEP"
+        if self.solver_obj.IncrementType == "auto":
+            stepline += " INC_TYPE=AUTO"
+        else:
+            stepline += " INC_TYPE=FIXED"
         stepline += ", SUBSTEPS="+"%d"%self.solver_obj.SUBSTEPS
         f.write(stepline+"\n")
         

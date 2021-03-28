@@ -201,6 +201,17 @@ def add_attributes(obj, fistr_prefs):
     solver_threshold = fistr_prefs.GetString("MatrixSolverResidual", "1.0E-6")
     obj.MatrixSolverResidual = solver_threshold
 
+    choices_increment_type = ["auto", "fixed"]
+    obj.addProperty(
+        "App::PropertyEnumeration",
+        "IncrementType",
+        "Static",
+        "Type of time increment. Cutback is available only"
+    )
+    obj.IncrementType = choices_increment_type
+    increment_type = fistr_prefs.GetString("IncrementType", "auto")
+    obj.IncrementType = increment_type
+
     obj.addProperty(
         "App::PropertyIntegerConstraint",
         "SUBSTEPS",
