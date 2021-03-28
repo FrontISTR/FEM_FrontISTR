@@ -887,8 +887,7 @@ class FemInputWriterfistr(writerbase.FemInputWriter):
         f.write(solveriter)
 
         # residual setting
-        solverres  = " "
-        solverres += self.solver_obj.MatrixSolverResidual
+        solverres  = " {:E}".format(self.solver_obj.MatrixSolverResidual)
         solverres += ", 1.0, 0.0\n"
         f.write(solverres)
 
@@ -912,19 +911,19 @@ class FemInputWriterfistr(writerbase.FemInputWriter):
             stepline += " INC_TYPE=AUTO"
         else:
             stepline += " INC_TYPE=FIXED"
-        stepline += ", CONVERG={:e}".format(self.solver_obj.NewtonConvergeResidual)
+        stepline += ", CONVERG={:E}".format(self.solver_obj.NewtonConvergeResidual)
         stepline += ", MAXITER={:d}".format(self.solver_obj.NewtonMaximumIteration)
         stepline += ", SUBSTEPS="+"%d"%self.solver_obj.SUBSTEPS
         f.write(stepline+"\n")
 
         timeline = " "
         if self.solver_obj.IncrementType == "auto":
-            timeline += "{:e}, {:e}, {:e}, {:e}".format(self.solver_obj.InitialTimeIncrement,
+            timeline += "{:E}, {:E}, {:E}, {:E}".format(self.solver_obj.InitialTimeIncrement,
                                                         self.solver_obj.TimeEnd,
                                                         self.solver_obj.MinimumTimeIncrement,
                                                         self.solver_obj.MaximumTimeIncrement)
         else:
-            timeline += "{:e}, {:e}".format(self.solver_obj.InitialTimeIncrement,
+            timeline += "{:E}, {:E}".format(self.solver_obj.InitialTimeIncrement,
                                             self.solver_obj.TimeEnd)
         f.write(timeline + "\n")
         if self.isactive_load:
