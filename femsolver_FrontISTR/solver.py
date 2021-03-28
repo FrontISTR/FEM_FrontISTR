@@ -227,8 +227,26 @@ def add_attributes(obj, fistr_prefs):
         "Static",
         "Initial Time Increment"
     )
-    time_increment = fistr_prefs.GetFloat("InitialTimeIncrement", 1.0)
-    obj.InitialTimeIncrement = time_increment
+    init_time_increment = fistr_prefs.GetFloat("InitialTimeIncrement", 1.0)
+    obj.InitialTimeIncrement = init_time_increment
+
+    obj.addProperty(
+        "App::PropertyFloatConstraint",
+        "MinimumTimeIncrement",
+        "Static",
+        "Minimum Time Increment"
+    )
+    min_time_increment = fistr_prefs.GetFloat("MinimumTimeIncrement", 0.001)
+    obj.MinimumTimeIncrement = min_time_increment
+
+    obj.addProperty(
+        "App::PropertyFloatConstraint",
+        "MaximumTimeIncrement",
+        "Static",
+        "Maximum Time Increment"
+    )
+    max_time_increment = fistr_prefs.GetFloat("MaximumTimeIncrement", 1.0)
+    obj.MaximumTimeIncrement = max_time_increment
 
     obj.addProperty(
         "App::PropertyIntegerConstraint",
