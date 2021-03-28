@@ -913,6 +913,7 @@ class FemInputWriterfistr(writerbase.FemInputWriter):
         else:
             stepline += " INC_TYPE=FIXED"
         stepline += ", CONVERG={:e}".format(self.solver_obj.NewtonConvergeResidual)
+        stepline += ", MAXITER={:d}".format(self.solver_obj.NewtonMaximumIteration)
         stepline += ", SUBSTEPS="+"%d"%self.solver_obj.SUBSTEPS
         f.write(stepline+"\n")
 

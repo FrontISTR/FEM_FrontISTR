@@ -259,6 +259,15 @@ def add_attributes(obj, fistr_prefs):
 
     obj.addProperty(
         "App::PropertyIntegerConstraint",
+        "NewtonMaximumIteration",
+        "Static",
+        "Maximum number of Newton iteration"
+    )
+    newton_iter = fistr_prefs.GetInt("NewtonMaximumIteration", 20)
+    obj.NewtonMaximumIteration = newton_iter
+
+    obj.addProperty(
+        "App::PropertyIntegerConstraint",
         "SUBSTEPS",
         "Fem",
         "Number of increment for each step"
