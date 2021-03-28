@@ -912,6 +912,7 @@ class FemInputWriterfistr(writerbase.FemInputWriter):
             stepline += " INC_TYPE=AUTO"
         else:
             stepline += " INC_TYPE=FIXED"
+        stepline += ", CONVERG={:e}".format(self.solver_obj.NewtonConvergeResidual)
         stepline += ", SUBSTEPS="+"%d"%self.solver_obj.SUBSTEPS
         f.write(stepline+"\n")
 

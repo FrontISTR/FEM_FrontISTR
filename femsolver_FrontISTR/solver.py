@@ -249,6 +249,15 @@ def add_attributes(obj, fistr_prefs):
     obj.MaximumTimeIncrement = max_time_increment
 
     obj.addProperty(
+        "App::PropertyFloatConstraint",
+        "NewtonConvergeResidual",
+        "Static",
+        "Convergence threshold of Newton iteration"
+    )
+    newton_res = fistr_prefs.GetFloat("NewtonConvergeResidual", 1.0e-6)
+    obj.NewtonConvergeResidual = newton_res
+
+    obj.addProperty(
         "App::PropertyIntegerConstraint",
         "SUBSTEPS",
         "Fem",
