@@ -881,8 +881,7 @@ class FemInputWriterfistr(writerbase.FemInputWriter):
         f.write(linearsolver+"\n")
 
         # iteration number setting
-        solveriter  = " "
-        solveriter += self.solver_obj.MatrixSolverNumIter
+        solveriter  = " {:d}".format(self.solver_obj.MatrixSolverNumIter)
         solveriter += ", 1\n"
         f.write(solveriter)
 
@@ -1382,7 +1381,7 @@ class FemInputWriterfistr(writerbase.FemInputWriter):
                     f.write("{0:.3e}\n".format(SH_in_JkgK))
 
             # nonlinear material properties
-            if self.solver_obj.MaterialNonlinearity == "nonlinear":
+            if self.solver_obj.Nonlinearity == "nonlinear":
                 for nlfemobj in self.material_nonlinear_objects:
                     # femobj --> dict, FreeCAD document object is nlfemobj["Object"]
                     nl_mat_obj = nlfemobj["Object"]
