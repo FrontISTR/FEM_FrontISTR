@@ -192,12 +192,12 @@ def add_attributes(obj, fistr_prefs):
     obj.MatrixSolverNumIter = num_iter
 
     obj.addProperty(
-        "App::PropertyFloatConstraint",
+        "App::PropertyString",
         "MatrixSolverResidual",
         "General",
         "Convergence threshold of iterative solver"
     )
-    solver_threshold = fistr_prefs.GetFloat("MatrixSolverResidual", 1.0e-6)
+    solver_threshold = fistr_prefs.GetString("MatrixSolverResidual", "1.0e-6")
     obj.MatrixSolverResidual = solver_threshold
 
     choices_increment_type = ["auto", "fixed"]
@@ -248,12 +248,12 @@ def add_attributes(obj, fistr_prefs):
     obj.MaximumTimeIncrement = max_time_increment
 
     obj.addProperty(
-        "App::PropertyFloatConstraint",
+        "App::PropertyString",
         "NewtonConvergeResidual",
         "Static",
         "Convergence threshold of Newton iteration"
     )
-    newton_res = fistr_prefs.GetFloat("NewtonConvergeResidual", 1.0e-6)
+    newton_res = fistr_prefs.GetString("NewtonConvergeResidual", "1.0e-6")
     obj.NewtonConvergeResidual = newton_res
 
     obj.addProperty(

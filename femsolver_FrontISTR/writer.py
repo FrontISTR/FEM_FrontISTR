@@ -886,7 +886,13 @@ class FemInputWriterfistr(writerbase.FemInputWriter):
         f.write(solveriter)
 
         # residual setting
-        solverres  = " {:E}".format(self.solver_obj.MatrixSolverResidual)
+        try:
+            matrix_solver_residual_float = float(self.solver_obj.MatrixSolverResidual)
+        except ValueError:
+            matrix_solver_residual_float = 1.0e-6
+            converting_string = "Converting Matrix Solver Residual value {} to float failed. Using default value 1.0E-6.".format(self.solver_obj.MatrixSolverResidual)
+            FreeCAD.Console.PrintMessage(converting_string + "\n")
+        solverres  = " {:E}".format(matrix_solver_residual_float)
         solverres += ", 1.0, 0.0\n"
         f.write(solverres)
 
@@ -910,7 +916,14 @@ class FemInputWriterfistr(writerbase.FemInputWriter):
             stepline += " INC_TYPE=AUTO"
         else:
             stepline += " INC_TYPE=FIXED"
-        stepline += ", CONVERG={:E}".format(self.solver_obj.NewtonConvergeResidual)
+
+        try:
+            newton_converge_residual_float = float(self.solver_obj.NewtonConvergeResidual)
+        except ValueError:
+            newton_converge_residual_float = 1.0e-6
+            converting_string = "Converting Newton Converge Residual value {} to float failed. Using default value 1.0E-6.".format(self.solver_obj.NewtonConvergeResidual)
+            FreeCAD.Console.PrintMessage(converting_string + "\n")
+        stepline += ", CONVERG={:E}".format(newton_converge_residual_float)
         stepline += ", MAXITER={:d}".format(self.solver_obj.NewtonMaximumIteration)
         stepline += ", SUBSTEPS=10000"
         f.write(stepline+"\n")
