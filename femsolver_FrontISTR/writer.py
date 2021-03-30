@@ -463,7 +463,7 @@ class FemInputWriterfistr(writerbase.FemInputWriter):
             return
         # write for all analysis types
         s = "FrontISTR Addon does not support tie. \n"
-        FreeCAD.Console.PrintLog(s)
+        FreeCAD.Console.PrintWarning(s)
         if FreeCAD.GuiUp:
             from PySide import QtGui
             QtGui.QMessageBox.warning(None, "Not Supported", s)
@@ -571,7 +571,7 @@ class FemInputWriterfistr(writerbase.FemInputWriter):
             return
         # write for all analysis type
         s = "FrontISTR Addon does not support transform. \n"
-        FreeCAD.Console.PrintLog(s)
+        FreeCAD.Console.PrintWarning(s)
         if FreeCAD.GuiUp:
             from PySide import QtGui
             QtGui.QMessageBox.warning(None, "Not Supported", s)
