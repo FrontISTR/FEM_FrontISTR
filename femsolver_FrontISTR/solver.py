@@ -264,30 +264,3 @@ def add_attributes(obj, fistr_prefs):
     )
     newton_iter = fistr_prefs.GetInt("NewtonMaximumIteration", 20)
     obj.NewtonMaximumIteration = newton_iter
-
-    obj.addProperty(
-        "App::PropertyIntegerConstraint",
-        "SUBSTEPS",
-        "Fem",
-        "Number of increment for each step"
-    )
-    n_substeps = fistr_prefs.GetInt("SUBSTEPS", 1)
-    obj.SUBSTEPS = n_substeps
-
-    obj.addProperty(
-        "App::PropertyFloatConstraint",
-        "TimeInitialStep",
-        "Fem",
-        "Initial time steps"
-    )
-    ini = fistr_prefs.GetFloat("AnalysisTimeInitialStep", 1.0)
-    obj.TimeInitialStep = ini
-
-    obj.addProperty(
-        "App::PropertyFloatConstraint",
-        "TimeEnd",
-        "Fem",
-        "End time analysis"
-    )
-    eni = fistr_prefs.GetFloat("AnalysisTime", 1.0)
-    obj.TimeEnd = eni

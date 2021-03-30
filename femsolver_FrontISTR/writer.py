@@ -905,14 +905,14 @@ class FemInputWriterfistr(writerbase.FemInputWriter):
     # step settings
     def write_step(self, f):
         f.write("### STEP Control ###\n")
-        stepline = "!STEP"
+        stepline = "!STEP,"
         if self.solver_obj.IncrementType == "auto":
             stepline += " INC_TYPE=AUTO"
         else:
             stepline += " INC_TYPE=FIXED"
         stepline += ", CONVERG={:E}".format(self.solver_obj.NewtonConvergeResidual)
         stepline += ", MAXITER={:d}".format(self.solver_obj.NewtonMaximumIteration)
-        stepline += ", SUBSTEPS="+"%d"%self.solver_obj.SUBSTEPS
+        stepline += ", SUBSTEPS=10000"
         f.write(stepline+"\n")
 
         timeline = " "
