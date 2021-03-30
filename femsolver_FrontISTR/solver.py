@@ -235,7 +235,7 @@ def add_attributes(obj, fistr_prefs):
         "Static",
         "Minimum Time Increment"
     )
-    min_time_increment = fistr_prefs.GetFloat("MinimumTimeIncrement", 0.001)
+    min_time_increment = fistr_prefs.GetFloat("MinimumTimeIncrement", 0.01)
     obj.MinimumTimeIncrement = min_time_increment
 
     obj.addProperty(
