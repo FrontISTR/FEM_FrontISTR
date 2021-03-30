@@ -35,7 +35,6 @@ FrontISTR(japanese web site): https://www.frontistr.com/
 ### Prerequisites
 
 - [Development versions of FreeCAD (0.19_pre)](https://github.com/FreeCAD/FreeCAD/releases/tag/0.19_pre)
-- [FrontISTR v5.1.1](https://www.frontistr.com/download/)
 - [Paraview](https://www.paraview.org/download/)
 
 ### Windows
@@ -43,8 +42,7 @@ FrontISTR(japanese web site): https://www.frontistr.com/
 1. Install FreeCAD and Paraview.
 2. Download or git clone this repository to C:/Users/user_name/AppData/Roaming/FreeCAD/Mod/FEM_FrontISTR
     - The procedure will be automated when FEM_FrontISTR is registerd to FreeCAD addon manager.
-3. Download [FrontISTR v5.1.1 Windows x64 executable(MPI ver.)](https://www.frontistr.com/download/link.php?release/x86_64-w64-mingw32-msmpi/FrontISTR-v5.1.1.zip).
-4. Extract FrontISTR_v5.1.1.zip and move all files to ${YOUR_FreeCAD_DIR}/bin.
+    - FrontISTR binaries will be automatically downloaded and installed on the first run.
 
 ### Linux
 

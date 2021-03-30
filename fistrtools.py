@@ -391,7 +391,7 @@ class FemToolsFISTR(QtCore.QRunnable, QtCore.QObject):
             raise
 
     def setup_fistr(self, fistr_binary=None, fistr_binary_sig="FrontISTR"):
-        """Set FrontISTR binary path and validate its execution.
+        """Set FrontISTR binary path and validate its execution or download FrontISTR.
 
         Parameters
         ----------
@@ -413,9 +413,9 @@ class FemToolsFISTR(QtCore.QRunnable, QtCore.QObject):
         ).GetBool("UseStandardfistrLocation", True)
         if fistr_std_location:
             if system() == "Windows":
-                fistr_path = FreeCAD.getHomePath() + "bin/fistr1.exe"
-                partitioner_path = FreeCAD.getHomePath() + "bin/hecmw_part1.exe"
-                mpiexec_path = FreeCAD.getHomePath() + "bin/mpiexec.exe"
+                fistr_path = FreeCAD.getUserAppDataDir() + "Mod/FEM_FrontISTR/bin/fistr1.exe"
+                partitioner_path = FreeCAD.getUserAppDataDir() + "Mod/FEM_FrontISTR/bin/hecmw_part1.exe"
+                mpiexec_path = FreeCAD.getUserAppDataDir() + "Mod/FEM_FrontISTR/bin/mpiexec.exe"
                 FreeCAD.ParamGet(
                     "User parameter:BaseApp/Preferences/Mod/Fem/FrontISTR"
                 ).SetString("fistrBinaryPath", fistr_path)
@@ -489,15 +489,32 @@ class FemToolsFISTR(QtCore.QRunnable, QtCore.QObject):
         except OSError as e:
             FreeCAD.Console.PrintError("{}\n".format(e))
             if e.errno == 2:
-                error_message = (
-                    "FEM: FrontISTR binary fistr \'{}\' not found. "
-                    "Please set the FrontISTR binary fistr path in "
-                    "FEM preferences tab FrontISTR.\n"
-                    .format(fistr_binary)
-                )
-                if FreeCAD.GuiUp:
-                    QtGui.QMessageBox.critical(None, error_title, error_message)
-                raise Exception(error_message)
+                if system() == "Windows":
+                    import urllib.request
+                    import zipfile
+                    import shutil
+                    from pathlib import Path
+                    filename = 'FrontISTR-latest.zip'
+                    filepath = Path(FreeCAD.getUserAppDataDir() + 'Mod/FEM_FrontISTR/' + filename)
+                    req = urllib.request.Request(
+                        # TODO: this redirector does not work
+                        #'https://www.frontistr.com/download/link.php?' +
+                        'https://frontistr-commons.gitlab.io/FrontISTR/release/x86_64-w64-mingw32-msmpi/' +
+                        filename)
+                    with urllib.request.urlopen(req) as response, open(filepath, "wb") as out_file:
+                        shutil.copyfileobj(response, out_file)
+                    with zipfile.ZipFile(filepath) as zf:
+                        zf.extractall(Path(FreeCAD.getUserAppDataDir() + 'Mod/FEM_FrontISTR/bin'))
+                else:
+                    error_message = (
+                        "FEM: FrontISTR binary fistr \'{}\' not found. "
+                        "Please set the FrontISTR binary fistr path in "
+                        "FEM preferences tab FrontISTR.\n"
+                        .format(fistr_binary)
+                    )
+                    if FreeCAD.GuiUp:
+                        QtGui.QMessageBox.critical(None, error_title, error_message)
+                    raise Exception(error_message)
             else:
                 FreeCAD.Console.PrintError(
                     "Unexpected error when executing FrontISTR: {}\n"
