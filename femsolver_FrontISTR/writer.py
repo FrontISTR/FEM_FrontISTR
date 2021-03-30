@@ -892,6 +892,9 @@ class FemInputWriterfistr(writerbase.FemInputWriter):
             matrix_solver_residual_float = 1.0e-6
             converting_string = "Converting Matrix Solver Residual value {} to float failed. Using default value 1.0E-6.".format(self.solver_obj.MatrixSolverResidual)
             FreeCAD.Console.PrintWarning(converting_string + "\n")
+            if FreeCAD.GuiUp:
+                from PySide import QtGui
+                QtGui.QMessageBox.warning(None, "Converting value failed", converting_string)
         solverres  = " {:E}".format(matrix_solver_residual_float)
         solverres += ", 1.0, 0.0\n"
         f.write(solverres)
@@ -923,6 +926,9 @@ class FemInputWriterfistr(writerbase.FemInputWriter):
             newton_converge_residual_float = 1.0e-6
             converting_string = "Converting Newton Converge Residual value {} to float failed. Using default value 1.0E-6.".format(self.solver_obj.NewtonConvergeResidual)
             FreeCAD.Console.PrintWarning(converting_string + "\n")
+            if FreeCAD.GuiUp:
+                from PySide import QtGui
+                QtGui.QMessageBox.warning(None, "Converting value failed", converting_string)
         stepline += ", CONVERG={:E}".format(newton_converge_residual_float)
         stepline += ", MAXITER={:d}".format(self.solver_obj.NewtonMaximumIteration)
         stepline += ", SUBSTEPS=10000"
