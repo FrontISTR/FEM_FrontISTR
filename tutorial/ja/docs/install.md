@@ -9,5 +9,6 @@
 ## Windows
 
 - 本レポジトリのファイルを `%AppData%\FreeCAD\Mod\FEM_FrontISTR` に展開してください。
+    - FrontISTRの実行バイナリなどは自動でダウンロードされます。
     - FreeCAD addon managerからGUIによるインストールを準備中です。
 

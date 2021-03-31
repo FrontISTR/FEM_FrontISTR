@@ -4,7 +4,7 @@
 
 1. [FreeCAD](https://www.freecadweb.org/)を起動し、赤角丸で囲った例題をクリックする。
 ![FreeCAD スタート画面](./images/1_FreeCAD_start.png)
-2. 左の赤丸(Analysis)を右クリックし `Activate Analysis` を選択する。するとこの解析を再計算ができるようにする。同時に、上の赤丸(StartまたはFEM)をクリックして `FrontISTR` を選択する
+2. 左の赤丸(Analysis)を右クリックし `Activate Analysis` を選択する。するとこの解析を再計算ができるようになる。同時に、上の赤丸(StartまたはFEM)をクリックして `FrontISTR` を選択する
 ![解析初期画面](./images/2_Cantilever_init.png)
 3. 左下の赤丸(Analysis)を選択し、左上のボタン(Solver)をクリックする。すると `SolverFISTRTools` というものが Analysis の中にできる。これが FrontISTR ソルバオブジェクトである。なお、この段階でFrontISTRの実行バイナリを自動でダウンロードする。
 ![FrontISTR ワークベンチ選択](./images/3_FrontISTR_workbench.png)
