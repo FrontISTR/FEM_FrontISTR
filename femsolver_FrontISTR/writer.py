@@ -854,22 +854,24 @@ class FemInputWriterfistr(writerbase.FemInputWriter):
         # analysis line --> analysis type
         if self.analysis_type == "static":
             analysis_type = "STATIC"
-        elif self.analysis_type == "frequency":
-            analysis_type = "FREQUENCY"
-        elif self.analysis_type == "thermomech":
-            analysis_type = "STATIC"
+        elif self.analysis_type == "heat":
+            analysis_type = "HEAT"
+        elif self.analysis_type == "eigen":
+            analysis_type = "EIGEN"
+        elif self.analysis_type == "dynamic":
+            analysis_type = "DYNAMIC"
         elif self.analysis_type == "check":
             analysis_type = "ELEMCHECK"
         solution = "!SOLUTION, TYPE="+analysis_type
         # nonlinear
-        if self.solver_obj.GeometricalNonlinearity == "nonlinear":
+        if self.solver_obj.Nonlinearity == "yes":
             solution += ", NONLINEAR"
         f.write(solution+"\n")
-        
+
         # CONTROLS line
-        linearsolver="!SOLVER"
+        linearsolver = "!SOLVER"
         # setup linear equation solver
-        solver_type = "None"
+        solver_type = ""
         if self.solver_obj.MatrixSolverType == "CG":
             linearsolver += ",METHOD=CG"
             solver_type = "iterative"
@@ -885,7 +887,7 @@ class FemInputWriterfistr(writerbase.FemInputWriter):
         elif self.solver_obj.MatrixSolverType == "MUMPS":
             linearsolver += ",METHOD=MUMPS"
             solver_type = "direct"
-        elif self.solver_obj.MatrixSolverType == "DIRECTmkl":
+        elif self.solver_obj.MatrixSolverType == "DIRECT":
             linearsolver += ",METHOD=DIRECTmkl"
             solver_type = "direct"
 
@@ -893,23 +895,45 @@ class FemInputWriterfistr(writerbase.FemInputWriter):
             # setup preconditioiner
             if self.solver_obj.MatrixPrecondType == "SSOR":
                 linearsolver += ",PRECOND=1"
-            elif self.solver_obj.MatrixPrecondType == "DIAGNAL_SCALING":
+            elif self.solver_obj.MatrixPrecondType == "DIAG":
                 linearsolver += ",PRECOND=3"
             elif self.solver_obj.MatrixPrecondType == "AMG":
                 linearsolver += ",PRECOND=5"
-            elif self.solver_obj.MatrixPrecondType == "Block ILU(0)":
+            elif self.solver_obj.MatrixPrecondType == "ILU0":
                 linearsolver += ",PRECOND=10"
-            elif self.solver_obj.MatrixPrecondType == "Block ILU(1)":
+            elif self.solver_obj.MatrixPrecondType == "ILU1":
                 linearsolver += ",PRECOND=11"
-            elif self.solver_obj.MatrixPrecondType == "Block ILU(2)":
+            elif self.solver_obj.MatrixPrecondType == "ILU2":
                 linearsolver += ",PRECOND=12"
-        
-        linearsolver += ",ITERLOG=NO,TIMELOG=YES"
+
+        if self.solver_obj.MatrixSolverIterLog == "yes":
+            linearsolver += ",ITERLOG=YES"
+        else:
+            linearsolver += ",ITERLOG=NO"
+        if self.solver_obj.MatrixSolverTimeLog == "yes":
+            linearsolver += ",TIMELOG=YES"
+        else:
+            linearsolver += ",TIMELOG=NO"
         f.write(linearsolver+"\n")
-        
-        # control under construction( currently set fixed value)
-        f.write(" 5000, 1"+"\n")
-        f.write(" 1.0e-08, 1.0, 0.0"+"\n")
+
+        # iteration number setting
+        solveriter  = " {:d}".format(self.solver_obj.MatrixSolverNumIter)
+        solveriter += ", 1\n"
+        f.write(solveriter)
+
+        # residual setting
+        try:
+            matrix_solver_residual_float = float(self.solver_obj.MatrixSolverResidual)
+        except ValueError:
+            matrix_solver_residual_float = 1.0e-6
+            converting_string = "Converting Matrix Solver Residual value {} to float failed. Using default value 1.0E-6.".format(self.solver_obj.MatrixSolverResidual)
+            FreeCAD.Console.PrintWarning(converting_string + "\n")
+            if FreeCAD.GuiUp:
+                from PySide import QtGui
+                QtGui.QMessageBox.warning(None, "Converting value failed", converting_string)
+        solverres  = " {:E}".format(matrix_solver_residual_float)
+        solverres += ", 1.0, 0.0\n"
+        f.write(solverres)
 
     # ********************************************************************************************
     # output types
@@ -926,10 +950,36 @@ class FemInputWriterfistr(writerbase.FemInputWriter):
     # step settings
     def write_step(self, f):
         f.write("### STEP Control ###\n")
-        stepline = "!STEP"
-        stepline += ", SUBSTEPS="+"%d"%self.solver_obj.SUBSTEPS
+        stepline = "!STEP,"
+        if self.solver_obj.IncrementType == "auto":
+            stepline += " INC_TYPE=AUTO"
+        else:
+            stepline += " INC_TYPE=FIXED"
+
+        try:
+            newton_converge_residual_float = float(self.solver_obj.NewtonConvergeResidual)
+        except ValueError:
+            newton_converge_residual_float = 1.0e-6
+            converting_string = "Converting Newton Converge Residual value {} to float failed. Using default value 1.0E-6.".format(self.solver_obj.NewtonConvergeResidual)
+            FreeCAD.Console.PrintWarning(converting_string + "\n")
+            if FreeCAD.GuiUp:
+                from PySide import QtGui
+                QtGui.QMessageBox.warning(None, "Converting value failed", converting_string)
+        stepline += ", CONVERG={:E}".format(newton_converge_residual_float)
+        stepline += ", MAXITER={:d}".format(self.solver_obj.NewtonMaximumIteration)
+        stepline += ", SUBSTEPS=10000"
         f.write(stepline+"\n")
-        
+
+        timeline = " "
+        if self.solver_obj.IncrementType == "auto":
+            timeline += "{:E}, {:E}, {:E}, {:E}".format(self.solver_obj.InitialTimeIncrement,
+                                                        self.solver_obj.TimeEnd,
+                                                        self.solver_obj.MinimumTimeIncrement,
+                                                        self.solver_obj.MaximumTimeIncrement)
+        else:
+            timeline += "{:E}, {:E}".format(self.solver_obj.InitialTimeIncrement,
+                                            self.solver_obj.TimeEnd)
+        f.write(timeline + "\n")
         if self.isactive_load:
             f.write("LOAD,1\n")
         if self.isactive_boundary:
@@ -1386,7 +1436,7 @@ class FemInputWriterfistr(writerbase.FemInputWriter):
                     f.write("{0:.3e}\n".format(SH_in_JkgK))
 
             # nonlinear material properties
-            if self.solver_obj.MaterialNonlinearity == "nonlinear":
+            if self.solver_obj.Nonlinearity == "nonlinear":
                 for nlfemobj in self.material_nonlinear_objects:
                     # femobj --> dict, FreeCAD document object is nlfemobj["Object"]
                     nl_mat_obj = nlfemobj["Object"]
