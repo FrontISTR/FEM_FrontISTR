@@ -41,7 +41,7 @@ from femtools import femutils
 if FreeCAD.GuiUp:
     import FemGui
 
-ANALYSIS_TYPES = ["static", "frequency", "thermomech", "check"]
+ANALYSIS_TYPES = ["static", "heat", "eigen", "dynamic", "check"]
 
 
 def create(doc, name="SolverFrontISTR"):
@@ -92,92 +92,33 @@ class ViewProxy(solverbase.ViewProxy):
 def add_attributes(obj, fistr_prefs):
 
     obj.addProperty(
+        "App::PropertyIntegerConstraint",
+        "n_process",
+        "General",
+        "Number of process for palallel execution"
+    )
+    n_process = fistr_prefs.GetInt("n_process", 4)
+    obj.n_process = n_process
+
+    obj.addProperty(
         "App::PropertyEnumeration",
         "AnalysisType",
-        "Fem",
+        "General",
         "Type of the analysis"
     )
     obj.AnalysisType = ANALYSIS_TYPES
     analysis_type = fistr_prefs.GetInt("AnalysisType", 0)
     obj.AnalysisType = ANALYSIS_TYPES[analysis_type]
 
-    choices_geom_nonlinear = ["linear", "nonlinear"]
+    choices_nonlinear = ["yes", "no"]
     obj.addProperty(
         "App::PropertyEnumeration",
-        "GeometricalNonlinearity",
-        "Fem",
-        "Set geometrical nonlinearity"
-    )
-    obj.GeometricalNonlinearity = choices_geom_nonlinear
-    nonlinear_geom = fistr_prefs.GetBool("NonlinearGeometry", False)
-    if nonlinear_geom is True:
-        obj.GeometricalNonlinearity = choices_geom_nonlinear[1]  # nonlinear
-    else:
-        obj.GeometricalNonlinearity = choices_geom_nonlinear[0]  # linear
-
-    choices_material_nonlinear = ["linear", "nonlinear"]
-    obj.addProperty(
-        "App::PropertyEnumeration",
-        "MaterialNonlinearity",
-        "Fem",
+        "Nonlinearity",
+        "General",
         "Set material nonlinearity (needs geometrical nonlinearity)"
     )
-    obj.MaterialNonlinearity = choices_material_nonlinear
-    obj.MaterialNonlinearity = choices_material_nonlinear[0]
-
-    obj.addProperty(
-        "App::PropertyIntegerConstraint",
-        "EigenmodesCount",
-        "Fem",
-        "Number of modes for frequency calculations"
-    )
-    noem = fistr_prefs.GetInt("EigenmodesCount", 30)
-    obj.EigenmodesCount = (noem, 1, 100, 1)
-
-    obj.addProperty(
-        "App::PropertyFloatConstraint",
-        "EigenmodeLowLimit",
-        "Fem",
-        "Low frequency limit for eigenmode calculations"
-    )
-    ell = fistr_prefs.GetFloat("EigenmodeLowLimit", 0.0)
-    obj.EigenmodeLowLimit = (ell, 0.0, 1000000.0, 10000.0)
-
-    obj.addProperty(
-        "App::PropertyFloatConstraint",
-        "EigenmodeHighLimit",
-        "Fem",
-        "High frequency limit for eigenmode calculations"
-    )
-    ehl = fistr_prefs.GetFloat("EigenmodeHighLimit", 1000000.0)
-    obj.EigenmodeHighLimit = (ehl, 0.0, 1000000.0, 10000.0)
-
-    obj.addProperty(
-        "App::PropertyFloatConstraint",
-        "TimeInitialStep",
-        "Fem",
-        "Initial time steps"
-    )
-    ini = fistr_prefs.GetFloat("AnalysisTimeInitialStep", 1.0)
-    obj.TimeInitialStep = ini
-
-    obj.addProperty(
-        "App::PropertyFloatConstraint",
-        "TimeEnd",
-        "Fem",
-        "End time analysis"
-    )
-    eni = fistr_prefs.GetFloat("AnalysisTime", 1.0)
-    obj.TimeEnd = eni
-
-    obj.addProperty(
-        "App::PropertyBool",
-        "ThermoMechSteadyState",
-        "Fem",
-        "Choose between steady state thermo mech or transient thermo mech analysis"
-    )
-    sted = fistr_prefs.GetBool("StaticAnalysis", True)
-    obj.ThermoMechSteadyState = sted
+    obj.Nonlinearity = choices_nonlinear
+    obj.Nonlinearity = choices_nonlinear[1]
 
     known_fistr_solver_types = [
         "CG",
@@ -185,12 +126,12 @@ def add_attributes(obj, fistr_prefs):
         "GMRES",
         "GPBiCG",
         "MUMPS",
-        "DIRECTmkl"
+        "DIRECT"
     ]
     obj.addProperty(
         "App::PropertyEnumeration",
         "MatrixSolverType",
-        "Fem",
+        "General",
         "Type of solver to use"
     )
     obj.MatrixSolverType = known_fistr_solver_types
@@ -198,46 +139,128 @@ def add_attributes(obj, fistr_prefs):
     obj.MatrixSolverType = known_fistr_solver_types[solver_type]
 
     known_fistr_precond_types = [
-        "AMG",
         "SSOR",
-        "DIAGNAL_SCALING",
-        "Block ILU(0)",
-        "Block ILU(1)",
-        "Block ILU(2)"
+        "DIAG",
+        "AMG",
+        "ILU0",
+        "ILU1",
+        "ILU2"
     ]
     obj.addProperty(
         "App::PropertyEnumeration",
         "MatrixPrecondType",
-        "Fem",
+        "General",
         "Type of preconditioner to use"
     )
     obj.MatrixPrecondType = known_fistr_precond_types
     precond_type = fistr_prefs.GetInt("Precond", 0)
     obj.MatrixPrecondType = known_fistr_precond_types[precond_type]
 
+    choices_iterlog = ["yes", "no"]
     obj.addProperty(
-        "App::PropertyBool",
-        "BeamShellResultOutput3D",
-        "Fem",
-        "Output 3D results for 1D and 2D analysis "
+        "App::PropertyEnumeration",
+        "MatrixSolverIterLog",
+        "General",
+        "Output convergence history of iterative solver"
     )
-    dimout = fistr_prefs.GetBool("BeamShellOutput", False)
-    obj.BeamShellResultOutput3D = dimout
+    obj.MatrixSolverIterLog = choices_iterlog
+    iter_log = fistr_prefs.GetString("MatrixSolverIterLog", "no")
+    if iter_log is not "yes":
+        iter_log = "no"
+    obj.MatrixSolverIterLog = iter_log
+
+    choices_timelog = ["yes", "no"]
+    obj.addProperty(
+        "App::PropertyEnumeration",
+        "MatrixSolverTimeLog",
+        "General",
+        "Output execution summary of iterative solver"
+    )
+    obj.MatrixSolverTimeLog = choices_timelog
+    time_log = fistr_prefs.GetString("MatrixSolverTimeLog", "yes")
+    if time_log is not "no":
+        time_log = "yes"
+    obj.MatrixSolverTimeLog = time_log
 
     obj.addProperty(
         "App::PropertyIntegerConstraint",
-        "SUBSTEPS",
-        "Fem",
-        "Number of increment for each step"
+        "MatrixSolverNumIter",
+        "General",
+        "Maximum number of iteration (iterative solver only)"
     )
-    n_substeps = fistr_prefs.GetInt("SUBSTEPS", 1)
-    obj.SUBSTEPS = n_substeps
+    num_iter = fistr_prefs.GetInt("MatrixSolverNumIter", 5000)
+    obj.MatrixSolverNumIter = num_iter
+
+    obj.addProperty(
+        "App::PropertyString",
+        "MatrixSolverResidual",
+        "General",
+        "Convergence threshold of iterative solver"
+    )
+    solver_threshold = fistr_prefs.GetString("MatrixSolverResidual", "1.0e-6")
+    obj.MatrixSolverResidual = solver_threshold
+
+    choices_increment_type = ["auto", "fixed"]
+    obj.addProperty(
+        "App::PropertyEnumeration",
+        "IncrementType",
+        "Static",
+        "Type of time increment. Cutback is available only"
+    )
+    obj.IncrementType = choices_increment_type
+    increment_type = fistr_prefs.GetString("IncrementType", "auto")
+    obj.IncrementType = increment_type
+
+    obj.addProperty(
+        "App::PropertyFloatConstraint",
+        "TimeEnd",
+        "Static",
+        "Analysis Time End"
+    )
+    time_end = fistr_prefs.GetFloat("TimeEnd", 1.0)
+    obj.TimeEnd = time_end
+
+    obj.addProperty(
+        "App::PropertyFloatConstraint",
+        "InitialTimeIncrement",
+        "Static",
+        "Initial Time Increment"
+    )
+    init_time_increment = fistr_prefs.GetFloat("InitialTimeIncrement", 1.0)
+    obj.InitialTimeIncrement = init_time_increment
+
+    obj.addProperty(
+        "App::PropertyFloatConstraint",
+        "MinimumTimeIncrement",
+        "Static",
+        "Minimum Time Increment"
+    )
+    min_time_increment = fistr_prefs.GetFloat("MinimumTimeIncrement", 0.01)
+    obj.MinimumTimeIncrement = min_time_increment
+
+    obj.addProperty(
+        "App::PropertyFloatConstraint",
+        "MaximumTimeIncrement",
+        "Static",
+        "Maximum Time Increment"
+    )
+    max_time_increment = fistr_prefs.GetFloat("MaximumTimeIncrement", 1.0)
+    obj.MaximumTimeIncrement = max_time_increment
+
+    obj.addProperty(
+        "App::PropertyString",
+        "NewtonConvergeResidual",
+        "Static",
+        "Convergence threshold of Newton iteration"
+    )
+    newton_res = fistr_prefs.GetString("NewtonConvergeResidual", "1.0e-6")
+    obj.NewtonConvergeResidual = newton_res
 
     obj.addProperty(
         "App::PropertyIntegerConstraint",
-        "n_process",
-        "Fem",
-        "Number of process for palallel execution"
+        "NewtonMaximumIteration",
+        "Static",
+        "Maximum number of Newton iteration"
     )
-    n_process = fistr_prefs.GetInt("n_process", 4)
-    obj.n_process = n_process
+    newton_iter = fistr_prefs.GetInt("NewtonMaximumIteration", 20)
+    obj.NewtonMaximumIteration = newton_iter
