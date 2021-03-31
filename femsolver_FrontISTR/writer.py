@@ -154,6 +154,41 @@ class FemInputWriterfistr(writerbase.FemInputWriter):
         self.write_constraints_initialtemperature(mshfile)
         self.write_femelementsets(mshfile)
 
+        # Fluid sections:
+        # not supported yet
+        for femobj in self.material_objects:
+            if femobj["Object"].Category == "Fluid":
+                s = "FrontISTR Addon does not support fluid.\n"
+                FreeCAD.Console.PrintWarning(s)
+                if FreeCAD.GuiUp:
+                    from PySide import QtGui
+                    QtGui.QMessageBox.warning(None, "Not Supported", s)
+
+        if self.fluidsection_objects:
+            s = "FrontISTR Addon does not support fluid.\n"
+            FreeCAD.Console.PrintWarning(s)
+            if FreeCAD.GuiUp:
+                from PySide import QtGui
+                QtGui.QMessageBox.warning(None, "Not Supported", s)
+
+        # Beam sections:
+        # not supported yet
+        if self.beamsection_objects:
+            s = "FrontISTR Addon does not support beam.\n"
+            FreeCAD.Console.PrintWarning(s)
+            if FreeCAD.GuiUp:
+                from PySide import QtGui
+                QtGui.QMessageBox.warning(None, "Not Supported", s)
+
+        # Shell sections:
+        # not supported yet
+        if self.shellthickness_objects:
+            s = "FrontISTR Addon does not support shell.\n"
+            FreeCAD.Console.PrintWarning(s)
+            if FreeCAD.GuiUp:
+                from PySide import QtGui
+                QtGui.QMessageBox.warning(None, "Not Supported", s)
+
         # constraints independent from steps
         ## self.write_constraints_contact(cntfile)
         ## self.write_constraints_tie(cntfile)
@@ -381,9 +416,11 @@ class FemInputWriterfistr(writerbase.FemInputWriter):
         if not self.planerotation_objects:
             return
         # write for all analysis types
-        FreeCAD.Console.PrintLog(
-            "FrontISTR Addon does not support planerotation. \n"
-        )
+        s = "FrontISTR Addon does not support planerotation. \n"
+        FreeCAD.Console.PrintWarning(s)
+        if FreeCAD.GuiUp:
+            from PySide import QtGui
+            QtGui.QMessageBox.warning(None, "Not Supported", s)
         return
 
     # ********************************************************************************************
@@ -392,9 +429,11 @@ class FemInputWriterfistr(writerbase.FemInputWriter):
         if not self.contact_objects:
             return
         # write for all analysis types
-        FreeCAD.Console.PrintLog(
-            "FrontISTR Addon does not support contact analysis. \n"
-        )
+        s = "FrontISTR Addon does not support contact analysis. \n"
+        FreeCAD.Console.PrintWarning(s)
+        if FreeCAD.GuiUp:
+            from PySide import QtGui
+            QtGui.QMessageBox.warning(None, "Not Supported", s)
         return
 
         # get faces
@@ -458,9 +497,11 @@ class FemInputWriterfistr(writerbase.FemInputWriter):
         if not self.tie_objects:
             return
         # write for all analysis types
-        FreeCAD.Console.PrintLog(
-            "FrontISTR Addon does not support tie. \n"
-        )
+        s = "FrontISTR Addon does not support tie. \n"
+        FreeCAD.Console.PrintWarning(s)
+        if FreeCAD.GuiUp:
+            from PySide import QtGui
+            QtGui.QMessageBox.warning(None, "Not Supported", s)
         return
 
         # get faces
@@ -563,10 +604,13 @@ class FemInputWriterfistr(writerbase.FemInputWriter):
     def write_node_sets_constraints_transform(self, f):
         if not self.transform_objects:
             return
-        # write for all analysis types
-        FreeCAD.Console.PrintLog(
-            "FrontISTR Addon does not support transform. \n"
-        )
+        # write for all analysis type
+        s = "FrontISTR Addon does not support transform. \n"
+        FreeCAD.Console.PrintWarning(s)
+        if FreeCAD.GuiUp:
+            from PySide import QtGui
+            QtGui.QMessageBox.warning(None, "Not Supported", s)
+        return
 
     # ********************************************************************************************
     # constraints temperature
