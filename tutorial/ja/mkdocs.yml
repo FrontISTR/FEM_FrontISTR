@@ -1,0 +1,13 @@
+site_name: FrontISTR solver plugin for FreeCAD
+theme:
+    name: 'material'
+    highlightjs: true
+    language: 'ja'
+
+use_directory_urls: false
+
+nav:
+- ホーム: index.md
+- インストール: install.md
+- GUIによる静解析: usegui.md
+- スクリプトによる静解析: usescript.md

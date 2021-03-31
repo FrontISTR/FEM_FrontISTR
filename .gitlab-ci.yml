@@ -1,0 +1,32 @@
+variables:
+  REGISTRY: registry.gitlab.com/frontistr-commons/frontistr_manual
+
+image: ${REGISTRY}/build:latest
+
+cache:
+  paths:
+    - tutorial/ja/site
+
+stages:
+  - build
+  - deploy
+
+mkdocs:
+  stage: build
+  script:
+    - pushd tutorial/ja
+    - mkdocs build
+  artifacts:
+    paths:
+    - tutorial
+
+pages:
+  stage: deploy
+  # only:
+  #   - master
+  script:
+    - mkdir -p public
+    - cp -r tutorial/ja/site public/${CI_COMMIT_TAG}/ja
+  artifacts:
+    paths:
+    - public
