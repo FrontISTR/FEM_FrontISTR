@@ -67,3 +67,5 @@ In preparation.
 ## Tutorial
 
 Available at https://frontistr-commons.gitlab.io/FEM_FrontISTR/ja/
+
+![GUI result](tutorial/ja/docs/images/12_python_results.png)
