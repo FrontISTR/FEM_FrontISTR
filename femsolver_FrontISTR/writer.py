@@ -154,6 +154,33 @@ class FemInputWriterfistr(writerbase.FemInputWriter):
         self.write_constraints_initialtemperature(mshfile)
         self.write_femelementsets(mshfile)
 
+        # Fluid sections:
+        # not supported yet
+        if self.fluidsection_objects:
+            s = "FrontISTR Addon does not support fluid.\n"
+            FreeCAD.Console.PrintWarning(s)
+            if FreeCAD.GuiUp:
+                from PySide import QtGui
+                QtGui.QMessageBox.warning(None, "Not Supported", s)
+
+        # Beam sections:
+        # not supported yet
+        if self.beamsection_objects:
+            s = "FrontISTR Addon does not support beam.\n"
+            FreeCAD.Console.PrintWarning(s)
+            if FreeCAD.GuiUp:
+                from PySide import QtGui
+                QtGui.QMessageBox.warning(None, "Not Supported", s)
+
+        # Shell sections:
+        # not supported yet
+        if self.shellthickness_objects:
+            s = "FrontISTR Addon does not support shell.\n"
+            FreeCAD.Console.PrintWarning(s)
+            if FreeCAD.GuiUp:
+                from PySide import QtGui
+                QtGui.QMessageBox.warning(None, "Not Supported", s)
+
         # constraints independent from steps
         ## self.write_constraints_contact(cntfile)
         ## self.write_constraints_tie(cntfile)
