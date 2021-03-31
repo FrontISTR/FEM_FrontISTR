@@ -165,7 +165,7 @@ def add_attributes(obj, fistr_prefs):
     )
     obj.MatrixSolverIterLog = choices_iterlog
     iter_log = fistr_prefs.GetString("MatrixSolverIterLog", "no")
-    if iter_log is not "yes":
+    if iter_log != "yes":
         iter_log = "no"
     obj.MatrixSolverIterLog = iter_log
 
@@ -178,7 +178,7 @@ def add_attributes(obj, fistr_prefs):
     )
     obj.MatrixSolverTimeLog = choices_timelog
     time_log = fistr_prefs.GetString("MatrixSolverTimeLog", "yes")
-    if time_log is not "no":
+    if time_log != "no":
         time_log = "yes"
     obj.MatrixSolverTimeLog = time_log
 
