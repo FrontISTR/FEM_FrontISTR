@@ -156,6 +156,14 @@ class FemInputWriterfistr(writerbase.FemInputWriter):
 
         # Fluid sections:
         # not supported yet
+        for femobj in self.material_objects:
+            if femobj["Object"].Category == "Fluid":
+                s = "FrontISTR Addon does not support fluid.\n"
+                FreeCAD.Console.PrintWarning(s)
+                if FreeCAD.GuiUp:
+                    from PySide import QtGui
+                    QtGui.QMessageBox.warning(None, "Not Supported", s)
+
         if self.fluidsection_objects:
             s = "FrontISTR Addon does not support fluid.\n"
             FreeCAD.Console.PrintWarning(s)
