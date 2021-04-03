@@ -1,6 +1,8 @@
-# GUI を用いた静解析のチュートリアル
+# GUI から FEM_FrontISTRを実行するチュートリアル
 
-ここでは [FreeCAD](https://www.freecadweb.org/) 付属の例題を用いてFrontISTRで計算を行う
+FEM_FrontISTRは、FreeCAD標準のFEMモジュールで作成した解析モデルに対し、FrontISTRソルバによる解析を実行する。解析モデルの設定方法はFreeCAD標準のFEM解析機能と同一であるので、本チュートリアルではその説明を省略する（解析モデルの設定方法は、例えば[FEM_tutorial](https://wiki.freecadweb.org/FEM_tutorial) などを参考にされたい）。
+
+ここでは、 [FreeCAD](https://www.freecadweb.org/) 付属のFEMサンプルをFrontISTRで実行する場合を例に、FrontISTRモジュールの使用方法を説明する。
 
 1. [FreeCAD](https://www.freecadweb.org/)を起動し、赤角丸で囲った例題をクリックする。
 ![FreeCAD スタート画面](./images/1_FreeCAD_start.png)
@@ -12,7 +14,9 @@
 ![FrontISTR options](./images/4_FrontISTR_option.png)
 5. `Working directory` を自由に設定したあと、 `Write input file` をクリックすると、 `Working directory` の中にFrontISTRの入力ファイルが書きだされる。その後、 `Run FrontISTR` をクリックすると計算が実行される。
 ![FrontISTR run](./images/5_FrontISTR_run.png)
-6. 計算が成功すると、図のような出力で計算が終わる。入出力ファイルの場所を確認したら、 `Close` をクリックして 4. に戻る。境界条件を変えた計算を行いたい場合などは、上の `FrontISTR` から `FEM` に変更する
+6. 計算が成功すると、図のような出力で計算が終わる。
 ![FrontISTR result](./images/6_FrontISTR_result.png)
-7. 境界条件や物性を変えた計算を行う場合は、左の赤丸内を選択することで現在の設定を変更できる。また、上の赤丸内のボタンを選択することで新たな境界条件を付与することもできる。条件の設定後、4. からの手順を再度行うことで別条件での計算が可能である。
+7. `Working directory`にある`Box_Mesh_vis_psf.0001.pvtu`を[paraview](https://www.paraview.org/)で開き、結果を確認する。用意されている結果と一致していることが確認できる。
+![FrontISTR result](./images/6b_FrontISTR_result.png)
+8. 解析条件を変えた計算を行う場合は、タスクの`Close` をクリックして 4. に戻り、ワークベンチを `FrontISTR` から `FEM` に変更する。境界条件や物性については、左の赤丸内を選択することで現在の設定を変更できる。また、上の赤丸内のボタンを選択することで新たな境界条件を付与することもできる。条件の設定後、4. からの手順を再度行うことで別条件での計算が可能である。
 ![他の境界条件](./images/7_other_options.png)

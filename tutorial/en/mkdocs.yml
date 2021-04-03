@@ -1,0 +1,13 @@
+site_name: FrontISTR solver plugin for FreeCAD
+theme:
+    name: 'material'
+    highlightjs: true
+    language: 'ja'
+
+use_directory_urls: false
+
+nav:
+- Home: index.md
+- Install: install.md
+- Use FEM_FrontISTR from GUI: usegui.md
+- Scripting static linear analysis : usescript.md

@@ -6,5 +6,5 @@
 
 - [ホーム](./index.md)
 - [インストール](./install.md)
-- [GUI による静解析](./usegui.md)
+- [GUI から FEM_FrontISTRを実行する](./usegui.md)
 - [スクリプトによる静解析](./usescript.md)
