@@ -1,6 +1,6 @@
 # FEM_FrontISTR: A parallel nonlinear finite element analysis workbench for FreeCAD
 
-FEM_FrontISTR is a FreeCAD addon that enables a parallel nonliner FEM solver FrontISTR.
+FEM_FrontISTR is a FreeCAD addon that enables FrontISTR, an open-source large-scale parallel FEM program for nonlinear structural analysis.
 
 FrontISTR(japanese web site): https://www.frontistr.com/
 
@@ -13,7 +13,7 @@ FrontISTR(japanese web site): https://www.frontistr.com/
     - element check
 - geometrical nonlinearity
     - small(linear)
-    - large deformation (in preparation)
+    - large deformation
 - materials
     - mechanical
         - linear elastic
@@ -28,20 +28,20 @@ FrontISTR(japanese web site): https://www.frontistr.com/
     - points fixed or displacement
 - contact (in preparation)
 - step control
-    - auto time increment and cutback (in preparation)
+    - auto time increment and cutback
 
 ## Install
 
 ### Prerequisites
 
-- [Development versions of FreeCAD (0.19_pre)](https://github.com/FreeCAD/FreeCAD/releases/tag/0.19_pre)
+- [FreeCAD v0.19 or later](https://github.com/FreeCAD/FreeCAD/releases/)
 - [Paraview](https://www.paraview.org/download/)
 
 ### Windows
 
 1. Install FreeCAD and Paraview.
 2. Download or git clone this repository to C:/Users/user_name/AppData/Roaming/FreeCAD/Mod/FEM_FrontISTR
-    - The procedure will be automated when FEM_FrontISTR is registerd to FreeCAD addon manager.
+    - This procedure will be automated when FEM_FrontISTR is registerd to FreeCAD addon manager.
     - FrontISTR binaries will be automatically downloaded and installed on the first run.
 
 ### Linux
@@ -54,10 +54,10 @@ In preparation.
 
 ## How to use
 
-1. Setup Analysis by FEM module (in the same way as calculiX).
+1. Set up an analysis model by FEM module (in the same way as calculiX).
 2. Switch module to "FrontISTR" and create a FrontISTR solver object.
-    - SolverFISTRTools object is created in Analysis group
-3. Open task panel of SolverFISTRTools and set working directory.
+    - SolverFISTRTools object is created in "Analysis" group
+3. Open the task panel of SolverFISTRTools and set working directory.
 4. Click "Write input file"
     - FrontISTR input files are generated in working directory
 5. Click "Run FrontISTR"
@@ -66,6 +66,7 @@ In preparation.
 
 ## Tutorial
 
-Available at https://frontistr-commons.gitlab.io/FEM_FrontISTR/ja/
+  - English: https://frontistr-commons.gitlab.io/FEM_FrontISTR/ja/
+  - “ú–{Œê: https://frontistr-commons.gitlab.io/FEM_FrontISTR/ja/
 
 ![GUI result](tutorial/ja/docs/images/12_python_results.png)
