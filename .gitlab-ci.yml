@@ -16,6 +16,9 @@ mkdocs:
   script:
     - pushd tutorial/ja
     - mkdocs build
+    - popd
+    - pushd tutorial/en
+    - mkdocs build
   artifacts:
     paths:
     - tutorial
@@ -27,6 +30,7 @@ pages:
   script:
     - mkdir -p public
     - cp -r tutorial/ja/site public/${CI_COMMIT_TAG}/ja
+    - cp -r tutorial/en/site public/${CI_COMMIT_TAG}/en
   artifacts:
     paths:
     - public

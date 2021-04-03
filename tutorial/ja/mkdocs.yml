@@ -1,6 +1,6 @@
 site_name: FrontISTR solver plugin for FreeCAD
 theme:
-    name: 'readthedocs'
+    name: 'material'
     highlightjs: true
     language: 'ja'
 
