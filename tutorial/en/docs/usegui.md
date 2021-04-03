@@ -20,5 +20,3 @@ In this section, we will explain how to use the FrontISTR module, using the FEM 
 ![FrontISTR result](./images/6b_FrontISTR_result.png) 
 8. If you want to perform a calculation with different analysis conditions, click `Close` on the task to return to 4. and change the workbench from `FrontISTR` to `FEM`. For boundary conditions and properties, you can change the current settings by selecting inside the red circle on the left. You can also add new boundary conditions by selecting the button in the upper red circle. After setting the conditions, the calculation can be performed under different conditions by repeating the procedure from 4.
 ![other boundary conditions](./images/7_other_options.png)
-
-Translated with www.DeepL.com/Translator (free version)
