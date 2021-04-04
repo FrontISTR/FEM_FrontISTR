@@ -67,6 +67,6 @@ In preparation.
 ## Tutorial
 
   - English: https://frontistr-commons.gitlab.io/FEM_FrontISTR/ja/
-  - “ú–{Œê: https://frontistr-commons.gitlab.io/FEM_FrontISTR/ja/
+  - æ—¥æœ¬èªž: https://frontistr-commons.gitlab.io/FEM_FrontISTR/ja/
 
 ![GUI result](tutorial/ja/docs/images/12_python_results.png)
