@@ -554,6 +554,10 @@ class FemToolsFISTR(QtCore.QRunnable, QtCore.QObject):
             _env = os.putenv("OMP_NUM_THREADS", str(num_cpu_pref))
         else:
             _env = os.putenv("OMP_NUM_THREADS", str(multiprocessing.cpu_count()))
+        # if n_process is set and greater than 1, n_process is for MPI process.
+        # therefore set OMP_NUM_THREADS=1 explicitly.
+        if self.solver.n_process > 1:
+            _env = os.putenv("OMP_NUM_THREADS", str(1))
         # change cwd because fistr may crash if directory has no write permission
         # there is also a limit of the length of file names so jump to the document directory
         cwd = QtCore.QDir.currentPath()
