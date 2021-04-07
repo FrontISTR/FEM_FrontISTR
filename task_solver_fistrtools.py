@@ -409,7 +409,16 @@ class _TaskPanel:
         # It may make user wait, but calling partitioner from self.FrontISTR.start causes error
         import subprocess
         subprocess.call(self.fea.partitioner_binary, cwd=self.fea.working_dir)
+        if "OMP_NUM_THREADS" in os.environ:
+            ont_backup_available = True
+            ont_backup = os.environ.get("OMP_NUM_THREADS")
+        else:
+            ont_backup_available = False
+        if self.fea.solver.n_process > 1:
+            os.environ["OMP_NUM_THREADS"] = str(1)
         self.FrontISTR.start(self.fea.mpiexec_binary,["-n",n_pe,"-logfile",logfile,self.fea.fistr_binary])
+        if ont_backup_available:
+            os.environ["OMP_NUM_THREADS"] = str(ont_backup)
 
         QApplication.restoreOverrideCursor()
 
