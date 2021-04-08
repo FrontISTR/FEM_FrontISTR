@@ -153,7 +153,7 @@ def add_attributes(obj, fistr_prefs):
         "Type of preconditioner to use"
     )
     obj.MatrixPrecondType = known_fistr_precond_types
-    precond_type = fistr_prefs.GetInt("Precond", 0)
+    precond_type = fistr_prefs.GetInt("Precond", 2)
     obj.MatrixPrecondType = known_fistr_precond_types[precond_type]
 
     choices_iterlog = ["yes", "no"]

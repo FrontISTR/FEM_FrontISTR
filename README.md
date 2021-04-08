@@ -66,7 +66,7 @@ In preparation.
 
 ## Tutorial
 
-  - English: https://frontistr-commons.gitlab.io/FEM_FrontISTR/ja/
+  - English: https://frontistr-commons.gitlab.io/FEM_FrontISTR/en/
   - 日本語: https://frontistr-commons.gitlab.io/FEM_FrontISTR/ja/
 
 ![GUI result](tutorial/ja/docs/images/12_python_results.png)
