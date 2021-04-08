@@ -469,7 +469,7 @@ class FemToolsFISTR(QtCore.QRunnable, QtCore.QObject):
         fistr_stderr = None
         try:
             p = subprocess.Popen(
-                [self.fistr_binary],
+                [self.fistr_binary, "-v"],
                 cwd=self.working_dir,
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
@@ -567,7 +567,7 @@ class FemToolsFISTR(QtCore.QRunnable, QtCore.QObject):
         cmd += self.mpiexec_binary+" -np "+'%d'%self.solver.n_process+" "+self.fistr_binary
         FreeCAD.Console.PrintMessage(cmd+"\n") #tmp
         p = subprocess.Popen(
-            [self.fistr_binary, "-i ", f.baseName()],
+            [self.fistr_binary],
             cwd=self.working_dir,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
