@@ -952,7 +952,7 @@ class FemInputWriterfistr(writerbase.FemInputWriter):
         f.write("!VISUAL,metod=PSR"+"\n")
         f.write("!surface_num=1"+"\n")
         f.write("!surface 1"+"\n")
-        f.write("!output_type=VTK"+"\n\n")
+        f.write("!output_type=COMPLETE_AVS"+"\n\n")
 
     # ********************************************************************************************
     # step settings

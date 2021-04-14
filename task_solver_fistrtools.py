@@ -318,10 +318,10 @@ class _TaskPanel:
             raise
 
         QApplication.setOverrideCursor(Qt.WaitCursor)
-        #try:
-        #    self.fea.load_results()
-        #except Exception:
-        #    FreeCAD.Console.PrintError("loading results failed\n")
+        try:
+            self.fea.load_results()
+        except Exception:
+            FreeCAD.Console.PrintError("loading results failed\n")
 
         QApplication.restoreOverrideCursor()
         self.form.l_time.setText("Time: {0:4.1f}: ".format(time.time() - self.Start))

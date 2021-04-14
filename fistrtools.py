@@ -826,17 +826,16 @@ class FemToolsFISTR(QtCore.QRunnable, QtCore.QObject):
             return False
 
     def load_results(self):
-        FreeCAD.Console.PrintMessage("We will load the fistr frd and dat result file.\n")
+        FreeCAD.Console.PrintMessage("We will load the fistr visualized file.\n")
         self.results_present = False
-        # TODO: frd/dat files are CalculiX specific. comment out for now
-        # self.load_results_fistrfrd()
+        self.load_results_fistrfrd()
         # self.load_results_fistrdat()
 
     def load_results_fistrfrd(self):
         """Load results of fistr calculations from .frd file.
         """
         import importfistrFrdResults
-        frd_result_file = os.path.splitext(self.inp_file_name)[0] + ".frd"
+        frd_result_file = os.path.splitext(self.inp_file_name)[0] + "_vis_psf.0001.inp" #tmp
         if os.path.isfile(frd_result_file):
             importfistrFrdResults.importFrd(frd_result_file, self.analysis, "FISTR_")
             for m in self.analysis.Group:
