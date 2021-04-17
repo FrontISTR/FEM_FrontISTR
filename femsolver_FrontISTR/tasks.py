@@ -37,8 +37,7 @@ import FreeCAD
 from . import writer
 from femsolver import run
 from femsolver import settings
-import importfistrDatResults
-import importfistrFrdResults
+import importfistrAvsResults
 from femtools import femutils
 from femtools import membertools
 
@@ -109,8 +108,7 @@ class Results(run.Results):
             "User parameter:BaseApp/Preferences/Mod/Fem/General")
         if not prefs.GetBool("KeepResultsOnReRun", False):
             self.purge_results()
-        self.load_results_fistrfrd()
-        self.load_results_fistrdat()
+        self.load_results_fistravs()
 
     def purge_results(self):
         for m in membertools.get_member(self.analysis, "Fem::FemResultObject"):
@@ -119,31 +117,15 @@ class Results(run.Results):
             self.analysis.Document.removeObject(m.Name)
         self.analysis.Document.recompute()
 
-    def load_results_fistrfrd(self):
-        frd_result_file = os.path.join(
-            self.directory, _inputFileName + ".frd")
-        if os.path.isfile(frd_result_file):
+    def load_results_fistravs(self):
+        avs_result_file = os.path.join(
+            self.directory, _inputFileName + ".avs")
+        if os.path.isfile(avs_result_file):
             result_name_prefix = "FrontISTR_" + self.solver.AnalysisType + "_"
-            importfistrFrdResults.importFrd(
-                frd_result_file, self.analysis, result_name_prefix)
+            importfistrAvsResults.importAvs(
+                avs_result_file, self.analysis, result_name_prefix)
         else:
             raise Exception(
-                "FEM: No results found at {}!".format(frd_result_file))
-
-    def load_results_fistrdat(self):
-        dat_result_file = os.path.join(
-            self.directory, _inputFileName + ".dat")
-        if os.path.isfile(dat_result_file):
-            mode_frequencies = importfistrDatResults.import_dat(
-                dat_result_file, self.analysis)
-        else:
-            raise Exception(
-                "FEM: No .dat results found at {}!".format(dat_result_file))
-        if mode_frequencies:
-            for m in membertools.get_member(self.analysis, "Fem::FemResultObject"):
-                if m.Eigenmode > 0:
-                    for mf in mode_frequencies:
-                        if m.Eigenmode == mf["eigenmode"]:
-                            m.EigenmodeFrequency = mf["frequency"]
+                "FEM: No results found at {}!".format(avs_result_file))
 
 ##  @}

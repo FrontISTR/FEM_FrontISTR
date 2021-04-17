@@ -21,13 +21,13 @@
 #*                                                                         *
 #***************************************************************************
 
-__title__ = "Result import for FrontISTR frd file format"
+__title__ = "Result import for FrontISTR Avs file format"
 __author__ = "FrontISTR Commons"
 __url__ = "https://www.frontistr.com/"
 
-## @package importfistrFrdResults
+## @package importfistrAvsResults
 #  \ingroup FEM
-#  \brief FreeCAD FrontISTR FRD Reader for FEM workbench
+#  \brief FreeCAD FrontISTR AVS Reader for FEM workbench
 
 import os
 
@@ -60,11 +60,11 @@ def insert(
     except NameError:
         doc = FreeCAD.newDocument(docname)
     FreeCAD.ActiveDocument = doc
-    importFrd(filename)
+    importAvs(filename)
 
 
 # ********* module specific methods *********
-def importFrd(
+def importAvs(
     filename,
     analysis=None,
     result_name_prefix=""
@@ -77,7 +77,7 @@ def importFrd(
     else:
         doc = FreeCAD.ActiveDocument
 
-    m = read_frd_result(filename)
+    m = read_avs_result(filename)
     result_mesh_object = None
     res_obj = None
 
@@ -169,7 +169,7 @@ def importFrd(
                     Console.PrintLog(
                         "No Analysis detected, standard principal stresses will be added.\n"
                     )
-                    # if a pure frd file was opened no analysis and thus no parent group
+                    # if a pure avs file was opened no analysis and thus no parent group
                     # fill PrincipalMax, PrincipalMed, PrincipalMin, MaxShear
                     res_obj = resulttools.add_principal_stress_std(res_obj)
                 # fill Stats
@@ -177,18 +177,18 @@ def importFrd(
 
         else:
             error_message = (
-                "Nodes, but no results found in frd file. "
-                "It means there only is a mesh but no results in frd file. "
+                "Nodes, but no results found in avs file. "
+                "It means there only is a mesh but no results in avs file. "
                 "Usually this happens for: \n"
                 "- analysis type 'NOANALYSIS'\n"
                 "- if FrontISTR returned no results "
                 "(happens on nonpositive jacobian determinant in at least one element)\n"
-                "- just no frd results where requestet in input file "
+                "- just no avs results where requestet in input file "
                 "(neither 'node file' nor 'el file' in output section')\n"
             )
             Console.PrintWarning(error_message)
 
-        # create a result obj, even if we have no results but a result mesh in frd file
+        # create a result obj, even if we have no results but a result mesh in avs file
         # see error message above for more information
         if not res_obj:
             if result_name_prefix:
@@ -209,28 +209,28 @@ def importFrd(
 
     else:
         Console.PrintError(
-            "Problem on frd file import. No nodes found in frd file.\n"
+            "Problem on avs file import. No nodes found in avs file.\n"
         )
         # None will be returned
-        # or would it be better to raise an exception if there are not even nodes in frd file?
+        # or would it be better to raise an exception if there are not even nodes in avs file?
 
     return res_obj
 
 
 # read a FrontISTR result file and extract the nodes
 # displacement vectors and stress values.
-def read_frd_result(
-    frd_input
+def read_avs_result(
+    avs_input
 ):
     Console.PrintMessage(
         "Read fistr results from complete avs file: {}\n"
-        .format(frd_input)
+        .format(avs_input)
     )
 
-    if os.path.exists(frd_input):
-        frd_file = pyopen(frd_input, "r")
+    if os.path.exists(avs_input):
+        avs_file = pyopen(avs_input, "r")
     else:
-        Console.PrintMessage(frd_input+" not found.")
+        Console.PrintMessage(avs_input+" not found.")
 
     nodes = {}
     elements_hexa8 = {}
@@ -257,8 +257,8 @@ def read_frd_result(
     mode_massflow = {}
     mode_networkpressure = {}
 
-    dat = frd_file.readlines()
-    frd_file.close()
+    dat = avs_file.readlines()
+    avs_file.close()
     
     dat.reverse()
     
