@@ -489,6 +489,12 @@ class FemToolsFISTR(QtCore.QRunnable, QtCore.QObject):
         except OSError as e:
             FreeCAD.Console.PrintError("{}\n".format(e))
             if e.errno == 2:
+                FreeCAD.Console.PrintMessage("Start installing FrontISTR...")
+                message = (
+                    "FrontISTR binary files are not found. "
+                    "Start the installation. This may take several time."
+                )
+                QtGui.QMessageBox.warning(None, "Install FrontISTR", message)
                 if system() == "Windows":
                     import urllib.request
                     import zipfile
@@ -515,6 +521,7 @@ class FemToolsFISTR(QtCore.QRunnable, QtCore.QObject):
                     if FreeCAD.GuiUp:
                         QtGui.QMessageBox.critical(None, error_title, error_message)
                     raise Exception(error_message)
+                FreeCAD.Console.PrintMessage("Done\n")
             else:
                 FreeCAD.Console.PrintError(
                     "Unexpected error when executing FrontISTR: {}\n"

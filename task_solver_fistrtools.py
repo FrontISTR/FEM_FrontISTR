@@ -273,7 +273,7 @@ class _TaskPanel:
             self.FrontISTRError()
 
         self.form.pb_run_fistr.setText("Re-run FrontISTR")
-        self.femConsoleMessage("Loading result sets...")
+        self.femConsoleMessage("Loading result sets...\n")
         self.form.l_time.setText("Time: {0:4.1f}: ".format(time.time() - self.Start))
         self.fea.reset_mesh_purge_results_checked()
         self.fea.inp_file_name = self.fea.inp_file_name
@@ -293,6 +293,7 @@ class _TaskPanel:
         QApplication.setOverrideCursor(Qt.WaitCursor)
         try:
             self.fea.load_results()
+            self.femConsoleMessage("Done loading result sets.\n")
         except Exception:
             FreeCAD.Console.PrintError("loading results failed\n")
 
