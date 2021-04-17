@@ -16,7 +16,9 @@ In this section, we will explain how to use the FrontISTR module, using the FEM 
 ![FrontISTR run](./images/5_FrontISTR_run.png) 
 6. If the calculation finishes successfully, it will end with the output as shown in the figure.
 ![FrontISTR result](./images/6_FrontISTR_result.png) 
-7. Open `Box_Mesh_vis_psf.0001.pvtu` in the `Working directory` with [paraview](https://www.paraview.org/) and check the result. It can be confirmed that the results are consistent with the prepared results.
-![FrontISTR result](./images/6b_FrontISTR_result.png) 
-8. If you want to perform a calculation with different analysis conditions, click `Close` on the task to return to 4. and change the workbench from `FrontISTR` to `FEM`. For boundary conditions and properties, you can change the current settings by selecting inside the red circle on the left. You can also add new boundary conditions by selecting the button in the upper red circle. After setting the conditions, the calculation can be performed under different conditions by repeating the procedure from 4.
+7. Close the task of SolverFISTRTools and delete `CCX_Results`. Double click `FISTR_Results` for post-process.
+![FrontISTR result](./images/6b_FrontISTR_result.png)
+8. Control view settings from the task panel of SolverFISTRTools. The folloings is a displacement contour of Von Mises stress.
+![FrontISTR result](./images/6c_FrontISTR_result.png)
+9. If you want to perform a calculation with different analysis conditions, click `Close` on the task to return to 4. and change the workbench from `FrontISTR` to `FEM`. For boundary conditions and properties, you can change the current settings by selecting inside the red circle on the left. You can also add new boundary conditions by selecting the button in the upper red circle. After setting the conditions, the calculation can be performed under different conditions by repeating the procedure from 4.
 ![other boundary conditions](./images/7_other_options.png)
