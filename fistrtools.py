@@ -835,7 +835,17 @@ class FemToolsFISTR(QtCore.QRunnable, QtCore.QObject):
         """Load results of fistr calculations from .frd file.
         """
         import importfistrFrdResults
-        frd_result_file = os.path.splitext(self.inp_file_name)[0] + "_vis_psf.0001.inp" #tmp
+        
+        # grep visfiles
+        visfiles = []
+        for file in os.listdir(self.working_dir):
+            if file.find("_vis_psf.") < 0:
+                continue
+            visfiles.append(file)
+        visfiles.sort()
+        
+        # read only visfile at the last substep
+        frd_result_file = self.working_dir.replace("\\","/")+"/"+visfiles[-1]
         if os.path.isfile(frd_result_file):
             importfistrFrdResults.importFrd(frd_result_file, self.analysis, "FISTR_")
             for m in self.analysis.Group:

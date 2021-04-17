@@ -948,7 +948,7 @@ class FemInputWriterfistr(writerbase.FemInputWriter):
     def write_outputs_types(self, f):
         f.write("### OUTPUT Control ###\n")
         f.write("!WRITE,RESULT"+"\n")
-        f.write("!WRITE,VISUAL"+"\n")
+        f.write("!WRITE,VISUAL,FREQUENCY=9999"+"\n")
         f.write("!VISUAL,metod=PSR"+"\n")
         f.write("!surface_num=1"+"\n")
         f.write("!surface 1"+"\n")
