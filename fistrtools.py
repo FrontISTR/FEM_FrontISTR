@@ -55,7 +55,7 @@ class FemToolsFISTR(QtCore.QRunnable, QtCore.QObject):
         FEM solver object
         has to be present, will be set in __init__
     base_name : str
-        name of .inp/.frd file (without extension)
+        name of .inp/.avs file (without extension)
         It is used to construct .inp file path that is passed to FrontISTR fistr
     fistr_binary : str
     working_dir : str
@@ -271,7 +271,7 @@ class FemToolsFISTR(QtCore.QRunnable, QtCore.QObject):
         Parameters
         ----------
         base_name : str, optional
-            base_name base name of .inp/.frd file (without extension).
+            base_name base name of .inp/.avs file (without extension).
             It is used to construct .inp file path that is passed to FrontISTR fistr
         """
         if base_name is None:
@@ -284,7 +284,7 @@ class FemToolsFISTR(QtCore.QRunnable, QtCore.QObject):
     def set_inp_file_name(self, inp_file_name=None):
         """
         Set inp file name. Normally inp file name is set by write_inp_file.
-        That name is also used to determine location and name of frd result file.
+        That name is also used to determine location and name of avs result file.
 
         Parameters
         ----------
@@ -489,6 +489,12 @@ class FemToolsFISTR(QtCore.QRunnable, QtCore.QObject):
         except OSError as e:
             FreeCAD.Console.PrintError("{}\n".format(e))
             if e.errno == 2:
+                FreeCAD.Console.PrintMessage("Start installing FrontISTR...")
+                message = (
+                    "FrontISTR binary files are not found. "
+                    "Start the installation. This may take several time."
+                )
+                QtGui.QMessageBox.warning(None, "Install FrontISTR", message)
                 if system() == "Windows":
                     import urllib.request
                     import zipfile
@@ -515,6 +521,7 @@ class FemToolsFISTR(QtCore.QRunnable, QtCore.QObject):
                     if FreeCAD.GuiUp:
                         QtGui.QMessageBox.critical(None, error_title, error_message)
                     raise Exception(error_message)
+                FreeCAD.Console.PrintMessage("Done\n")
             else:
                 FreeCAD.Console.PrintError(
                     "Unexpected error when executing FrontISTR: {}\n"
@@ -826,19 +833,27 @@ class FemToolsFISTR(QtCore.QRunnable, QtCore.QObject):
             return False
 
     def load_results(self):
-        FreeCAD.Console.PrintMessage("We will load the fistr frd and dat result file.\n")
+        FreeCAD.Console.PrintMessage("We will load the fistr visualized file.\n")
         self.results_present = False
-        # TODO: frd/dat files are CalculiX specific. comment out for now
-        # self.load_results_fistrfrd()
-        # self.load_results_fistrdat()
+        self.load_results_fistravs()
 
-    def load_results_fistrfrd(self):
-        """Load results of fistr calculations from .frd file.
+    def load_results_fistravs(self):
+        """Load results of fistr calculations from .avs file.
         """
-        import importfistrFrdResults
-        frd_result_file = os.path.splitext(self.inp_file_name)[0] + ".frd"
-        if os.path.isfile(frd_result_file):
-            importfistrFrdResults.importFrd(frd_result_file, self.analysis, "FISTR_")
+        import importfistrAvsResults
+        
+        # grep visfiles
+        visfiles = []
+        for file in os.listdir(self.working_dir):
+            if file.find("_vis_psf.") < 0:
+                continue
+            visfiles.append(file)
+        visfiles.sort()
+        
+        # read only visfile at the last substep
+        avs_result_file = self.working_dir.replace("\\","/")+"/"+visfiles[-1]
+        if os.path.isfile(avs_result_file):
+            importfistrAvsResults.importAvs(avs_result_file, self.analysis, "FISTR_")
             for m in self.analysis.Group:
                 if m.isDerivedFrom("Fem::FemResultObject"):
                     self.results_present = True
@@ -853,35 +868,7 @@ class FemToolsFISTR(QtCore.QRunnable, QtCore.QObject):
                 else:
                     FreeCAD.Console.PrintError("FEM: No result object in active Analysis.\n")
         else:
-            raise Exception("FEM: No results found at {}!".format(frd_result_file))
-
-    def load_results_fistrdat(self):
-        """Load results of fistr calculations from .dat file.
-        """
-        import importfistrDatResults
-        dat_result_file = os.path.splitext(self.inp_file_name)[0] + ".dat"
-
-        if os.path.isfile(dat_result_file):
-            mode_frequencies = importfistrDatResults.import_dat(dat_result_file, self.analysis)
-
-            obj = FreeCAD.ActiveDocument.addObject("App::TextDocument", "fistr dat file")
-            # TODO this object should be inside analysis or under result object
-            # self.result_object.addObject(obj)
-            file = open(dat_result_file, "r")
-            obj.Text = file.read()
-            file.close()
-            # TODO make the Text of obj read only, or the obj itself
-        else:
-            raise Exception("FEM: No .dat results found at {}!".format(dat_result_file))
-
-        if mode_frequencies:
-            # print(mode_frequencies)
-            for m in self.analysis.Group:
-                if m.isDerivedFrom("Fem::FemResultObject") and m.Eigenmode > 0:
-                    for mf in mode_frequencies:
-                        if m.Eigenmode == mf["eigenmode"]:
-                            m.EigenmodeFrequency = mf["frequency"]
-
+            raise Exception("FEM: No results found at {}!".format(avs_result_file))
 
 class FrontISTRTools(FemToolsFISTR):
 

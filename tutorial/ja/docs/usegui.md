@@ -16,7 +16,9 @@ FEM_FrontISTRは、FreeCAD標準のFEMモジュールで作成した解析モデ
 ![FrontISTR run](./images/5_FrontISTR_run.png)
 6. 計算が成功すると、図のような出力で計算が終わる。
 ![FrontISTR result](./images/6_FrontISTR_result.png)
-7. `Working directory`にある`Box_Mesh_vis_psf.0001.pvtu`を[paraview](https://www.paraview.org/)で開き、結果を確認する。用意されている結果と一致していることが確認できる。
+7. SolverFISTRToolsのタスクを閉じ、`CCX_Results`を消去する。解析結果を確認するために`FISTR_Results` をダブルクリックする。
 ![FrontISTR result](./images/6b_FrontISTR_result.png)
-8. 解析条件を変えた計算を行う場合は、タスクの`Close` をクリックして 4. に戻り、ワークベンチを `FrontISTR` から `FEM` に変更する。境界条件や物性については、左の赤丸内を選択することで現在の設定を変更できる。また、上の赤丸内のボタンを選択することで新たな境界条件を付与することもできる。条件の設定後、4. からの手順を再度行うことで別条件での計算が可能である。
+8. SolverFISTRToolsのタスクから、結果表示を制御できる。図はMises応力の変形コンター図である。
+![FrontISTR result](./images/6c_FrontISTR_result.png)
+9. 解析条件を変えた計算を行う場合は、タスクの`Close` をクリックして 4. に戻り、ワークベンチを `FrontISTR` から `FEM` に変更する。境界条件や物性については、左の赤丸内を選択することで現在の設定を変更できる。また、上の赤丸内のボタンを選択することで新たな境界条件を付与することもできる。条件の設定後、4. からの手順を再度行うことで別条件での計算が可能である。
 ![他の境界条件](./images/7_other_options.png)

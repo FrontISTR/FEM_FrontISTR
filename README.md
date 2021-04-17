@@ -35,7 +35,6 @@ FrontISTR(japanese web site): https://www.frontistr.com/
 ### Prerequisites
 
 - [FreeCAD v0.19 or later](https://github.com/FreeCAD/FreeCAD/releases/)
-- [Paraview](https://www.paraview.org/download/)
 
 ### Windows
 
@@ -61,8 +60,8 @@ In preparation.
 4. Click "Write input file"
     - FrontISTR input files are generated in working directory
 5. Click "Run FrontISTR"
-    - FrontISTR starts in parallel and output result files
-6. Open result files for visualization "${work_directory}/${jobname}_vis_psf.*.pvtu" by paraview.
+    - FrontISTR starts in parallel and FISTR_Results object will be created after finishing calculation.
+6. Check FISTR_Results for post processing.
 
 ## Tutorial
 
