@@ -66,6 +66,7 @@ class _TaskPanel:
         self.fea = fistr(solver_object)
         self.fea.setup_working_dir()
         self.fea.setup_fistr()
+        self.logfile = ""
 
         self.FrontISTR = QtCore.QProcess()
         self.Timer = QtCore.QTimer()
@@ -175,50 +176,22 @@ class _TaskPanel:
 
     def printFrontISTRstdout(self):
 
-        out = self.FrontISTR.readAllStandardOutput()
-        # print(type(out))
-        # <class 'PySide2.QtCore.QByteArray'>
-
-        if out.isEmpty():
-            self.femConsoleMessage("FrontISTR stdout is empty", "#FF0000")
-            return False
-
-        if sys.version_info.major >= 3:
-            # https://forum.freecadweb.org/viewtopic.php?f=18&t=39195
-            # convert QByteArray to a binary string an decode it to "utf-8"
-            out = out.data().decode()  # "utf-8" can be omitted
-            # print(type(out))
+        try:
+            f = open(self.logfile,'r')
+            out = f.readlines()
+            f.close()
+            out = "".join(out)
+            out = out.replace("\n", "<br>")
             # print(out)
-        else:
-            try:
-                out = unicode(out, "utf-8", "replace")
-                rx = QtCore.QRegExp("\\*ERROR.*\\n\\n")
-                # print(rx)
-                rx.setMinimal(True)
-                pos = rx.indexIn(out)
-                while not pos < 0:
-                    match = rx.cap(0)
-                    FreeCAD.Console.PrintError(match.strip().replace("\n", " ") + "\n")
-                    pos = rx.indexIn(out, pos + 1)
-            except UnicodeDecodeError:
-                self.femConsoleMessage("Error converting stdout from FrontISTR", "#FF0000")
-        out = os.linesep.join([s for s in out.splitlines() if s])
-        out = out.replace("\n", "<br>")
-        # print(out)
-        self.femConsoleMessage(out)
-
-        if "*ERROR in e_c3d: nonpositive jacobian" in out:
-            error_message = (
-                "\n\nFrontISTR returned an error due to "
-                "nonpositive jacobian determinant in at least one element\n"
-                "Use the run button on selected solver to get a better error output.\n"
-            )
-            FreeCAD.Console.PrintError(error_message)
-
-        if "*ERROR" in out:
+            self.femConsoleMessage(out)
+        except UnicodeDecodeError:
+            self.femConsoleMessage("Error reading stdout from FrontISTR", "#FF0000")
             return False
-        else:
+
+        if out[-100:].find("FrontISTR Completed !!") > -1:
             return True
+        else:
+            return False
 
     def printFrontISTRstderr(self):
         out = self.FrontISTR.readAllStandardError()
@@ -398,7 +371,7 @@ class _TaskPanel:
         fi = QtCore.QFileInfo(self.fea.cnt_file_name)
         work_dir = fi.path()
         QtCore.QDir.setCurrent(work_dir)
-        logfile = work_dir + "/fistr.log"
+        self.logfile = work_dir + "/fistr.log"
 
         FreeCAD.Console.PrintMessage(
             "run FrontISTR at: {}, n_process ={}\n"
@@ -416,7 +389,7 @@ class _TaskPanel:
             ont_backup_available = False
         if self.fea.solver.n_process > 1:
             os.environ["OMP_NUM_THREADS"] = str(1)
-        self.FrontISTR.start(self.fea.mpiexec_binary,["-n",n_pe,"-logfile",logfile,self.fea.fistr_binary])
+        self.FrontISTR.start(self.fea.mpiexec_binary,["-n",n_pe,"-logfile",self.logfile,self.fea.fistr_binary])
         if ont_backup_available:
             os.environ["OMP_NUM_THREADS"] = str(ont_backup)
 
