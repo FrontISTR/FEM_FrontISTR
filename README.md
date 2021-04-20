@@ -1,8 +1,10 @@
 # FEM_FrontISTR: A parallel nonlinear finite element analysis workbench for FreeCAD
 
-FEM_FrontISTR is a FreeCAD addon that enables FrontISTR, an open-source large-scale parallel FEM program for nonlinear structural analysis.
+FEM_FrontISTR is a FreeCAD addon that enables FrontISTR, an open-source large-scale parallel FEM program for nonlinear structural analysis. See [FrontISTR Home(Japanese language website)](https://www.frontistr.com/) for the detail of FrontISTR solver.
 
-FrontISTR(japanese web site): https://www.frontistr.com/
+![Result](tutorial/ja/docs/images/0a_bikeframe.png)
+[Motorcycle frame](https://grabcad.com/library/motorcycle-frame-6)
+
 
 ## Feautres
 
@@ -38,7 +40,7 @@ FrontISTR(japanese web site): https://www.frontistr.com/
 
 ### Windows
 
-1. Install FreeCAD and Paraview.
+1. Install FreeCAD.
 2. Download or git clone this repository to C:/Users/user_name/AppData/Roaming/FreeCAD/Mod/FEM_FrontISTR
     - This procedure will be automated when FEM_FrontISTR is registerd to FreeCAD addon manager.
     - FrontISTR binaries will be automatically downloaded and installed on the first run.
@@ -63,9 +65,22 @@ In preparation.
     - FrontISTR starts in parallel and FISTR_Results object will be created after finishing calculation.
 6. Check FISTR_Results for post processing.
 
-## Tutorial
+## Documents
+
+### FEM_FrontISTR manual and tutorial
 
   - English: https://frontistr-commons.gitlab.io/FEM_FrontISTR/en/
   - 日本語: https://frontistr-commons.gitlab.io/FEM_FrontISTR/ja/
 
-![GUI result](tutorial/ja/docs/images/12_python_results.png)
+### FrontISTR manual
+
+  - English: https://manual.frontistr.com/en/
+  - 日本語: https://manual.frontistr.com/ja/
+
+## Support
+
+### Inquiry
+Create an issue at the github or post your inquiry to
+https://www.frontistr.com/inquiry/.
+(Membership registration is required.)
+
