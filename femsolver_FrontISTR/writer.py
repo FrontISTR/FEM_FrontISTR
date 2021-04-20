@@ -983,9 +983,19 @@ class FemInputWriterfistr(writerbase.FemInputWriter):
 
         timeline = " "
         if self.solver_obj.IncrementType == "auto":
+            try:
+                min_time_increment = float(self.solver_obj.MinimumTimeIncrement)
+            except ValueError:
+                min_time_increment = 1.0e-5
+                converting_string = "Converting Newton Converge Residual value {} to float failed. Using default value 1.0E-5.".format(self.solver_obj.MinimumTimeIncrement)
+                FreeCAD.Console.PrintWarning(converting_string + "\n")
+                if FreeCAD.GuiUp:
+                    from PySide import QtGui
+                    QtGui.QMessageBox.warning(None, "Converting value failed", converting_string)
+
             timeline += "{:E}, {:E}, {:E}, {:E}".format(self.solver_obj.InitialTimeIncrement,
                                                         self.solver_obj.TimeEnd,
-                                                        self.solver_obj.MinimumTimeIncrement,
+                                                        min_time_increment,
                                                         self.solver_obj.MaximumTimeIncrement)
         else:
             timeline += "{:E}, {:E}".format(self.solver_obj.InitialTimeIncrement,

@@ -231,12 +231,12 @@ def add_attributes(obj, fistr_prefs):
     obj.InitialTimeIncrement = init_time_increment
 
     obj.addProperty(
-        "App::PropertyFloatConstraint",
+        "App::PropertyString",
         "MinimumTimeIncrement",
         "Static",
         "Minimum Time Increment"
     )
-    min_time_increment = fistr_prefs.GetFloat("MinimumTimeIncrement", 0.01)
+    min_time_increment = fistr_prefs.GetString("MinimumTimeIncrement", "1.0e-4")
     obj.MinimumTimeIncrement = min_time_increment
 
     obj.addProperty(
