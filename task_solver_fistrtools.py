@@ -295,8 +295,8 @@ class _TaskPanel:
         try:
             self.fea.load_results()
             self.femConsoleMessage("Done loading result sets.\n")
-        except Exception:
-            FreeCAD.Console.PrintError("loading results failed\n")
+        except Exception as err:
+            FreeCAD.Console.PrintError("loading results failed: {}\n".format(err))
 
         QApplication.restoreOverrideCursor()
         self.form.l_time.setText("Time: {0:4.1f}: ".format(time.time() - self.Start))

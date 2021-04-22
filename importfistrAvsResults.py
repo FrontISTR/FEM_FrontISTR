@@ -75,17 +75,29 @@ def importAvs(
     import ObjectsFem
     from feminout import importToolsFem
 
+    TUNE=False
+    if TUNE:
+        import time
+        cur = time.time()
+
     if analysis:
         doc = analysis.Document
     else:
         doc = FreeCAD.ActiveDocument
 
     m = read_avs_result(filename)
+    
     result_mesh_object = None
     res_obj = None
 
+    if TUNE:
+        new = time.time(); Console.PrintMessage("dtime 1:"+'%8.3f'%(new-cur)+"\n") ; cur = new
+
     if len(m["Nodes"]) > 0:
         mesh = importToolsFem.make_femmesh(m)
+        if TUNE:
+            new = time.time(); Console.PrintMessage("dtime 2:"+'%8.3f'%(new-cur)+"\n") ; cur = new
+
         result_mesh_object = ObjectsFem.makeMeshResult(
             doc,
             "ResultMesh"
@@ -98,7 +110,10 @@ def importAvs(
         Console.PrintLog(
             "Increments: " + str(number_of_increments) + "\n"
         )
+        if TUNE:
+            new = time.time(); Console.PrintMessage("dtime 3:"+'%8.3f'%(new-cur)+"\n") ; cur = new
         if len(m["Results"]) > 0:
+            
             for result_set in m["Results"]:
                 if "number" in result_set:
                     eigenmode_number = result_set["number"]
@@ -122,13 +137,21 @@ def importAvs(
                         .format(result_name_prefix)
                     )
 
+                if TUNE:
+                    new = time.time(); Console.PrintMessage("dtime 4:"+'%8.3f'%(new-cur)+"\n") ; cur = new
                 res_obj = ObjectsFem.makeResultMechanical(doc, results_name)
                 res_obj.Mesh = result_mesh_object
+
+                if TUNE:
+                    new = time.time(); Console.PrintMessage("dtime 5:"+'%8.3f'%(new-cur)+"\n") ; cur = new
+
                 res_obj = importToolsFem.fill_femresult_mechanical(res_obj, result_set)
                 if analysis:
                     # need to be here, becasause later on, the analysis objs are needed
                     # see fill of principal stresses
                     analysis.addObject(res_obj)
+                if TUNE:
+                    new = time.time(); Console.PrintMessage("dtime 6:"+'%8.3f'%(new-cur)+"\n") ; cur = new
 
                 # more result object calculations
                 from femresult import resulttools
@@ -143,41 +166,39 @@ def importAvs(
                         # all other result sets, do not compact FemMesh, only set NodeNumbers
                         res_obj.NodeNumbers = nodenumbers_for_compacted_mesh
 
+                if TUNE:
+                    new = time.time(); Console.PrintMessage("dtime 7:"+'%8.3f'%(new-cur)+"\n") ; cur = new
                 # fill DisplacementLengths
                 res_obj = resulttools.add_disp_apps(res_obj)
+
+                if TUNE:
+                    new = time.time(); Console.PrintMessage("dtime 8:"+'%8.3f'%(new-cur)+"\n") ; cur = new
+
                 # fill vonMises
-                res_obj = resulttools.add_von_mises(res_obj)
+                mstress = []
+                for nid in res_obj.NodeNumbers:
+                    mstress.append(result_set["mises"][nid])
+                res_obj.vonMises = mstress
+
+                if TUNE:
+                    new = time.time(); Console.PrintMessage("dtime 9:"+'%8.3f'%(new-cur)+"\n") ; cur = new
+
                 # fill principal stress
-                # if material reinforced object use add additional values to the res_obj
-                if res_obj.getParentGroup():
-                    has_reinforced_mat = False
-                    for obj in res_obj.getParentGroup().Group:
-                        if femutils.is_of_type(obj, "Fem::MaterialReinforced"):
-                            has_reinforced_mat = True
-                            Console.PrintLog(
-                                "Reinfoced material object detected, "
-                                "reinforced principal stresses and standard principal "
-                                " stresses will be added.\n"
-                            )
-                            resulttools.add_principal_stress_reinforced(res_obj)
-                            break
-                    if has_reinforced_mat is False:
-                        Console.PrintLog(
-                            "No einfoced material object detected, "
-                            "standard principal stresses will be added.\n"
-                        )
-                        # fill PrincipalMax, PrincipalMed, PrincipalMin, MaxShear
-                        res_obj = resulttools.add_principal_stress_std(res_obj)
-                else:
-                    Console.PrintLog(
-                        "No Analysis detected, standard principal stresses will be added.\n"
-                    )
-                    # if a pure avs file was opened no analysis and thus no parent group
-                    # fill PrincipalMax, PrincipalMed, PrincipalMin, MaxShear
-                    res_obj = resulttools.add_principal_stress_std(res_obj)
+                prinstress1 = []; prinstress2 = []; prinstress3 = []
+                for nid in res_obj.NodeNumbers:
+                    pstr = result_set["pstress"][nid]
+                    prinstress1.append(pstr[0])
+                    prinstress2.append(pstr[1])
+                    prinstress3.append(pstr[2])
+                res_obj.PrincipalMax = prinstress1
+                res_obj.PrincipalMed = prinstress2
+                res_obj.PrincipalMin = prinstress3
+
                 # fill Stats
                 res_obj = resulttools.fill_femresult_stats(res_obj)
 
+                if TUNE:
+                    new = time.time(); Console.PrintMessage("dtime10:"+'%8.3f'%(new-cur)+"\n") ; cur = new
         else:
             error_message = (
                 "Nodes, but no results found in avs file. "
@@ -210,6 +231,9 @@ def importAvs(
                 FemGui.setActiveAnalysis(analysis)
             doc.recompute()
 
+        if TUNE:
+            new = time.time(); Console.PrintMessage("dtime11:"+'%8.3f'%(new-cur)+"\n") ; cur = new
+
     else:
         Console.PrintError(
             "Problem on avs file import. No nodes found in avs file.\n"
@@ -217,8 +241,70 @@ def importAvs(
         # None will be returned
         # or would it be better to raise an exception if there are not even nodes in avs file?
 
-    return res_obj
+    return res_obj 
 
+def make_hash_tri(surf):
+    tmp = [surf[0],surf[1],surf[2]]
+    tmp.sort()
+    return str(tmp[0])+"%"+str(tmp[1])+"%"+str(tmp[2])
+
+def extract_surface(n_nodes,n_elems,nodes,elements_tetra10,elements_tetra4,elements_tria6,elements_tria3):
+    used_nid = []
+
+    # extract surface of tetra10 elements
+    table_tri6 = {}
+    for eid in elements_tetra10.keys():
+        ve = elements_tetra10[eid]
+        s = []
+        s.append((ve[0],ve[1],ve[2],ve[4],ve[5],ve[6]))
+        s.append((ve[0],ve[3],ve[1],ve[7],ve[8],ve[4]))
+        s.append((ve[1],ve[3],ve[2],ve[8],ve[9],ve[5]))
+        s.append((ve[2],ve[3],ve[0],ve[9],ve[7],ve[6]))
+        for i in range(4):
+            hash = make_hash_tri(s[i])
+            try:
+                table_tri6[hash].append(s[i])
+            except:
+                table_tri6[hash] = [s[i]]
+    count = 0
+    for k in table_tri6.keys():
+        if len(table_tri6[k]) == 1:
+            if len(table_tri6[k][0]) == 6:
+                count += 1
+                elements_tria6[count] = table_tri6[k][0]
+                for nid in elements_tria6[count]:
+                    used_nid.append(nid)
+    
+    # extract surface of tetra4 elements
+    table_tri3 = {}
+    for eid in elements_tetra4.keys():
+        ve = elements_tetra4[eid]
+        s = []
+        s.append((ve[0],ve[1],ve[2]))
+        s.append((ve[0],ve[3],ve[1]))
+        s.append((ve[1],ve[3],ve[2]))
+        s.append((ve[2],ve[3],ve[0]))
+        for i in range(4):
+            hash = make_hash_tri(s[i])
+            try:
+                table_tri3[hash].append(s[i])
+            except:
+                table_tri3[hash] = [s[i]]
+    for k in table_tri3.keys():
+        if len(table_tri3[k]) == 1:
+            count += 1
+            elements_tria3[count] = table_tri3[k][0]
+            for nid in elements_tria3[count]:
+                used_nid.append(nid)
+
+    used_nid = list(set(used_nid))
+    newnodes = {}
+    for nid in used_nid:
+        newnodes[nid] = nodes[nid]
+    nodes = newnodes
+    
+    n_nodes = len(nodes.keys())
+    n_elems = len(elements_tria3.keys())+len(elements_tria6.keys())
 
 # read a FrontISTR result file and extract the nodes
 # displacement vectors and stress values.
@@ -254,6 +340,8 @@ def read_avs_result(
     mode_results["time"] = float("NaN")
     mode_disp = {}
     mode_stress = {}
+    mode_mises = {}
+    mode_pstress = {}
     mode_strain = {}
     mode_peeq = {}
     mode_temp = {}
@@ -302,6 +390,12 @@ def read_avs_result(
             nd4 = int(line[6])
             elements_tetra4[eid] = (nd2, nd1, nd4, nd3)
 
+    extract_surface(n_nodes,n_elems,nodes,elements_tetra10,elements_tetra4,elements_tria6,elements_tria3)
+    del elements_tetra10
+    elements_tetra10 = {}
+    del elements_tetra4
+    elements_tetra4 = {}
+
     n_noderes, n_elemres = map(int, list(filter(None, dat.pop().split(" "))))
     if n_noderes > 0 :
         dofs = list(map(int, list(filter(None, dat.pop().split(" ")))))
@@ -325,18 +419,32 @@ def read_avs_result(
                 nresults[labels[j]][nid] = linedat[dofs[j]:dofs[j+1]]
 
         # displacement
-        for nid in nresults['DISPLACEMENT'].keys():
+        for nid in nodes.keys():
             disp = nresults['DISPLACEMENT'][nid]
             mode_disp[nid] = FreeCAD.Vector(disp[0],disp[1],disp[2])
     
-        # displacement
-        for nid in nresults['NodalSTRESS'].keys():
+        # NodalSTRESS
+        for nid in nodes.keys():
             stress = nresults['NodalSTRESS'][nid]
             mode_stress[nid] = (stress[0],stress[1],stress[2],stress[3],stress[5],stress[4])
 
+        # NodalMises
+        for nid in nodes.keys():
+            mises = nresults['NodalMISES'][nid][0]
+            mode_mises[nid] = mises
+            
+        # NodalPrincipalSTRESS
+        for nid in nodes.keys():
+            pstr = nresults['NodalPrincipalSTRESS'][nid]
+            mode_pstress[nid] = pstr
+
+    n_nodes = len(nodes.keys())
+    n_elems = len(elements_tria3.keys())+len(elements_tria6.keys())
     
     mode_results["disp"] = mode_disp
     mode_results["stress"] = mode_stress
+    mode_results["mises"] = mode_mises
+    mode_results["pstress"] = mode_pstress
     results.append(mode_results)
 
     return {
