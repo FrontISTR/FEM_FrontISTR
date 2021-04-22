@@ -1,17 +1,18 @@
 # FEM_FrontISTR: A parallel nonlinear finite element analysis workbench for FreeCAD
 
-FEM_FrontISTR is a FreeCAD addon that enables FrontISTR, an open-source large-scale parallel FEM program for nonlinear structural analysis. See [FrontISTR Home(Japanese language website)](https://www.frontistr.com/) for the detail of FrontISTR solver.
+FEM_FrontISTR is a FreeCAD addon that enables FrontISTR, an open-source large-scale parallel FEM program for nonlinear structural analysis. See [FrontISTR Home (Japanese website)](https://www.frontistr.com/) for the detail of FrontISTR solver.
 
-![Result](tutorial/ja/docs/images/0a_bikeframe.png)
-[Motorcycle frame](https://grabcad.com/library/motorcycle-frame-6)
+![Result](sample/showcase/0a_bikeframe.png)
+Fig: [Motorcycle frame](https://grabcad.com/library/motorcycle-frame-6), 644,415 nodes and 398,851 elements, calculation time is 172sec (8cores) with Intel Core i7-6700 @3.40GHz x 1CPU, 16.0GB Mem. Check [samples/showcase](./samples/showcase) for more samples.
 
 
-## Feautres
+## Features
+FrontISTR is a nonlinear structural analysis solver with the following capabilities:
 
 - analysis type
     - static
-    - dynamic (in preparation)
-    - thermal (in preparation)
+    - dynamic\*
+    - thermal\*
     - element check
 - geometrical nonlinearity
     - small(linear)
@@ -19,18 +20,20 @@ FEM_FrontISTR is a FreeCAD addon that enables FrontISTR, an open-source large-sc
 - materials
     - mechanical
         - linear elastic
-        - plastic (in preparation)
-        - hyper elastic (in preparation)
-        - creep (in preparation)
-        - visco elastic (in preparation)
+        - plastic\*
+        - hyper elastic\*
+        - creep\*
+        - visco elastic\*
 - loads
     - mechanical concentrated and distributed loads
     - gravity
 - boundary
     - points fixed or displacement
-- contact (in preparation)
+- contact\*
 - step control
     - auto time increment and cutback
+
+\* FEM_FrontISTR support is currently under preparation.
 
 ## Install
 
@@ -47,11 +50,11 @@ FEM_FrontISTR is a FreeCAD addon that enables FrontISTR, an open-source large-sc
 
 ### Linux
 
-In preparation.
+Under preparation.
 
 ### MacOS
 
-In preparation.
+Under preparation.
 
 ## How to use
 
@@ -72,15 +75,18 @@ In preparation.
   - English: https://frontistr-commons.gitlab.io/FEM_FrontISTR/en/
   - 日本語: https://frontistr-commons.gitlab.io/FEM_FrontISTR/ja/
 
-### FrontISTR manual
+### FrontISTR solver manual
 
   - English: https://manual.frontistr.com/en/
   - 日本語: https://manual.frontistr.com/ja/
 
 ## Support
 
+### Known issues
+
+- MUMPS solver is currently not available for windows due to a problem between MS-MPI and MUMPS.
+
 ### Inquiry
 Create an issue at the github or post your inquiry to
 https://www.frontistr.com/inquiry/.
 (Membership registration is required.)
-
