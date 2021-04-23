@@ -46,7 +46,11 @@ FrontISTR is a nonlinear structural analysis solver with the following capabilit
 1. Install FreeCAD.
 2. Download or git clone this repository to C:/Users/user_name/AppData/Roaming/FreeCAD/Mod/FEM_FrontISTR
     - This procedure will be automated when FEM_FrontISTR is registerd to FreeCAD addon manager.
-    - FrontISTR binaries will be automatically downloaded and installed on the first run.
+    - FrontISTR binaries will be automatically downloaded and installed on the first run. 
+      If the download does not proceed, please follow the steps below to install the solver.
+        1. Download [FrontISTR-latest.zip](https://www.frontistr.com/download/link.php?https://frontistr-commons.gitlab.io/FrontISTR/release/x86_64-w64-mingw32-msmpi/FrontISTR-latest.zip)
+        2. Create directory FEM_FrontISTR/bin
+        3. Extract FrontISTR-latest.zip and put all files in FEM_FrontISTR/bin directory.
 
 ### Linux
 
