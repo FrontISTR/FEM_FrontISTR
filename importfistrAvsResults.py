@@ -423,12 +423,12 @@ def read_avs_result(
             nd4 = int(line[6])
             elements_tetra4[eid] = (nd2, nd1, nd4, nd3)
 
+    # Extract surface
     extract_surface(nodes,elements_tetra10,elements_tetra4,elements_tria6,elements_tria3)
-    del elements_tetra10
     elements_tetra10 = {}
-    del elements_tetra4
     elements_tetra4 = {}
     
+    # Renumber for pipeline view
     nodes, Renumbered_nid = renumber_nid(nodes)
     elements_tria6, elements_tria3, Renumbered_eid = renumber_eid(Renumbered_nid,elements_tria6,elements_tria3)
 
