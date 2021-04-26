@@ -201,6 +201,20 @@ def add_attributes(obj, fistr_prefs):
     solver_threshold = fistr_prefs.GetString("MatrixSolverResidual", "1.0e-6")
     obj.MatrixSolverResidual = solver_threshold
 
+    known_fistr_output_format = [
+        "AVS",
+        "VTK (paraview required)"
+    ]
+    obj.addProperty(
+        "App::PropertyEnumeration",
+        "OutputFileFormat",
+        "General",
+        "File format of output file."
+    )
+    obj.OutputFileFormat = known_fistr_output_format
+    output_format = fistr_prefs.GetInt("OutputFileFormat", 0)
+    obj.OutputFileFormat = known_fistr_output_format[output_format]
+
     choices_increment_type = ["auto", "fixed"]
     obj.addProperty(
         "App::PropertyEnumeration",

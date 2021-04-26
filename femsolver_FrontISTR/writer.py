@@ -957,7 +957,13 @@ class FemInputWriterfistr(writerbase.FemInputWriter):
         f.write("!VISUAL,metod=PSR"+"\n")
         f.write("!surface_num=1"+"\n")
         f.write("!surface 1"+"\n")
-        f.write("!output_type=COMPLETE_AVS"+"\n\n")
+        fmtype = self.solver_obj.OutputFileFormat
+        if fmtype == "AVS":
+            f.write("!output_type=COMPLETE_AVS\n\n")
+        elif fmtype == "VTK (paraview required)":
+            f.write("!output_type=VTK\n\n")
+        elif fmtype == "Binary VTK (paraview required)":
+            f.write("!output_type=BIN_VTK\n\n")
 
     # ********************************************************************************************
     # step settings
