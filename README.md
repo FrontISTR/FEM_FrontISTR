@@ -43,14 +43,19 @@ FrontISTR is a nonlinear structural analysis solver with the following capabilit
         - method: CG, BiCGSTAB, GMRES, GPBiCG
     - direct
         - MUMPS
+- output file format
+    - AVS, VTK&dagger;
 
 \* FEM_FrontISTR support is currently under preparation.
+
+&dagger; paraview required
 
 ## Install
 
 ### Prerequisites
 
 - [FreeCAD v0.19 or later](https://github.com/FreeCAD/FreeCAD/releases/)
+- [paraivew](https://www.paraview.org/) (optional)
 
 ### Windows
 
