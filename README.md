@@ -17,6 +17,11 @@ FrontISTR is a nonlinear structural analysis solver with the following capabilit
 - geometrical nonlinearity
     - small(linear)
     - large deformation
+- elements
+    - 1st/2nd order tetrahedron
+    - 1st/2nd order prism\*
+    - 1st/2nd order hexahedron(F-bar, B-bar, Incompatible)\*
+    - beam\*, shell\*, truss\*
 - materials
     - mechanical
         - linear elastic
@@ -32,6 +37,12 @@ FrontISTR is a nonlinear structural analysis solver with the following capabilit
 - contact\*
 - step control
     - auto time increment and cutback
+- linear equation solver
+    - Iterative
+        - preconditioner: AMG, SSOR, Diagonal, ILU(k)(k=0,1,2)
+        - method: CG, BiCGSTAB, GMRES, GPBiCG
+    - direct
+        - MUMPS
 
 \* FEM_FrontISTR support is currently under preparation.
 
@@ -90,7 +101,22 @@ Under preparation.
 
 - MUMPS solver is currently not available for windows due to a problem between MS-MPI and MUMPS.
 
+### Tips
+
+- What kind of linear equation solver should I set up?
+  - Try default settings, CG with AMG preconditioner, at first. As far as we know, this setting is the best for many models.
+  - If you are faced with insufficient memory for a large-scale model, consider SSOR and DIAG. It will take longer time than default, but use less memory.
+  - If the iterative solver is slow to converge, consider the direct solver. In our experience, the convergence of the iterative solver can be very slow for extremely elongated or flat shapes.
+- What value should I set Matrix Solver Residual to?
+  - The larger the matrix solver residual value, the faster you can finish the calculation, but the less accurate the solution will be.
+  - Default value 1.0e-6 is for linear static analysis and enough for many models. If you are running a nonlinear analysis, you can set this value to around 1.0e-2 or 1.0e-3. This is because the Newton iteration limits the magnitude of the residual force and thus ensures the accuracy of the solution, even if the convergence threshold of the linear equation is loosened.
+
 ### Inquiry
+
 Create an issue at the github or post your inquiry to
 https://www.frontistr.com/inquiry/.
 (Membership registration is required.)
+
+
+## Acknowledgements
+This program was funded by [FrontISTR Commons](https://www.frontistr.org/) and developed with the cooperation of [RICOS Co. Ltd.](https://www.ricos.co.jp/).
