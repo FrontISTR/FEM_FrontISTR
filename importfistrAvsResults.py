@@ -248,7 +248,7 @@ def make_hash_tri(surf):
     tmp.sort()
     return str(tmp[0])+"%"+str(tmp[1])+"%"+str(tmp[2])
 
-def extract_surface(n_nodes,n_elems,nodes,elements_tetra10,elements_tetra4,elements_tria6,elements_tria3):
+def extract_surface(nodes,elements_tetra10,elements_tetra4,elements_tria6,elements_tria3):
     used_nid = []
 
     # extract surface of tetra10 elements
@@ -302,9 +302,42 @@ def extract_surface(n_nodes,n_elems,nodes,elements_tetra10,elements_tetra4,eleme
     for nid in used_nid:
         newnodes[nid] = nodes[nid]
     nodes = newnodes
+
+def renumber_nid(nodes):
+    Renumbered_nid = {}
+    count = 0
+    nodes_old = nodes.copy()
+    nodes = {}
+    for nid in list(nodes_old.keys()):
+        count += 1
+        Renumbered_nid[nid] = count
+        nodes[count] = nodes_old[nid]
+
+    return nodes, Renumbered_nid
+
+def renumber_eid(Renumbered_nid,elements_tria6,elements_tria3):
+    Renumbered_eid = {}
+    count = 0
     
-    n_nodes = len(nodes.keys())
-    n_elems = len(elements_tria3.keys())+len(elements_tria6.keys())
+    elements_tria6_new = {}
+    for eid in list(elements_tria6.keys()):
+        count += 1
+        Renumbered_eid[eid] = count
+        nodelist = []
+        for nid in elements_tria6[eid]:
+            nodelist.append(Renumbered_nid[nid])
+        elements_tria6_new[count] = nodelist
+
+    elements_tria3_new = {}
+    for eid in list(elements_tria3.keys()):
+        count += 1
+        Renumbered_eid[eid] = count
+        nodelist = []
+        for nid in elements_tria3[eid]:
+            nodelist.append(Renumbered_nid[nid])
+        elements_tria3_new[count] = nodelist
+    
+    return elements_tria6_new, elements_tria3_new, Renumbered_eid
 
 # read a FrontISTR result file and extract the nodes
 # displacement vectors and stress values.
@@ -390,11 +423,14 @@ def read_avs_result(
             nd4 = int(line[6])
             elements_tetra4[eid] = (nd2, nd1, nd4, nd3)
 
-    extract_surface(n_nodes,n_elems,nodes,elements_tetra10,elements_tetra4,elements_tria6,elements_tria3)
+    extract_surface(nodes,elements_tetra10,elements_tetra4,elements_tria6,elements_tria3)
     del elements_tetra10
     elements_tetra10 = {}
     del elements_tetra4
     elements_tetra4 = {}
+    
+    nodes, Renumbered_nid = renumber_nid(nodes)
+    elements_tria6, elements_tria3, Renumbered_eid = renumber_eid(Renumbered_nid,elements_tria6,elements_tria3)
 
     n_noderes, n_elemres = map(int, list(filter(None, dat.pop().split(" "))))
     if n_noderes > 0 :
@@ -416,7 +452,7 @@ def read_avs_result(
             nid = int(line[0])
             linedat = list(map(float,line[1:n_noderes+1]))
             for j in range(n_dofs):
-                nresults[labels[j]][nid] = linedat[dofs[j]:dofs[j+1]]
+                nresults[labels[j]][Renumbered_nid[nid]] = linedat[dofs[j]:dofs[j+1]]
 
         # displacement
         for nid in nodes.keys():
