@@ -102,16 +102,12 @@ Under preparation.
 
 ## Support
 
-### Known issues
-
-- MUMPS solver is currently not available for windows due to a problem between MS-MPI and MUMPS.
-
 ### Tips
 
 - What kind of linear equation solver should I set up?
-  - Try default settings, CG with AMG preconditioner, at first. As far as we know, this setting is the best for many models.
+  - Try default settings, CG with AMG preconditioner, at first. As far as we know, this setting is the best for many large-scale models.
   - If you are faced with insufficient memory for a large-scale model, consider SSOR and DIAG. It will take longer time than default, but use less memory.
-  - If the iterative solver is slow to converge, consider the direct solver. In our experience, the convergence of the iterative solver can be very slow for extremely elongated or flat shapes.
+  - If the iterative solver is slow to converge, consider the direct solver, MUMPS. In our experience, the convergence of the iterative solver can be very slow for extremely elongated or flat shapes.
 - What value should I set Matrix Solver Residual to?
   - The larger the matrix solver residual value, the faster you can finish the calculation, but the less accurate the solution will be.
   - Default value 1.0e-6 is for linear static analysis and enough for many models. If you are running a nonlinear analysis, you can set this value to around 1.0e-2 or 1.0e-3. This is because the Newton iteration limits the magnitude of the residual force and thus ensures the accuracy of the solution, even if the convergence threshold of the linear equation is loosened.
