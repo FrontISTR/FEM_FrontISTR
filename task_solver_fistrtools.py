@@ -293,7 +293,7 @@ class _TaskPanel:
 
         QApplication.setOverrideCursor(Qt.WaitCursor)
         try:
-            FreeCAD.Console.PrintMessage("self.fea.solver.OutputFileFormat: {}\n".format(self.fea.solver.OutputFileFormat))
+            FreeCAD.Console.PrintMessage("OutputFileFormat: {}\n".format(self.fea.solver.OutputFileFormat))
             if self.fea.solver.OutputFileFormat == "AVS": #AVS
                 self.fea.load_results()
                 self.femConsoleMessage("Done loading result sets.\n")
@@ -325,12 +325,34 @@ class _TaskPanel:
             QApplication.setOverrideCursor(Qt.WaitCursor)
             self.fea.write_inp_file()
             if self.fea.inp_file_name != "":
-                self.femConsoleMessage("Write completed.")
                 self.form.pb_edit_inp.setEnabled(True)
                 self.form.pb_run_fistr.setEnabled(True)
+
+                # partitioner
+                if self.fea.solver.n_process > 1:
+                    os.environ["OMP_NUM_THREADS"] = str(self.fea.solver.n_process)
+                import subprocess
+                from platform import system
+                startup_info = None
+                if system() == "Windows":
+                    # Windows workaround to avoid blinking terminal window
+                    startup_info = subprocess.STARTUPINFO()
+                    startup_info.dwFlags = subprocess.STARTF_USESHOWWINDOW
+
+                p = subprocess.Popen(
+                    [self.fea.partitioner_binary],
+                    cwd=self.fea.working_dir,
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.PIPE,
+                    shell=False,
+                    startupinfo=startup_info
+                )
+                part_stdout, part_stderr = p.communicate()                
+                self.femConsoleMessage("Writing .inp file and partitioning completed.")
             else:
-                self.femConsoleMessage("Write .inp file failed!", "#FF0000")
+                self.femConsoleMessage("Writing .inp file failed!", "#FF0000")
             QApplication.restoreOverrideCursor()
+
         self.form.l_time.setText("Time: {0:4.1f}: ".format(time.time() - self.Start))
 
     def check_prerequisites_helper(self):
@@ -390,20 +412,12 @@ class _TaskPanel:
         )
 
         # execute partitioner by subprocess
-        # It may make user wait, but calling partitioner from self.FrontISTR.start causes error
-        import subprocess
         if "OMP_NUM_THREADS" in os.environ:
             ont_backup_available = True
             ont_backup = os.environ.get("OMP_NUM_THREADS")
         else:
             ont_backup_available = False
         
-        # partitioner
-        import multiprocessing
-        if self.fea.solver.n_process > 1:
-            os.environ["OMP_NUM_THREADS"] = str(self.fea.solver.n_process)
-        subprocess.call(self.fea.partitioner_binary, cwd=self.fea.working_dir)
-
         # solver
         if self.fea.solver.n_process > 1:
             os.environ["OMP_NUM_THREADS"] = str(1)

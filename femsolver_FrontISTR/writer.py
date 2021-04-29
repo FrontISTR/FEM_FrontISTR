@@ -115,15 +115,9 @@ class FemInputWriterfistr(writerbase.FemInputWriter):
 
         self.write_FrontISTR_input()
 
-        writing_time_string = (
-            "Writing time FrontISTR input file: {} seconds"
-            .format(round((time.process_time() - timestart), 2))
-        )
         if self.femelement_count_test is True:
-            FreeCAD.Console.PrintMessage(writing_time_string + " \n\n")
             return self.include
         else:
-            FreeCAD.Console.PrintMessage(writing_time_string + " \n")
             FreeCAD.Console.PrintError(
                 "Problems on writing input file, check report prints.\n\n"
             )
@@ -950,7 +944,7 @@ class FemInputWriterfistr(writerbase.FemInputWriter):
     # output types
     def write_outputs_types(self, f):
         f.write("### OUTPUT Control ###\n")
-        f.write("!WRITE,RESULT"+"\n")
+        #f.write("!WRITE,RESULT"+"\n")
         f.write("!WRITE,VISUAL,FREQUENCY=9999"+"\n")
         f.write("!OUTPUT_VIS"+"\n")
         f.write("PRINC_NSTRESS,ON"+"\n")
