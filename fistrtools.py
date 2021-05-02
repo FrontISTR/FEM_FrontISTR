@@ -368,6 +368,30 @@ class FemToolsFISTR(QtCore.QRunnable, QtCore.QObject):
         # Update inp file name
         self.set_inp_file_name()
 
+    # modify floating point number expression compatible to FrontISTR
+    # (should be removed if FrontISTR solver accepts the expression such as 1e-3)
+    def mod_fp_expression(self,FILENAME):
+        import re
+        p = re.compile(r'([+\-,\s][0-9]+)([eE])')
+
+        f = open(FILENAME,"r")
+        dat = f.readlines()
+        f.close()
+
+        found_modfp=False
+        dat2 = []
+        for line in dat:
+            if p.search(line) == None:
+                dat2.append(line)
+            else:
+                dat2.append(p.sub(r'\1.\2',line))
+                found_modfp=True
+
+        if found_modfp:
+            f = open(FILENAME,"w")
+            f.writelines(dat2)
+            f.close()
+
     def write_inp_file(self):
         import femsolver_FrontISTR.writer as iw
         self.inp_file_name = ""
@@ -381,6 +405,7 @@ class FemToolsFISTR(QtCore.QRunnable, QtCore.QObject):
             )
             self.inp_file_name = inp_writer.write_FrontISTR_input_file()
             self.cnt_file_name = self.inp_file_name+".cnt.txt"
+            self.mod_fp_expression(self.inp_file_name+".inp")
         except Exception as e:
             FreeCAD.Console.PrintError(
                 "Unexpected error when writing FrontISTR input file: {}\n"
