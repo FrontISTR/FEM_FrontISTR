@@ -89,7 +89,9 @@ class ViewProxy(solverbase.ViewProxy):
 
 
 # helper add properties, this is outside of the class to be able
-# to use the attribute setter from framework solver and fistrtools solver
+# to use the attribute setter from framework solver and fistrtools solver.
+# some real value parameters are defined not by floating-point numbers but by characters.
+# This is because FreeCAD task panel does not accept exponential notation.
 def add_attributes(obj, fistr_prefs):
 
     obj.addProperty(

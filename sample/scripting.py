@@ -21,11 +21,28 @@ analysis_object = ObjectsFem.makeAnalysis(doc, "Analysis")
 # solver 
 Gui.activateWorkbench("FrontISTR")
 import ObjectsFISTR
+# See add_attributes from femsolver_FrontISTR/solver and writer
+# for the detail of attributions.
+obj.n_process = 4
+obj.AnalysisType = "static"
+obj.Nonlinearity = "no"
+obj.MatrixSolverType = "CG"
+obj.MatrixPrecondType = "AMG"
+obj.MatrixSolverIterLog = "no"
+obj.MatrixSolverTimeLog = "yes"
+obj.MatrixSolverNumIter = 5000
+obj.MatrixSolverResidual = "1.0e-6"
+obj.OutputFileFormat = "AVS"
+obj.IncrementType = "auto"
+obj.TimeEnd = 1.0
+obj.InitialTimeIncrement = 1.0
+obj.MinimumTimeIncrement = "1.0e-4"
+obj.MaximumTimeIncrement = 1.0
+obj.NewtonConvergeResidual = "1.0e-6"
+obj.NewtonMaximumIteration = 20
 solver_object = ObjectsFISTR.makeSolverFrontISTRTools(doc, "FrontISTR")
-solver_object.GeometricalNonlinearity = 'linear'
-solver_object.ThermoMechSteadyState = True
-solver_object.MatrixSolverType = 'CG'
-solver_object.IterationsControlParameterTimeUse = False
+
+
 analysis_object.addObject(solver_object)
 
 # material
@@ -72,13 +89,16 @@ import fistrtools
 fea = fistrtools.FemToolsFISTR(solver=solver_object)
 fea.update_objects()
 fea.setup_working_dir()
+print(fea.working_dir)
 fea.setup_fistr()
 message = fea.check_prerequisites()
 if not message:
-    fea.purge_results()
-    fea.write_inp_file()
-    fea.fistr_run()
-    fea.load_results()
+	fea.purge_results()
+	fea.write_inp_file()
+	fea.part_inp_file()
+	fea.fistr_run()
+	fea.load_results()
 else:
     FreeCAD.Console.PrintError("Houston, we have a problem! {}\n".format(message))  # in report view
     print("Houston, we have a problem! {}\n".format(message))  # in python console
+

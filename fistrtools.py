@@ -417,6 +417,28 @@ class FemToolsFISTR(QtCore.QRunnable, QtCore.QObject):
             FreeCAD.Console.PrintError("[x] Error: {error}".format(error=e)+"\n")
             raise
 
+    def part_inp_file(self):
+        # partitioner
+        if self.solver.n_process > 1:
+            os.environ["OMP_NUM_THREADS"] = str(self.solver.n_process)
+        import subprocess
+        from platform import system
+        startup_info = None
+        if system() == "Windows":
+            # Windows workaround to avoid blinking terminal window
+            startup_info = subprocess.STARTUPINFO()
+            startup_info.dwFlags = subprocess.STARTF_USESHOWWINDOW
+
+        p = subprocess.Popen(
+            [self.partitioner_binary],
+            cwd=self.working_dir,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            shell=False,
+            startupinfo=startup_info
+        )
+        part_stdout, part_stderr = p.communicate()                
+
     def setup_fistr(self, fistr_binary=None, fistr_binary_sig="FrontISTR"):
         """Set FrontISTR binary path and validate its execution or download FrontISTR.
 
@@ -594,21 +616,26 @@ class FemToolsFISTR(QtCore.QRunnable, QtCore.QObject):
             _env = os.putenv("OMP_NUM_THREADS", str(1))
         # change cwd because fistr may crash if directory has no write permission
         # there is also a limit of the length of file names so jump to the document directory
-        cwd = QtCore.QDir.currentPath()
-        f = QtCore.QFileInfo(self.inp_file_name)
-        QtCore.QDir.setCurrent(f.path())
-        cmd = self.partitioner_binary+" & "
-        cmd += self.mpiexec_binary+" -np "+'%d'%self.solver.n_process+" "+self.fistr_binary
-        FreeCAD.Console.PrintMessage(cmd+"\n") #tmp
+
+        n_pe = '%d'%self.solver.n_process
+        FreeCAD.Console.PrintMessage(" ".join([self.mpiexec_binary,"-n",n_pe,self.fistr_binary])+"\n")
+
+        from platform import system
+        startup_info = None
+        if system() == "Windows":
+            # Windows workaround to avoid blinking terminal window
+            startup_info = subprocess.STARTUPINFO()
+            startup_info.dwFlags = subprocess.STARTF_USESHOWWINDOW
         p = subprocess.Popen(
-            [self.fistr_binary],
+            [self.mpiexec_binary,"-n",n_pe,self.fistr_binary],
             cwd=self.working_dir,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             shell=False,
-            env=_env
+            startupinfo=startup_info
         )
         self.fistr_stdout, self.fistr_stderr = p.communicate()
+
         if sys.version_info.major >= 3:
             if system() == "Windows":
                 # TODO: encoding autodetection doesn't work on Windows yet
@@ -618,7 +645,6 @@ class FemToolsFISTR(QtCore.QRunnable, QtCore.QObject):
             self.fistr_stdout = self.fistr_stdout.decode(encoding)
             self.fistr_stderr = self.fistr_stderr.decode(encoding)
         os.putenv("OMP_NUM_THREADS", ont_backup)
-        QtCore.QDir.setCurrent(cwd)
         return p.returncode
 
     def get_fistr_version(self):
