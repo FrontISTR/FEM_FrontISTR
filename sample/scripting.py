@@ -21,27 +21,27 @@ analysis_object = ObjectsFem.makeAnalysis(doc, "Analysis")
 # solver 
 Gui.activateWorkbench("FrontISTR")
 import ObjectsFISTR
-# See add_attributes from femsolver_FrontISTR/solver and writer
-# for the detail of attributions.
-obj.n_process = 4
-obj.AnalysisType = "static"
-obj.Nonlinearity = "no"
-obj.MatrixSolverType = "CG"
-obj.MatrixPrecondType = "AMG"
-obj.MatrixSolverIterLog = "no"
-obj.MatrixSolverTimeLog = "yes"
-obj.MatrixSolverNumIter = 5000
-obj.MatrixSolverResidual = "1.0e-6"
-obj.OutputFileFormat = "AVS"
-obj.IncrementType = "auto"
-obj.TimeEnd = 1.0
-obj.InitialTimeIncrement = 1.0
-obj.MinimumTimeIncrement = "1.0e-4"
-obj.MaximumTimeIncrement = 1.0
-obj.NewtonConvergeResidual = "1.0e-6"
-obj.NewtonMaximumIteration = 20
 solver_object = ObjectsFISTR.makeSolverFrontISTRTools(doc, "FrontISTR")
 
+# See add_attributes from femsolver_FrontISTR/solver and writer
+# for the detail of attributions.
+solver_object.n_process = 4
+solver_object.AnalysisType = "static"
+solver_object.Nonlinearity = "no"
+solver_object.MatrixSolverType = "CG"
+solver_object.MatrixPrecondType = "AMG"
+solver_object.MatrixSolverIterLog = "no"
+solver_object.MatrixSolverTimeLog = "yes"
+solver_object.MatrixSolverNumIter = 5000
+solver_object.MatrixSolverResidual = "1.0e-6"
+solver_object.OutputFileFormat = "AVS"
+solver_object.IncrementType = "auto"
+solver_object.TimeEnd = 1.0
+solver_object.InitialTimeIncrement = 1.0
+solver_object.MinimumTimeIncrement = "1.0e-4"
+solver_object.MaximumTimeIncrement = 1.0
+solver_object.NewtonConvergeResidual = "1.0e-6"
+solver_object.NewtonMaximumIteration = 20
 
 analysis_object.addObject(solver_object)
 
