@@ -2,8 +2,8 @@
 
 FEM_FrontISTR is a FreeCAD addon that enables FrontISTR, an open-source large-scale parallel FEM program for nonlinear structural analysis. See [FrontISTR Home (Japanese website)](https://www.frontistr.com/) for the detail of FrontISTR solver.
 
-![Result](sample/showcase/0a_bikeframe.png)
-Fig: [Motorcycle frame](https://grabcad.com/library/motorcycle-frame-6), 644,415 nodes and 398,851 elements, calculation time is 172sec (8cores) with Intel Core i7-6700 @3.40GHz x 1CPU, 16.0GB Mem. Check [sample/showcase](./sample/showcase/README.md) for more samples.
+![Result](sample/benchmarks/03_bikeframe/result_mises_large.png)
+Fig: [Motorcycle frame](https://grabcad.com/library/motorcycle-frame-6), 364,807 nodes and 76,900 elements, calculation time is 31.4sec ( 82.5sec by calculix ) with Intel Core i7-6700 @3.40GHz x 4cores x 1CPU, 16.0GB Mem. Check [sample/benchmarks](./sample/benchmarks/) and [sample/showcase](./sample/showcase/README.md) for more samples.
 
 
 ## Features
@@ -102,6 +102,10 @@ Under preparation.
 
   - English: https://manual.frontistr.com/en/
   - 日本語: https://manual.frontistr.com/ja/
+
+### FreeCAD wiki
+
+  - https://wiki.freecadweb.org/FEM_FrontISTR_Workbench
 
 ## Support
 
