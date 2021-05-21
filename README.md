@@ -57,16 +57,19 @@ FrontISTR is a nonlinear structural analysis solver with the following capabilit
 - [FreeCAD v0.19 or later](https://github.com/FreeCAD/FreeCAD/releases/)
 - [paraivew](https://www.paraview.org/) (optional)
 
-### Windows
+### How to install
 
 1. Install FreeCAD.
-2. Download or git clone this repository to C:/Users/user_name/AppData/Roaming/FreeCAD/Mod/FEM_FrontISTR
-    - This procedure will be automated when FEM_FrontISTR is registered to FreeCAD addon manager.
-    - FrontISTR binaries will be automatically downloaded and installed on the first run. 
-      If the download does not proceed, please follow the steps below to install the solver.
-        1. Download [FrontISTR-latest.zip](https://www.frontistr.com/download/link.php?https://frontistr-commons.gitlab.io/FrontISTR/release/x86_64-w64-mingw32-msmpi/FrontISTR-latest.zip)
-        2. Create directory FEM_FrontISTR/bin
-        3. Extract FrontISTR-latest.zip and put all files in FEM_FrontISTR/bin directory.
+2. Installed FEM\_FrontISTR workbench from the FreeCAD Addon Manager. This can be done via the Tools → Addon Manager menu.
+
+### Windows
+
+If Installation from the FreeCAD Addon Manager does not work, download or git clone this repository to `C:/Users/user_name/AppData/Roaming/FreeCAD/Mod/FEM_FrontISTR`
+
+FrontISTR binaries will be automatically downloaded and installed on the first run. If the download does not proceed, please follow the steps below to install the solver.
+1. Download [FrontISTR-latest.zip](https://www.frontistr.com/download/link.php?https://frontistr-commons.gitlab.io/FrontISTR/release/x86_64-w64-mingw32-msmpi/FrontISTR-latest.zip)
+2. Create directory FEM_FrontISTR/bin
+3. Extract FrontISTR-latest.zip and put all files in FEM_FrontISTR/bin directory.
 
 ### Linux
 
@@ -83,7 +86,7 @@ Under preparation.
     - SolverFISTRTools object is created in "Analysis" group
 3. Open the task panel of SolverFISTRTools and set working directory.
 4. Click "Write input file"
-    - FrontISTR input files are generated in working directory
+    - FrontISTR input files are generated in working directory.
 5. Click "Run FrontISTR"
     - FrontISTR starts in parallel and FISTR_Results object will be created after finishing calculation.
 6. Check FISTR_Results for post processing.
@@ -106,7 +109,6 @@ Under preparation.
 
 - What kind of linear equation solver should I set up?
   - Try default settings, CG with AMG preconditioner, at first. As far as we know, this setting is the best for many large-scale models.
-  - If you are faced with insufficient memory for a large-scale model, consider SSOR and DIAG. It will take longer time than default, but use less memory.
   - If the iterative solver is slow to converge, consider the direct solver, MUMPS. In our experience, the convergence of the iterative solver can be very slow for extremely elongated or flat shapes.
 - What value should I set Matrix Solver Residual to?
   - The larger the matrix solver residual value, the faster you can finish the calculation, but the less accurate the solution will be.
