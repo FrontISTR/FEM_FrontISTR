@@ -102,3 +102,13 @@ else:
     FreeCAD.Console.PrintError("Houston, we have a problem! {}\n".format(message))  # in report view
     print("Houston, we have a problem! {}\n".format(message))  # in python console
 
+# get results
+result = doc.getObject('FISTR_Results')
+stats = result.Stats
+print("### results ###")
+for idof in [1,2,3]:
+    print("U{}: Max {:12.4e}, Min {:12.4e}".format(idof, stats[2*idof-1], stats[2*idof-2]))
+
+print("Max von mises  : {:12.4e}".format(stats[9]))
+print("Max prn. stress: {:12.4e}".format(stats[11]))
+print("Min prn. stress: {:12.4e}".format(stats[14]))
