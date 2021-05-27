@@ -21,8 +21,8 @@
   - CPU: Intel Core i7-6700 @3.40GHz 4cores x 1CPU
   - Memory: 16GB
   - FreeCAD 0.19.1 a88db11
-  - FrontISTR v5.2 380f1690
-  - FEM\_FrontISTR 8f57d2f3
+  - FrontISTR v5.2 1a5263e1
+  - FEM\_FrontISTR 96abb945
   - Paralell settings
     - Calculix: `OMP_NUM_THREADS=4`
       - Note that Iterativecholesky solver runs sequentially. The other processes are executed in parallel.
@@ -46,19 +46,19 @@ The performance(Solver time) of CalculiX and FrontISTR for the involute gear mod
 
 The detailed result table including write Input time, result loading time, Mises stress, and iterative solver information is as follows:
 
-| model     | Solver    | Matrix Solver     | Tw (sec) | Ts (sec) | Tt (sec) | Tr (sec) | Max Mises(MPa) | iter | residual | threshold |
-| --------- | --------- | ----------------- | -------- | -------- | -------- | -------- | -------------- | ---- | -------- | --------- |
-| 1. small  | CalculiX  | iterativecholesky | 4.8      | 8.6      | 18.7     | 10.1     | 334.16         | 151  | 2.02E-04 | 2.24E-04  |
-|           | CalculiX  | spooles           | 4.3      | 13.4     | 23.1     | 9.7      | 334.16         | N/A  | N/A      | N/A       |
-|           | FrontISTR | CG w/ AMG         | 6.1      | **4.1**  | 12.4     | 8.3      | 334.16         | 30   | 6.92E-07 | 1.00E-06  |
-|           | FrontISTR | MUMPS             | 6.1      | 7.0      | 15.3     | 8.3      | 334.16         | N/A  | 2.25E-12 | N/A       |
-| 2. middle | CalculiX  | iterativecholesky | 18.4     | 37.9     | 75.8     | 37.9     | 397.31         | 237  | 1.13E-04 | 1.24E-04  |
-|           | CalculiX  | spooles           | 19.1     | 120.1    | 151.2    | 31.1     | 397.37         | N/A  | N/A      | N/A       |
-|           | FrontISTR | CG w/ AMG         | 25.8     | **13.8** | 32.8     | 19.0     | 397.37         | 24   | 9.79E-07 | 1.00E-06  |
-|           | FrontISTR | MUMPS             | 25.2     | 55.3     | 77.2     | 21.9     | 397.37         | N/A  | 4.53E-12 | N/A       |
-| 3. large  | CalculiX  | iterativecholesky | 55.5     | 160.3    | 265.7    | 105.4    | 442.03         | 544  | 6.19E-05 | 6.50E-05  |
-|           | CalculiX  | spooles           | 50.8     | 880.8    | N/A*     | N/A*     | N/A*           | N/A  | N/A      | N/A       |
-|           | FrontISTR | CG w/ AMG         | 72.4     | **41.8** | 93.2     | 51.4     | 442.02         | 29   | 7.76E-07 | 1.00E-06  |
-|           | FrontISTR | MUMPS             | 74.4     | 590.5    | 651.5    | 61.0     | 442.02         | N/A  | 9.37E-12 | N/A       |
+| model     | Solver    | Matrix Solver     | Tw (sec) | Ts (sec)  | Tt (sec) | Tr (sec) | Max Mises(MPa) | iter | residual | threshold |
+| --------- | --------- | ----------------- | -------- | --------- | -------- | -------- | -------------- | ---- | -------- | --------- |
+| 1. small  | Calculix  | iterativecholesky | 4.8      | 8.6       | 18.7     | 10.1     | 334.16         | 151  | 2.02E-04 | 2.24E-04  |
+|           | Calculix  | spooles           | 4.3      | 13.4      | 23.1     | 9.7      | 334.16         | N/A  | N/A      | N/A       |
+|           | FrontISTR | CG w/ AMG         | 6.9      | **5.8**   | 14.3     | 8.5      | 334.16         | 11   | 6.64E-07 | 1.00E-06  |
+|           | FrontISTR | MUMPS             | 6.1      | 7.0       | 15.3     | 8.3      | 334.16         | N/A  | 2.25E-12 | N/A       |
+| 2. middle | Calculix  | iterativecholesky | 18.4     | 37.9      | 75.8     | 37.9     | 397.31         | 237  | 1.13E-04 | 1.24E-04  |
+|           | Calculix  | spooles           | 19.1     | 120.1     | 151.2    | 31.1     | 397.37         | N/A  | N/A      | N/A       |
+|           | FrontISTR | CG w/ AMG         | 26.7     | **22.3**  | 40.5     | 18.2     | 397.37         | 11   | 6.88E-07 | 1.00E-06  |
+|           | FrontISTR | MUMPS             | 25.2     | 55.3      | 77.2     | 21.9     | 397.37         | N/A  | 4.53E-12 | N/A       |
+| 3. large  | Calculix  | iterativecholesky | 55.5     | **160.3** | 265.7    | 105.4    | 442.03         | 544  | 6.19E-05 | 6.50E-05  |
+|           | Calculix  | spooles           | 50.8     | 880.8     | N/A*     | N/A*     | N/A*           | N/A  | N/A      | N/A       |
+|           | FrontISTR | CG w/ AMG         | 79.4     | 198.0     | 256.3    | 58.3     | 442.02         | 12   | 3.06E-07 | 1.00E-06  |
+|           | FrontISTR | MUMPS             | 74.4     | 590.5     | 651.5    | 61.0     | 442.02         | N/A  | 9.37E-12 | N/A       |
 
 \*Problem on frd file import. No nodes found in frd file.

@@ -938,6 +938,7 @@ class FemInputWriterfistr(writerbase.FemInputWriter):
                 QtGui.QMessageBox.warning(None, "Converting value failed", converting_string)
         solverres  = " {:E}".format(matrix_solver_residual_float)
         solverres += ", 1.0, 0.0\n"
+        solverres += "3, 1, 1, 2\n" #set AMG paramters
         f.write(solverres)
 
     # ********************************************************************************************

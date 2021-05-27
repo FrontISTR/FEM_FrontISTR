@@ -2,8 +2,8 @@
 
 FEM_FrontISTR is a FreeCAD addon that enables FrontISTR, an open-source large-scale parallel FEM program for nonlinear structural analysis. See [FrontISTR Home (Japanese website)](https://www.frontistr.com/) for the detail of FrontISTR solver.
 
-![Result](sample/showcase/0a_bikeframe.png)
-Fig: [Motorcycle frame](https://grabcad.com/library/motorcycle-frame-6), 644,415 nodes and 398,851 elements, calculation time is 172sec (8cores) with Intel Core i7-6700 @3.40GHz x 1CPU, 16.0GB Mem. Check [sample/showcase](./sample/showcase/README.md) for more samples.
+![Result](sample/benchmarks/03_bikeframe/result_mises_large.png)
+Fig: [Motorcycle frame](https://grabcad.com/library/motorcycle-frame-6), 364,807 nodes and 76,900 elements, calculation time is 31.4sec ( 82.5sec by calculix ) with Intel Core i7-6700 @3.40GHz x 4cores x 1CPU, 16.0GB Mem. Check [sample/benchmarks](./sample/benchmarks/) and [sample/showcase](./sample/showcase/README.md) for more samples.
 
 
 ## Features
@@ -57,16 +57,19 @@ FrontISTR is a nonlinear structural analysis solver with the following capabilit
 - [FreeCAD v0.19 or later](https://github.com/FreeCAD/FreeCAD/releases/)
 - [paraivew](https://www.paraview.org/) (optional)
 
-### Windows
+### How to install
 
 1. Install FreeCAD.
-2. Download or git clone this repository to C:/Users/user_name/AppData/Roaming/FreeCAD/Mod/FEM_FrontISTR
-    - This procedure will be automated when FEM_FrontISTR is registered to FreeCAD addon manager.
-    - FrontISTR binaries will be automatically downloaded and installed on the first run. 
-      If the download does not proceed, please follow the steps below to install the solver.
-        1. Download [FrontISTR-latest.zip](https://www.frontistr.com/download/link.php?https://frontistr-commons.gitlab.io/FrontISTR/release/x86_64-w64-mingw32-msmpi/FrontISTR-latest.zip)
-        2. Create directory FEM_FrontISTR/bin
-        3. Extract FrontISTR-latest.zip and put all files in FEM_FrontISTR/bin directory.
+2. Installed FEM\_FrontISTR workbench from the FreeCAD Addon Manager. This can be done via the Tools → Addon Manager menu.
+
+### Windows
+
+If Installation from the FreeCAD Addon Manager does not work, download or git clone this repository to `C:/Users/user_name/AppData/Roaming/FreeCAD/Mod/FEM_FrontISTR`
+
+FrontISTR binaries will be automatically downloaded and installed on the first run. If the download does not proceed, please follow the steps below to install the solver.
+1. Download [FrontISTR-latest.zip](https://www.frontistr.com/download/link.php?https://frontistr-commons.gitlab.io/FrontISTR/release/x86_64-w64-mingw32-msmpi/FrontISTR-latest.zip)
+2. Create directory FEM_FrontISTR/bin
+3. Extract FrontISTR-latest.zip and put all files in FEM_FrontISTR/bin directory.
 
 ### Linux
 
@@ -83,7 +86,7 @@ Under preparation.
     - SolverFISTRTools object is created in "Analysis" group
 3. Open the task panel of SolverFISTRTools and set working directory.
 4. Click "Write input file"
-    - FrontISTR input files are generated in working directory
+    - FrontISTR input files are generated in working directory.
 5. Click "Run FrontISTR"
     - FrontISTR starts in parallel and FISTR_Results object will be created after finishing calculation.
 6. Check FISTR_Results for post processing.
@@ -100,13 +103,16 @@ Under preparation.
   - English: https://manual.frontistr.com/en/
   - 日本語: https://manual.frontistr.com/ja/
 
+### FreeCAD wiki
+
+  - https://wiki.freecadweb.org/FEM_FrontISTR_Workbench
+
 ## Support
 
 ### Tips
 
 - What kind of linear equation solver should I set up?
   - Try default settings, CG with AMG preconditioner, at first. As far as we know, this setting is the best for many large-scale models.
-  - If you are faced with insufficient memory for a large-scale model, consider SSOR and DIAG. It will take longer time than default, but use less memory.
   - If the iterative solver is slow to converge, consider the direct solver, MUMPS. In our experience, the convergence of the iterative solver can be very slow for extremely elongated or flat shapes.
 - What value should I set Matrix Solver Residual to?
   - The larger the matrix solver residual value, the faster you can finish the calculation, but the less accurate the solution will be.
