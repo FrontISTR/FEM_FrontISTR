@@ -205,7 +205,8 @@ def add_attributes(obj, fistr_prefs):
 
     known_fistr_output_format = [
         "AVS",
-        "VTK (paraview required)"
+        "VTK (paraview required)",
+        "Binary VTK (paraview required)"
     ]
     obj.addProperty(
         "App::PropertyEnumeration",
