@@ -16,7 +16,6 @@
   - Matrix solver settings
     - CalculiX: iterativecholesky(iterative), spooles(direct)
     - FrontISTR: CG w/ AMG preconditioner(iterative), MUMPS(direct)
-      - Set Matrix Solver Residual=1.0E-3 due to slow convergence
 - Mesurement Environment
   - OS: Windows 10 Pro 10.0.19041 N/A Build 19041
   - CPU: Intel Core i7-6700 @3.40GHz 4cores x 1CPU
