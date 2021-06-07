@@ -549,12 +549,12 @@ class FemToolsFISTR(QtCore.QRunnable, QtCore.QObject):
                     import zipfile
                     import shutil
                     from pathlib import Path
-                    filename = 'FrontISTR-latest.zip'
+                    filename = 'FrontISTR-latest.hybrid_impi_mkl_intelthread.zip'
                     filepath = Path(FreeCAD.getUserAppDataDir() + 'Mod/FEM_FrontISTR/' + filename)
                     req = urllib.request.Request(
                         # TODO: this redirector does not work
                         #'https://www.frontistr.com/download/link.php?' +
-                        'https://frontistr-commons.gitlab.io/FrontISTR/release/x86_64-w64-mingw32-msmpi/' +
+                        'https://frontistr-commons.gitlab.io/FrontISTR/release/x86_64-w64-mingw32/' +
                         filename)
                     with urllib.request.urlopen(req) as response, open(filepath, "wb") as out_file:
                         shutil.copyfileobj(response, out_file)
