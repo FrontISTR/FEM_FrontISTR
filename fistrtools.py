@@ -437,7 +437,7 @@ class FemToolsFISTR(QtCore.QRunnable, QtCore.QObject):
             shell=False,
             startupinfo=startup_info
         )
-        part_stdout, part_stderr = p.communicate()                
+        part_stdout, part_stderr = p.communicate()
 
     def setup_fistr(self, fistr_binary=None, fistr_binary_sig="FrontISTR"):
         """Set FrontISTR binary path and validate its execution or download FrontISTR.
@@ -472,7 +472,7 @@ class FemToolsFISTR(QtCore.QRunnable, QtCore.QObject):
                 self.partitioner_binary = partitioner_path
                 self.mpiexec_binary = mpiexec_path
             elif system() in ("Linux", "Darwin"):
-                p1 = subprocess.Popen(["which", "fistr"], stdout=subprocess.PIPE)
+                p1 = subprocess.Popen(["which", "fistr1"], stdout=subprocess.PIPE)
                 if p1.wait() == 0:
                     if sys.version_info.major >= 3:
                         fistr_path = p1.stdout.read().decode("utf8").split("\n")[0]
@@ -480,7 +480,7 @@ class FemToolsFISTR(QtCore.QRunnable, QtCore.QObject):
                         fistr_path = p1.stdout.read().split("\n")[0]
                 elif p1.wait() == 1:
                     error_message = (
-                        "FEM: FrontISTR binary fistr not found in "
+                        "FEM: FrontISTR binary fistr1 not found in "
                         "standard system binary path. "
                         "Please install fistr or set path to binary "
                         "in FEM preferences tab FrontISTR.\n"
@@ -489,6 +489,38 @@ class FemToolsFISTR(QtCore.QRunnable, QtCore.QObject):
                         QtGui.QMessageBox.critical(None, error_title, error_message)
                     raise Exception(error_message)
                 self.fistr_binary = fistr_path
+
+                p2 = subprocess.Popen(["which", "hecmw_part1"], stdout=subprocess.PIPE)
+                if p2.wait() == 0:
+                    if sys.version_info.major >= 3:
+                        partitioner_path = p2.stdout.read().decode("utf8").split("\n")[0]
+                    else:
+                        partitioner_path = p2.stdout.read().split("\n")[0]
+                elif p2.wait() == 1:
+                    error_message = (
+                        "FEM: FrontISTR binary hecmw_part1 not found in "
+                        "standard system binary path.\n"
+                    )
+                    if FreeCAD.GuiUp:
+                        QtGui.QMessageBox.critical(None, error_title, error_message)
+                    raise Exception(error_message)
+                self.partitioner_binary = partitioner_path
+
+                p3 = subprocess.Popen(["which", "mpirun"], stdout=subprocess.PIPE)
+                if p3.wait() == 0:
+                    if sys.version_info.major >= 3:
+                        mpiexec_path = p3.stdout.read().decode("utf8").split("\n")[0]
+                    else:
+                        mpiexec_path = p3.stdout.read().split("\n")[0]
+                elif p3.wait() == 1:
+                    error_message = (
+                        "FEM: FrontISTR binary mpirun not found in "
+                        "standard system binary path.\n"
+                    )
+                    if FreeCAD.GuiUp:
+                        QtGui.QMessageBox.critical(None, error_title, error_message)
+                    raise Exception(error_message)
+                self.mpiexec_binary = mpiexec_path
         else:
             if not fistr_binary:
                 self.fistr_prefs = FreeCAD.ParamGet(
@@ -579,8 +611,8 @@ class FemToolsFISTR(QtCore.QRunnable, QtCore.QObject):
                 FreeCAD.Console.PrintError("[x] Type: {type}".format(type=type(e))+"\n")
                 FreeCAD.Console.PrintError("[x] Args: {args}".format(args=e.args)+"\n")
                 FreeCAD.Console.PrintError("[x] Message: {message}".format(message=e.message)+"\n")
-                FreeCAD.Console.PrintError("[x] Error: {error}".format(error=e)+"\n")                
-                
+                FreeCAD.Console.PrintError("[x] Error: {error}".format(error=e)+"\n")
+
         except Exception as e:
             FreeCAD.Console.PrintError("{}\n".format(e))
             error_message = (
@@ -894,7 +926,7 @@ class FemToolsFISTR(QtCore.QRunnable, QtCore.QObject):
         """Load results of fistr calculations from .avs file.
         """
         import importfistrAvsResults
-        
+
         # grep visfiles
         visfiles = []
         for file in os.listdir(self.working_dir):
@@ -902,7 +934,7 @@ class FemToolsFISTR(QtCore.QRunnable, QtCore.QObject):
                 continue
             visfiles.append(file)
         visfiles.sort()
-        
+
         # read only visfile at the last substep
         avs_result_file = self.working_dir.replace("\\","/")+"/"+visfiles[-1]
         if os.path.isfile(avs_result_file):
