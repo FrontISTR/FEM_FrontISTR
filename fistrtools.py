@@ -599,24 +599,17 @@ class FemToolsFISTR(QtCore.QRunnable, QtCore.QObject):
         from platform import system
         self.fistr_stdout = ""
         self.fistr_stderr = ""
-        ont_backup = os.environ.get("OMP_NUM_THREADS")
-        self.fistr_prefs = FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/Fem/FrontISTR")
-        # If number of CPU's specified
-        num_cpu_pref = self.fistr_prefs.GetInt("AnalysisNumCPUs", 1)
-        if not ont_backup:
-            ont_backup = str(num_cpu_pref)
-        if num_cpu_pref > 1:
-            # If user picked a number use that instead
-            _env = os.putenv("OMP_NUM_THREADS", str(num_cpu_pref))
+        
+        if "OMP_NUM_THREADS" in os.environ:
+            ont_backup_available = True
+            ont_backup = os.environ.get("OMP_NUM_THREADS")
         else:
-            _env = os.putenv("OMP_NUM_THREADS", str(multiprocessing.cpu_count()))
-        # if n_process is set and greater than 1, n_process is for MPI process.
-        # therefore set OMP_NUM_THREADS=1 explicitly.
+            ont_backup_available = False
+        
         if self.solver.n_process > 1:
-            _env = os.putenv("OMP_NUM_THREADS", str(1))
-        # change cwd because fistr may crash if directory has no write permission
-        # there is also a limit of the length of file names so jump to the document directory
-
+            os.environ["OMP_NUM_THREADS"] = str(1)
+            os.environ["MKL_NUM_THREADS"] = str(1)
+        
         n_pe = '%d'%self.solver.n_process
         FreeCAD.Console.PrintMessage(" ".join([self.mpiexec_binary,"-n",n_pe,self.fistr_binary])+"\n")
 
@@ -626,6 +619,7 @@ class FemToolsFISTR(QtCore.QRunnable, QtCore.QObject):
             # Windows workaround to avoid blinking terminal window
             startup_info = subprocess.STARTUPINFO()
             startup_info.dwFlags = subprocess.STARTF_USESHOWWINDOW
+
         p = subprocess.Popen(
             [self.mpiexec_binary,"-n",n_pe,self.fistr_binary],
             cwd=self.working_dir,
@@ -644,7 +638,10 @@ class FemToolsFISTR(QtCore.QRunnable, QtCore.QObject):
                 encoding = 'utf-8'
             self.fistr_stdout = self.fistr_stdout.decode(encoding)
             self.fistr_stderr = self.fistr_stderr.decode(encoding)
-        os.putenv("OMP_NUM_THREADS", ont_backup)
+
+        if ont_backup_available:
+            os.environ["OMP_NUM_THREADS"] = str(ont_backup)
+
         return p.returncode
 
     def get_fistr_version(self):
