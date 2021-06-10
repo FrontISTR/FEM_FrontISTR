@@ -181,7 +181,7 @@ class _TaskPanel:
             f = open(self.logfile,'r')
             out = f.readlines()
             f.close()
-            out = "".join(out)
+            out = "FrontISTR stdout: <br>"+"".join(out)
             out = out.replace("\n", "<br>")
             # print(out)
             self.femConsoleMessage(out)
@@ -411,17 +411,18 @@ class _TaskPanel:
             .format(work_dir, n_pe)
         )
 
-        # execute partitioner by subprocess
+        # solver
         if "OMP_NUM_THREADS" in os.environ:
             ont_backup_available = True
             ont_backup = os.environ.get("OMP_NUM_THREADS")
         else:
             ont_backup_available = False
         
-        # solver
         if self.fea.solver.n_process > 1:
             os.environ["OMP_NUM_THREADS"] = str(1)
-        self.FrontISTR.start(self.fea.mpiexec_binary,["-n",n_pe,"-logfile",self.logfile,self.fea.fistr_binary])
+            os.environ["MKL_NUM_THREADS"] = str(1)
+        self.FrontISTR.setStandardOutputFile(self.logfile)
+        self.FrontISTR.start(self.fea.mpiexec_binary,["-n",n_pe,self.fea.fistr_binary])
 
         if ont_backup_available:
             os.environ["OMP_NUM_THREADS"] = str(ont_backup)
