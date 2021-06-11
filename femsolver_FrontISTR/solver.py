@@ -42,7 +42,7 @@ from femtools import femutils
 if FreeCAD.GuiUp:
     import FemGui
 
-ANALYSIS_TYPES = ["static", "heat", "eigen", "dynamic", "check"]
+ANALYSIS_TYPES = ["static", "check"]
 
 
 def create(doc, name="SolverFrontISTR"):
