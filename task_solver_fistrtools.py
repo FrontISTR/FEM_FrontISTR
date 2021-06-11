@@ -292,20 +292,22 @@ class _TaskPanel:
             raise
 
         QApplication.setOverrideCursor(Qt.WaitCursor)
-        try:
-            FreeCAD.Console.PrintMessage("OutputFileFormat: {}\n".format(self.fea.solver.OutputFileFormat))
-            if self.fea.solver.OutputFileFormat == "AVS": #AVS
-                self.fea.load_results()
-                self.femConsoleMessage("Done loading result sets.\n")
-            else: # 1.VTK, 2.Binary VTK
-                message = (
-                    "VTK or Binary VTK is specified for output file format. "
-                    "The result file will not be read by FreeCAD FEM.\n"
-                    "Open a *.pvtu file with paraview and you can view the result.\n"
-                )
-                FreeCAD.Console.PrintMessage(message)
-        except Exception as err:
-            FreeCAD.Console.PrintError("loading results failed: {}\n".format(err))
+        
+        if self.fea.solver.AnalysisType != "check":
+            try:
+                FreeCAD.Console.PrintMessage("OutputFileFormat: {}\n".format(self.fea.solver.OutputFileFormat))
+                if self.fea.solver.OutputFileFormat == "AVS": #AVS
+                    self.fea.load_results()
+                    self.femConsoleMessage("Done loading result sets.\n")
+                else: # 1.VTK, 2.Binary VTK
+                    message = (
+                        "VTK or Binary VTK is specified for output file format. "
+                        "The result file will not be read by FreeCAD FEM.\n"
+                        "Open a *.pvtu file with paraview and you can view the result.\n"
+                    )
+                    FreeCAD.Console.PrintMessage(message)
+            except Exception as err:
+                FreeCAD.Console.PrintError("loading results failed: {}\n".format(err))
 
         QApplication.restoreOverrideCursor()
         self.form.l_time.setText("Time: {0:4.1f}: ".format(time.time() - self.Start))
