@@ -223,7 +223,7 @@ class FemInputWriterfistr(writerbase.FemInputWriter):
 
         mshfile = codecs.open(self.msh_name, "a", encoding="utf-8")
         # delete **Define element set Eall 
-        mshfile.seek(-58, os.SEEK_END)
+        mshfile.seek(-57, os.SEEK_END)
         mshfile.truncate()
 
         return mshfile
