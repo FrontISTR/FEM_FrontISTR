@@ -404,7 +404,7 @@ class FemToolsFISTR(QtCore.QRunnable, QtCore.QObject):
                 self.working_dir
             )
             self.inp_file_name = inp_writer.write_FrontISTR_input_file()
-            self.cnt_file_name = self.inp_file_name+".cnt.txt"
+            self.cnt_file_name = self.inp_file_name+".cnt"
             self.mod_fp_expression(self.inp_file_name+".inp")
         except Exception as e:
             FreeCAD.Console.PrintError(
@@ -644,6 +644,14 @@ class FemToolsFISTR(QtCore.QRunnable, QtCore.QObject):
         
         n_pe = '%d'%self.solver.n_process
         FreeCAD.Console.PrintMessage(" ".join([self.mpiexec_binary,"-n",n_pe,self.fistr_binary])+"\n")
+
+        import glob
+        cntinp_file_name = self.cnt_file_name.replace(".cnt", "_cnt.inp")
+        if len(glob.glob(self.cnt_file_name)) == 0:
+            os.rename(cntinp_file_name, self.cnt_file_name)
+        elif len(glob.glob(cntinp_file_name)) > 0:
+            # if both *.cnt and *_cnt.inp exist
+            os.remove(cntinp_file_name)
 
         from platform import system
         startup_info = None

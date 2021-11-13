@@ -87,7 +87,7 @@ class _TaskPanel:
             self.write_input_file_handler
         )
         QtCore.QObject.connect(
-            self.form.pb_edit_inp,
+            self.form.pb_edit_cnt,
             QtCore.SIGNAL("clicked()"),
             self.editFrontISTRCntFile
         )
@@ -327,7 +327,7 @@ class _TaskPanel:
             QApplication.setOverrideCursor(Qt.WaitCursor)
             self.fea.write_inp_file()
             if self.fea.inp_file_name != "":
-                self.form.pb_edit_inp.setEnabled(True)
+                self.form.pb_edit_cnt.setEnabled(True)
                 self.form.pb_run_fistr.setEnabled(True)
 
                 # partitioner
@@ -379,7 +379,7 @@ class _TaskPanel:
         print("editFrontISTRCntFile {}".format(self.fea.cnt_file_name))
         fistr_prefs = FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/Fem/FrontISTR")
         if fistr_prefs.GetBool("UseInternalEditor", True):
-            FemGui.open(self.fea.cnt_file_name)
+            self.openFrontISTRCntFileAsInp()
         else:
             ext_editor_path = fistr_prefs.GetString("ExternalEditorPath", "")
             if ext_editor_path:
@@ -389,7 +389,16 @@ class _TaskPanel:
                     "External editor is not defined in FEM preferences. "
                     "Falling back to internal editor"
                 )
-                FemGui.open(self.fea.cnt_file_name)
+                self.openFrontISTRCntFileAsInp()
+    
+    def openFrontISTRCntFileAsInp(self):
+        import glob
+        cntinp_file_name = self.fea.cnt_file_name.replace(".cnt", "_cnt.inp")
+        if len(glob.glob(self.fea.cnt_file_name)) > 0:
+            if len(glob.glob(cntinp_file_name)) > 0:
+                os.remove(cntinp_file_name)
+            os.rename(self.fea.cnt_file_name, cntinp_file_name)
+        FemGui.open(cntinp_file_name)
 
     def runFrontISTR(self):
         # print("runFrontISTR")
@@ -401,6 +410,14 @@ class _TaskPanel:
         # parallel settings
         n_pe = "%d"%self.fea.solver.n_process
         
+        import glob
+        cntinp_file_name = self.fea.cnt_file_name.replace(".cnt", "_cnt.inp")
+        if len(glob.glob(self.fea.cnt_file_name)) == 0:
+            os.rename(cntinp_file_name, self.fea.cnt_file_name)
+        elif len(glob.glob(cntinp_file_name)) > 0:
+            # if both *.cnt and *_cnt.inp exist
+            os.remove(cntinp_file_name)
+
         # work dir
         self.cwd = QtCore.QDir.currentPath()
         fi = QtCore.QFileInfo(self.fea.cnt_file_name)
@@ -434,7 +451,7 @@ class _TaskPanel:
     def select_analysis_type(self, analysis_type):
         if self.fea.solver.AnalysisType != analysis_type:
             self.fea.solver.AnalysisType = analysis_type
-            self.form.pb_edit_inp.setEnabled(False)
+            self.form.pb_edit_cnt.setEnabled(False)
             self.form.pb_run_fistr.setEnabled(False)
 
     def select_static_analysis(self):
