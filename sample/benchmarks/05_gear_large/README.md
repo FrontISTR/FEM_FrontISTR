@@ -12,14 +12,14 @@
   - Matrix solver settings
     - CalculiX: iterativecholesky(iterative), spooles(direct)
     - FrontISTR: CG w/ AMG preconditioner(iterative), MUMPS(direct)
-- Mesurement Environment
+- Measurement Environment
   - OS: Windows 10
   - CPU: Ryzen 3700X @3.60GHz 8cores x 1CPU
   - Memory: 64GB
   - FreeCAD 0.19.1 a88db11
   - FrontISTR v5.2 380f1690
   - FEM\_FrontISTR 8f57d2f3
-  - Paralell settings
+  - Parallel settings
     - Calculix: `OMP_NUM_THREADS=8`
       - Note that Iterativecholesky solver runs sequentially. The other processes are executed in parallel.
     - FrontISTR: `n_process=8`
