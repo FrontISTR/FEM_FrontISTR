@@ -1,4 +1,4 @@
-# FEM_FrontISTR: A parallel nonlinear finite element analysis workbench for FreeCAD
+## FEM_FrontISTR: A parallel nonlinear finite element analysis workbench for FreeCAD
 
 FEM_FrontISTR is a FreeCAD addon that enables FrontISTR, an open-source large-scale parallel FEM program for nonlinear structural analysis. See [FrontISTR Home (Japanese website)](https://www.frontistr.com/) for the detail of FrontISTR solver.
 
@@ -7,6 +7,7 @@ Fig: [Motorcycle frame](https://grabcad.com/library/motorcycle-frame-6), 364,807
 
 
 ## Features
+
 FrontISTR is a nonlinear structural analysis solver with the following capabilities:
 
 - analysis type
@@ -46,31 +47,40 @@ FrontISTR is a nonlinear structural analysis solver with the following capabilit
 - output file format
     - AVS, VTK&dagger;
 
-\* FEM_FrontISTR support is currently under preparation.
-
-&dagger; paraview required
+**\*** FEM_FrontISTR support is currently under preparation.  
+**&dagger;** Paraview required
 
 ## Install
 
 ### Prerequisites
 
 - [FreeCAD v0.19 or later](https://github.com/FreeCAD/FreeCAD/releases/)
-- [paraivew](https://www.paraview.org/) (optional)
+- [Paraview](https://www.paraview.org/) (optional)
 
-### How to install
+### Automatic Install
 
 1. Install FreeCAD.
-2. Installed FEM\_FrontISTR workbench from the FreeCAD Addon Manager. This can be done via the Tools → Addon Manager menu.
+2. Install the FEM\_FrontISTR workbench from the FreeCAD [Addon Manager](https://wiki.freecad.org/Std_AddonMgr). This can be done via the Tools → 'Addon Manager' drop down menu.
+3. Restart FreeCAD  
+  Result: The `FrontISTR` workbench will be available in the workbench dropdown menu.
 
 ### Windows
 
-If Installation from the FreeCAD Addon Manager does not work, download or git clone this repository to `C:/Users/user_name/AppData/Roaming/FreeCAD/Mod/FEM_FrontISTR`
+Running the FEM_FrontISTR is fully supported on windows. 
+<details>
+    <summary>
+        <i>Directions for manual install of FEM_FrontISTR if unsuccessful via Addon Manager</i>
+    </summary>
+<br/>
+
+If Installation via the FreeCAD Addon Manager is unsucessful, download or `git clone` this repository to `C:/Users/user_name/AppData/Roaming/FreeCAD/Mod/FEM_FrontISTR`
 
 FrontISTR binaries will be automatically downloaded and installed on the first run. If the download does not proceed, please follow the steps below to install the solver.
 1. Download [FrontISTR-latest.zip](https://www.frontistr.com/download/link.php?https://frontistr-commons.gitlab.io/FrontISTR/release/x86_64-w64-mingw32-msmpi/FrontISTR-latest.zip)
-2. Create directory FEM_FrontISTR/bin
-3. Extract FrontISTR-latest.zip and put all files in FEM_FrontISTR/bin directory.
+2. Create directory `FEM_FrontISTR/bin`
+3. Extract `FrontISTR-latest.zip` and put all files in the `FEM_FrontISTR/bin` directory.
 
+</details>
 ### Linux
 
 Under preparation.
@@ -79,19 +89,19 @@ Under preparation.
 
 Under preparation.
 
-## How to use
+## Usage
 
-1. Set up an analysis model by FEM module (in the same way as calculiX).
-2. Switch module to "FrontISTR" and create a FrontISTR solver object.
-    - SolverFISTRTools object is created in "Analysis" group
+1. Set up an analysis model via the FEM workbench (in the same way as calculiX).
+2. Switch to the "FrontISTR" workbench and create a FrontISTR solver object.
+    - `SolverFISTRTools` object is created in "Analysis" group
 3. Open the task panel of SolverFISTRTools and set working directory.
-4. Click "Write input file"
+4. Click `Write input file`
     - FrontISTR input files are generated in working directory.
-5. Click "Run FrontISTR"
+5. Click `Run FrontISTR`
     - FrontISTR starts in parallel and FISTR_Results object will be created after finishing calculation.
 6. Check FISTR_Results for post processing.
 
-## Documents
+## Documentation
 
 ### FEM_FrontISTR manual and tutorial
 
@@ -105,16 +115,16 @@ Under preparation.
 
 ### FreeCAD wiki
 
-  - https://wiki.freecadweb.org/FEM_FrontISTR_Workbench
+  - https://wiki.freecad.org/FEM_FrontISTR_Workbench
 
 ## Support
 
 ### Tips
 
-- What kind of linear equation solver should I set up?
+- **What kind of linear equation solver should I set up?**
   - Try default settings, CG with AMG preconditioner, at first. As far as we know, this setting is the best for many large-scale models.
   - If the iterative solver is slow to converge, consider the direct solver, MUMPS. In our experience, the convergence of the iterative solver can be very slow for extremely elongated or flat shapes.
-- What value should I set Matrix Solver Residual to?
+- **What value should I set Matrix Solver Residual to?**
   - The larger the matrix solver residual value, the faster you can finish the calculation, but the less accurate the solution will be.
   - Default value 1.0e-6 is for linear static analysis and enough for many models. If you are running a nonlinear analysis, you can set this value to around 1.0e-2 or 1.0e-3. This is because the Newton iteration limits the magnitude of the residual force and thus ensures the accuracy of the solution, even if the convergence threshold of the linear equation is loosened.
 
@@ -127,3 +137,6 @@ https://www.frontistr.com/inquiry/.
 
 ## Acknowledgements
 This program was funded by [FrontISTR Commons](https://www.frontistr.org/) and developed with the cooperation of [RICOS Co. Ltd.](https://www.ricos.co.jp/).
+
+## License
+GPLv3 (See [LICENSE](LICENSE) file).
