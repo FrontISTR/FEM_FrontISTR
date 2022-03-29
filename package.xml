@@ -18,6 +18,8 @@
       <icon>Resources/FrotISTR.svg</icon>
       <subdirectory>./</subdirectory>
       <classname>FemToolsFISTR</classname>
+      <tag>FEM</tag>
+      <tag>solver</tag>
     </workbench>
   </content>
 
