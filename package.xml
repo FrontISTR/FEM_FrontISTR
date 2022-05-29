@@ -15,7 +15,7 @@
 
   <content>
     <workbench>
-      <icon>Resources/FrotISTR.svg</icon>
+      <icon>Resources/FrontISTR.svg</icon>
       <subdirectory>./</subdirectory>
       <classname>FrontISTR</classname>
       <tag>FEM</tag>
