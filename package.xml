@@ -17,7 +17,7 @@
     <workbench>
       <icon>Resources/FrotISTR.svg</icon>
       <subdirectory>./</subdirectory>
-      <classname>FemToolsFISTR</classname>
+      <classname>FrontISTR</classname>
       <tag>FEM</tag>
       <tag>solver</tag>
     </workbench>
