@@ -148,7 +148,6 @@ class FemInputWriterfistr(writerbase.FemInputWriter):
 
         # materials and fem element types
         self.write_materials(mshfile,cntfile)
-        self.write_constraints_initialtemperature(mshfile)
         self.write_femelementsets(mshfile)
 
         # Fluid sections:
@@ -196,6 +195,7 @@ class FemInputWriterfistr(writerbase.FemInputWriter):
         self.write_constraints_selfweight(cntfile)
         self.write_constraints_force(cntfile)
         self.write_constraints_pressure(cntfile)
+        self.write_constraints_initialtemperature(cntfile)
         self.write_constraints_temperature(cntfile)
         self.write_constraints_heatflux(cntfile)
 
@@ -673,10 +673,9 @@ class FemInputWriterfistr(writerbase.FemInputWriter):
 
         self.isactive_load = True
         # write constraint to file
-        f.write("\n***********************************************************\n")
         f.write("## Initial temperature constraint\n")
         f.write("## written by {} function\n".format(sys._getframe().f_code.co_name))
-        f.write("!INITIAL CONDITIONS,TYPE=TEMPERATURE\n")
+        f.write("!INITIAL_CONDITION, TYPE=TEMPERATURE\n")
         for itobj in self.initialtemperature_objects:  # Should only be one
             inittemp_obj = itobj["Object"]
             # OvG: Initial temperature
@@ -859,8 +858,8 @@ class FemInputWriterfistr(writerbase.FemInputWriter):
         # analysis line --> analysis type
         if self.analysis_type == "static":
             analysis_type = "STATIC"
-        elif self.analysis_type == "heat":
-            analysis_type = "HEAT"
+        elif self.analysis_type == "thermomech":
+            analysis_type = "STATIC"  # thermal stress
         elif self.analysis_type == "eigen":
             analysis_type = "EIGEN"
         elif self.analysis_type == "dynamic":
@@ -1387,19 +1386,19 @@ class FemInputWriterfistr(writerbase.FemInputWriter):
         fcnt.write("## Materials\n")
         fcnt.write("## written by {} function\n".format(sys._getframe().f_code.co_name))
         fcnt.write("## Young\'s modulus unit is MPa = N/mm2\n")
-        if self.analysis_type == "frequency" \
-                or self.selfweight_objects \
-                or (
-                    self.analysis_type == "thermomech"
-                    and not self.solver_obj.ThermoMechSteadyState
-                ):
-            f.write("** Density\'s unit is t/mm^3\n")
-            fcnt.write("## Density\'s unit is t/mm^3\n")
+        # if self.analysis_type == "frequency" \
+        #         or self.selfweight_objects \
+        #         or (
+        #             self.analysis_type == "thermomech"
+        #             and not self.solver_obj.ThermoMechSteadyState
+        #         ):
+        #     f.write("** Density\'s unit is t/mm^3\n")
+        #     fcnt.write("## Density\'s unit is t/mm^3\n")
         if self.analysis_type == "thermomech":
             f.write("** Thermal conductivity unit is kW/mm/K = t*mm/K*s^3\n")
-            f.write("** Specific Heat unit is kJ/t/K = mm^2/s^2/K\n")
+            # f.write("** Specific Heat unit is kJ/t/K = mm^2/s^2/K\n")
             fcnt.write("## Thermal conductivity unit is kW/mm/K = t*mm/K*s^3\n")
-            fcnt.write("## Specific Heat unit is kJ/t/K = mm^2/s^2/K\n")
+            # fcnt.write("## Specific Heat unit is kJ/t/K = mm^2/s^2/K\n")
         for femobj in self.material_objects:
             # femobj --> dict, FreeCAD document object is femobj["Object"]
             mat_obj = femobj["Object"]
@@ -1411,14 +1410,14 @@ class FemInputWriterfistr(writerbase.FemInputWriter):
                 YM = FreeCAD.Units.Quantity(mat_obj.Material["YoungsModulus"])
                 YM_in_MPa = float(YM.getValueAs("MPa"))
                 PR = float(mat_obj.Material["PoissonRatio"])
-            if self.analysis_type == "frequency" \
-                    or self.selfweight_objects \
-                    or (
-                        self.analysis_type == "thermomech"
-                        and not self.solver_obj.ThermoMechSteadyState
-                    ):
-                density = FreeCAD.Units.Quantity(mat_obj.Material["Density"])
-                density_in_tonne_per_mm3 = float(density.getValueAs("t/mm^3"))
+            # if self.analysis_type == "frequency" \
+            #         or self.selfweight_objects \
+            #         or (
+            #             self.analysis_type == "thermomech"
+            #             and not self.solver_obj.ThermoMechSteadyState
+            #         ):
+            #     density = FreeCAD.Units.Quantity(mat_obj.Material["Density"])
+            #     density_in_tonne_per_mm3 = float(density.getValueAs("t/mm^3"))
             if self.analysis_type == "thermomech":
                 TC = FreeCAD.Units.Quantity(mat_obj.Material["ThermalConductivity"])
                 # SvdW: Add factor to force units to results base units
@@ -1446,24 +1445,26 @@ class FemInputWriterfistr(writerbase.FemInputWriter):
                 fcnt.write("!ELASTIC\n")
                 fcnt.write("{0:.0f}, {1:.3f}\n".format(YM_in_MPa, PR))
 
-            if self.analysis_type == "frequency" \
-                    or self.selfweight_objects \
-                    or (
-                        self.analysis_type == "thermomech"
-                        and not self.solver_obj.ThermoMechSteadyState
-                    ):
-                f.write("*DENSITY\n")
-                f.write("{0:.3e}\n".format(density_in_tonne_per_mm3))
-                fcnt.write("!DENSITY\n")
-                fcnt.write("{0:.3e}\n".format(density_in_tonne_per_mm3))
+            # if self.analysis_type == "frequency" \
+            #         or self.selfweight_objects \
+            #         or (
+            #             self.analysis_type == "thermomech"
+            #             and not self.solver_obj.ThermoMechSteadyState
+            #         ):
+            #     f.write("*DENSITY\n")
+            #     f.write("{0:.3e}\n".format(density_in_tonne_per_mm3))
+            #     fcnt.write("!DENSITY\n")
+            #     fcnt.write("{0:.3e}\n".format(density_in_tonne_per_mm3))
             if self.analysis_type == "thermomech":
                 if mat_obj.Category == "Solid":
-                    f.write("*CONDUCTIVITY\n")
-                    f.write("{0:.3f}\n".format(TC_in_WmK))
+                    # f.write("*CONDUCTIVITY\n")
+                    # f.write("{0:.3f}\n".format(TC_in_WmK))
                     f.write("*EXPANSION\n")
                     f.write("{0:.3e}\n".format(TEC_in_mmK))
-                    f.write("*SPECIFIC HEAT\n")
-                    f.write("{0:.3e}\n".format(SH_in_JkgK))
+                    # f.write("*SPECIFIC HEAT\n")
+                    # f.write("{0:.3e}\n".format(SH_in_JkgK))
+                    fcnt.write("!EXPANSION_COEFF\n")
+                    fcnt.write(" {:E}\n".format(TEC_in_mmK))
 
             # nonlinear material properties
             if self.solver_obj.Nonlinearity == "nonlinear":

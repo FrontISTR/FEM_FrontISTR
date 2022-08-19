@@ -42,3 +42,11 @@ def makeSolverFrontISTRTools(
         view_solver_fistrtools.VPSolverFrontISTRTools(obj.ViewObject)
     return obj
 
+def makeFrontISTRConstraintTemperature(
+    doc,
+    name="FrontISTRConstraintTemperature"
+):
+    """makeFrontISTRConstraintTemperature(document, [name]):
+    makes a FrontISTRConstraintTemperature object for thermal stress analyses"""
+    obj = doc.addObject("Fem::ConstraintTemperature", name)
+    return obj
