@@ -551,7 +551,11 @@ class FemInputWriterfistr(writerbase.FemInputWriter):
     # ********************************************************************************************
     # constraints sectionprint
     def write_surfaces_constraints_sectionprint(self, f):
-        if not self.sectionprint_objects:
+        if int(self.fc_ver[0]) == 0 and int(self.fc_ver[1]) < 20: # for ver 0.19
+            femobjs = self.sectionprint_objects
+        else:
+            femobjs = self.member.cons_sectionprint
+        if not femobjs:
             return
         # write for all analysis types
 
@@ -566,7 +570,11 @@ class FemInputWriterfistr(writerbase.FemInputWriter):
     def write_surfacefaces_constraints_sectionprint(self, f):
         # get surface nodes and write them to file
         obj = 0
-        for femobj in self.sectionprint_objects:
+        if int(self.fc_ver[0]) == 0 and int(self.fc_ver[1]) < 20: # for ver 0.19
+            femobjs = self.sectionprint_objects
+        else:
+            femobjs = self.member.cons_sectionprint
+        for femobj in femobjs:
             # femobj --> dict, FreeCAD document object is femobj["Object"]
             sectionprint_obj = femobj["Object"]
             f.write("** " + sectionprint_obj.Label + "\n")
