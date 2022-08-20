@@ -1,6 +1,6 @@
 # ***************************************************************************
-# *   Copyright (c) 2016 Bernd Hahnebach <bernd@bimstatik.org>              *
-# *   Copyright (c) 2020 FrontISTR Commons <https://www.frontistr.com/>     *
+# *   Copyright (c) 2015 Bernd Hahnebach <bernd@bimstatik.org>              *
+# *   Copyright (c) 2022 FrontISTR Commons <https://www.frontistr.com/>     *
 # *                                                                         *
 # *   This file is part of the FreeCAD CAx development system.              *
 # *                                                                         *
@@ -22,36 +22,30 @@
 # *                                                                         *
 # ***************************************************************************
 
-__title__ = "Objects FrontISTR"
+__title__ = "FrontISTR constraint temperature ViewProvider for the document object"
 __author__ = "FrontISTR Commons"
 __url__ = "https://www.frontistr.com/"
 
-import FreeCAD
+## @package view_fistr_constraint_temperature
+#  \ingroup FEM
+#  \brief view provider for FrontISTR constraint temperature object
 
-def makeSolverFrontISTRTools(
-    doc,
-    name="SolverFISTRTools"
-):
-    """makeSolverFrontISTRTools(document, [name]):
-    makes a FrontISTR solver object for the fistr tools module"""
-    obj = doc.addObject("Fem::FemSolverObjectPython", name)
-    import solver_fistrtools
-    solver_fistrtools.SolverFISTRTools(obj)
-    if FreeCAD.GuiUp:
-        import view_solver_fistrtools
-        view_solver_fistrtools.VPSolverFrontISTRTools(obj.ViewObject)
-    return obj
+import task_constraint_temperature_fistr
+from femviewprovider import view_base_femconstraint
 
-def makeConstraintTemperatureFrontISTR(
-    doc,
-    name="ConstraintTemperatureFrontISTR"
-):
-    """makeConstraintTemperatureFrontISTR(document, [name]):
-    makes a FrontISTR constraint temperature object for thermal stress analyses"""
-    obj = doc.addObject("Fem::ConstraintPython", name)
-    import constraint_temperature_fistr
-    constraint_temperature_fistr.ConstraintTemperatureFISTR(obj)
-    if FreeCAD.GuiUp:
-        import view_constraint_temperature_fistr
-        view_constraint_temperature_fistr.VPFrontISTRConstraintTemperature(obj.ViewObject)
-    return obj
+
+class VPFrontISTRConstraintTemperature(view_base_femconstraint.VPBaseFemConstraint):
+    """
+    A View Provider for the FrontISTR constraint temperature object
+    """
+
+    def getIcon(self):
+        return ":/icons/FEM_ConstraintTemperature.svg"
+
+    def setEdit(self, vobj, mode=0):
+        view_base_femconstraint.VPBaseFemConstraint.setEdit(
+            self,
+            vobj,
+            mode,
+            task_constraint_temperature_fistr._TaskPanel
+        )
