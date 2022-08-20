@@ -95,6 +95,8 @@ class FemInputWriterfistr(writerbase.FemInputWriter):
         self.isactive_load = False
         self.isactive_boundary = False
 
+        self.temperature_fistr_objects = member.cons_temperature_fistr
+
     # ********************************************************************************************
     # write FrontISTR input
     def write_FrontISTR_input_file(self):
@@ -646,7 +648,8 @@ class FemInputWriterfistr(writerbase.FemInputWriter):
                 f.write(str(n) + ",\n")
 
     def write_constraints_temperature(self, f):
-        if not self.temperature_objects:
+        # if not self.temperature_objects:
+        if not self.temperature_fistr_objects:  # for thermal stress analysis
             return
         if not self.analysis_type == "thermomech":
             return
@@ -655,21 +658,27 @@ class FemInputWriterfistr(writerbase.FemInputWriter):
         # write constraint to file
         f.write("## Fixed temperature constraint applied\n")
         f.write("## written by {} function\n".format(sys._getframe().f_code.co_name))
-        for ftobj in self.temperature_objects:
+        # for ftobj in self.temperature_objects:
+        #     fixedtemp_obj = ftobj["Object"]
+        #     f.write("## " + fixedtemp_obj.Label + "\n")
+        #     NumberOfNodes = len(ftobj["Nodes"])
+        #     if fixedtemp_obj.ConstraintType == "Temperature":
+        #         f.write("!TEMPERATURE\n")
+        #         f.write("{},{}\n".format(fixedtemp_obj.Name, fixedtemp_obj.Temperature))
+        #         f.write("\n")
+        #     elif fixedtemp_obj.ConstraintType == "CFlux":
+        #         f.write("!CFLUX\n")
+        #         f.write("{},11,{}\n".format(
+        #             fixedtemp_obj.Name,
+        #             fixedtemp_obj.CFlux * 0.001 / NumberOfNodes
+        #         ))
+        #         f.write("\n")
+        for ftobj in self.temperature_fistr_objects:  # Should only be one
             fixedtemp_obj = ftobj["Object"]
             f.write("## " + fixedtemp_obj.Label + "\n")
-            NumberOfNodes = len(ftobj["Nodes"])
-            if fixedtemp_obj.ConstraintType == "Temperature":
-                f.write("!TEMPERATURE\n")
-                f.write("{},{}\n".format(fixedtemp_obj.Name, fixedtemp_obj.Temperature))
-                f.write("\n")
-            elif fixedtemp_obj.ConstraintType == "CFlux":
-                f.write("!CFLUX\n")
-                f.write("{},11,{}\n".format(
-                    fixedtemp_obj.Name,
-                    fixedtemp_obj.CFlux * 0.001 / NumberOfNodes
-                ))
-                f.write("\n")
+            f.write("!TEMPERATURE, GRPID=1\n")
+            f.write("{0},{1}\n".format(self.fistr_nall, fixedtemp_obj.Temperature))
+            f.write("\n")
 
     # ********************************************************************************************
     # constraints initialtemperature

@@ -89,14 +89,14 @@ class _CommandFISTRConstraintTemperature:
                     "Creates a FrontISTR constraint for temperature acting on a body"
                 )}
 
-    def IsActive(self):
+    def IsActive(self):  # same as above
         active = (
             FemGui.getActiveAnalysis() is not None
             and self.active_analysis_in_active_doc()
         )
         return active
     
-    def active_analysis_in_active_doc(self):
+    def active_analysis_in_active_doc(self):  # same as above
         analysis = FemGui.getActiveAnalysis()
         if analysis.Document is FreeCAD.ActiveDocument:
             self.active_analysis = analysis
@@ -104,7 +104,7 @@ class _CommandFISTRConstraintTemperature:
         else:
             return False
 
-    def Activated(self):
+    def Activated(self):  # do_activated == "add_obj_on_gui_set_edit"
         FreeCAD.ActiveDocument.openTransaction("Create FrontISTR constraint temperature")
         FreeCADGui.addModule("ObjectsFISTR")
         FreeCADGui.addModule("FemGui")
@@ -112,7 +112,10 @@ class _CommandFISTRConstraintTemperature:
             "FemGui.getActiveAnalysis().addObject(ObjectsFISTR."
             "makeConstraintTemperatureFrontISTR(FreeCAD.ActiveDocument))"
         )
-        FreeCAD.ActiveDocument.commitTransaction()
+        FreeCADGui.Selection.clearSelection()
+        FreeCADGui.doCommand(
+            "FreeCADGui.ActiveDocument.setEdit(FreeCAD.ActiveDocument.ActiveObject.Name)"
+        )
         FreeCAD.ActiveDocument.recompute()
     
 

@@ -240,7 +240,9 @@ class FemToolsFISTR(QtCore.QRunnable, QtCore.QObject):
 
         ## @var members
         # members of the analysis. All except solvers and the mesh
-        self.member = membertools.AnalysisMember(self.analysis)
+        # self.member = membertools.AnalysisMember(self.analysis)
+        import membertools_fistr
+        self.member = membertools_fistr.AnalysisMemberfistr(self.analysis)
 
     def check_prerequisites(self):
         FreeCAD.Console.PrintMessage("Check prerequisites.\n")
