@@ -88,6 +88,7 @@ class FemToolsFISTR(QtCore.QRunnable, QtCore.QObject):
 
         self.analysis = None
         self.solver = None
+        self.fc_ver = FreeCAD.Version()
 
         if analysis:
             self.analysis = analysis
@@ -257,8 +258,11 @@ class FemToolsFISTR(QtCore.QRunnable, QtCore.QObject):
                 "Working directory \'{}\' doesn't exist."
                 .format(self.working_dir)
             )
-        from femtools.checksanalysis import check_member_for_solver_calculix
-        message += check_member_for_solver_calculix(
+        if int(self.fc_ver[0]) == 0 and int(self.fc_ver[1]) < 20: # for ver 0.19
+            from femtools.checksanalysis import check_analysismember as checker
+        else:
+            from femtools.checksanalysis import check_member_for_solver_calculix as checker
+        message += checker(
             self.analysis,
             self.solver,
             self.mesh,
