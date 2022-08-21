@@ -34,7 +34,7 @@ import task_constraint_temperature_fistr
 from femviewprovider import view_base_femconstraint
 
 
-class VPFrontISTRConstraintTemperature(view_base_femconstraint.VPBaseFemConstraint):
+class VPConstraintTemperatureFrontISTR(view_base_femconstraint.VPBaseFemConstraint):
     """
     A View Provider for the FrontISTR constraint temperature object
     """

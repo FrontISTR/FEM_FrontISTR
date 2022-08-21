@@ -45,7 +45,7 @@ class _TaskPanel(object):
         self._obj = obj
 
         self._paramWidget = FreeCADGui.PySideUic.loadUi(
-            FreeCAD.getUserAppDataDir() + "Mod/FEM_FrontISTR/Resources/TaskFrontISTRConstraintTemperature.ui")
+            FreeCAD.getUserAppDataDir() + "Mod/FEM_FrontISTR/Resources/TaskConstraintTemperatureFrontISTR.ui")
         self._initParamWidget()
 
         # form made from param and selection widget

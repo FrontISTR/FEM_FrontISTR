@@ -53,5 +53,5 @@ def makeConstraintTemperatureFrontISTR(
     constraint_temperature_fistr.ConstraintTemperatureFISTR(obj)
     if FreeCAD.GuiUp:
         import view_constraint_temperature_fistr
-        view_constraint_temperature_fistr.VPFrontISTRConstraintTemperature(obj.ViewObject)
+        view_constraint_temperature_fistr.VPConstraintTemperatureFrontISTR(obj.ViewObject)
     return obj

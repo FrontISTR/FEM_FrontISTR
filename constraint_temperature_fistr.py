@@ -22,7 +22,7 @@
 # *                                                                         *
 # ***************************************************************************
 
-__title__ = "FreeCAD FEM solver FrontISTR tools document object"
+__title__ = "FrontISTR constraint temperature document object"
 __author__ = "FrontISTR Commons"
 __url__ = "https://www.frontistr.com/"
 
@@ -30,7 +30,8 @@ from femobjects import base_fempythonobject
 
 
 class ConstraintTemperatureFISTR(base_fempythonobject.BaseFemPythonObject):
-    """The Fem::FemSolver's Proxy python type, add solver specific properties
+    """
+    The ConstraintTemperatureFISTR object
     """
 
     Type = "Fem::ConstraintTemperatureFISTR"

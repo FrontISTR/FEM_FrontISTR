@@ -1413,9 +1413,9 @@ class FemInputWriterfistr(writerbase.FemInputWriter):
         #     fcnt.write("## Density\'s unit is t/mm^3\n")
         if self.analysis_type == "thermomech":
             f.write("** Thermal conductivity unit is kW/mm/K = t*mm/K*s^3\n")
-            # f.write("** Specific Heat unit is kJ/t/K = mm^2/s^2/K\n")
+            f.write("** Specific Heat unit is kJ/t/K = mm^2/s^2/K\n")
             fcnt.write("## Thermal conductivity unit is kW/mm/K = t*mm/K*s^3\n")
-            # fcnt.write("## Specific Heat unit is kJ/t/K = mm^2/s^2/K\n")
+            fcnt.write("## Specific Heat unit is kJ/t/K = mm^2/s^2/K\n")
         for femobj in self.material_objects:
             # femobj --> dict, FreeCAD document object is femobj["Object"]
             mat_obj = femobj["Object"]
