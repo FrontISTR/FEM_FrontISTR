@@ -55,3 +55,19 @@ def makeConstraintTemperatureFrontISTR(
         import view_constraint_temperature_fistr
         view_constraint_temperature_fistr.VPConstraintTemperatureFrontISTR(obj.ViewObject)
     return obj
+
+def makeMaterialViscoelasticFrontISTR(
+    doc,
+    base_material,
+    name="MaterialViscoelasticFrontISTR"
+):
+    """makeMaterialViscoelasticFrontISTR(document, base_material, [name]):
+    makes a FrontISTR material viscoelastic object"""
+    obj = doc.addObject("Fem::FeaturePython", name)
+    import material_viscoelastic_fistr
+    material_viscoelastic_fistr.MaterialViscoelasticFISTR(obj)
+    obj.LinearBaseMaterial = base_material
+    if FreeCAD.GuiUp:
+        import view_material_viscoelastic_fistr
+        view_material_viscoelastic_fistr.VPMaterialViscoelasticFrontISTR(obj.ViewObject)
+    return obj

@@ -96,6 +96,7 @@ class FemInputWriterfistr(writerbase.FemInputWriter):
         self.isactive_boundary = False
 
         self.temperature_fistr_objects = member.cons_temperature_fistr
+        self.material_visco_objects = member.mats_visco_fistr
 
     # ********************************************************************************************
     # write FrontISTR input
@@ -1484,7 +1485,7 @@ class FemInputWriterfistr(writerbase.FemInputWriter):
                     fcnt.write(" {:E}\n".format(TEC_in_mmK))
 
             # nonlinear material properties
-            if self.solver_obj.Nonlinearity == "nonlinear":
+            if self.solver_obj.Nonlinearity == "yes":
                 for nlfemobj in self.material_nonlinear_objects:
                     # femobj --> dict, FreeCAD document object is nlfemobj["Object"]
                     nl_mat_obj = nlfemobj["Object"]
@@ -1494,6 +1495,34 @@ class FemInputWriterfistr(writerbase.FemInputWriter):
                             if nl_mat_obj.YieldPoint1:
                                 f.write(nl_mat_obj.YieldPoint1 + ", 0.0\n")
                     f.write("\n")
+                # viscoelastic
+                for nlfemobj in self.material_visco_objects:
+                    nl_mat_obj = nlfemobj["Object"]
+                    if nl_mat_obj.LinearBaseMaterial == mat_obj:
+                        fcnt.write("!VISCOELASTIC\n")
+                        fcnt.write(" {}, {}\n".format(
+                            nl_mat_obj.ShearRelaxationModulus,
+                            nl_mat_obj.RelaxationTime
+                        ))
+                    fcnt.write("\n")
+                # creep
+                # for nlfemobj in self.material_visco_objects:
+                #     nl_mat_obj = nlfemobj["Object"]
+                #     if nl_mat_obj.LinearBaseMaterial == mat_obj:
+                #         if not nl_mat_obj.TemperatureEnabled:
+                #             fcnt.write("!CREEP\n")
+                #             fcnt.write(" {}, {}\n".format(
+                #                 nl_mat_obj.ShearRelaxationModulus,
+                #                 nl_mat_obj.RelaxationTime
+                #             ))
+                #         elif nl_mat_obj.TempeartureEnabled:
+                #             fcnt.write("!CREEP, DEPENDENCIES=1\n")
+                #             fcnt.write(" {}, {}, {}".format(
+                #                 nl_mat_obj.ShearRelaxationModulus,
+                #                 nl_mat_obj.RelaxationTime,
+                #                 nl_mat_obj.Tempearture
+                #             ))
+                #     fcnt.write("\n")
 
     def write_femelementsets(self, f):
         f.write("\n***********************************************************\n")

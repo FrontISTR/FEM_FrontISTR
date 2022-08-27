@@ -1,6 +1,5 @@
 # ***************************************************************************
-# *   Copyright (c) 2017 Markus Hovorka <m.hovorka@live.de>                 *
-# *   Copyright (c) 2018 Bernd Hahnebach <bernd@bimstatik.org>              *
+# *   Copyright (c) 2015 Bernd Hahnebach <bernd@bimstatik.org>              *
 # *   Copyright (c) 2022 FrontISTR Commons <https://www.frontistr.com/>     *
 # *                                                                         *
 # *   This file is part of the FreeCAD CAx development system.              *
@@ -23,37 +22,31 @@
 # *                                                                         *
 # ***************************************************************************
 
-
-__title__ = "FrontISTR analysis tools"
+__title__ = "FrontISTR material viscoelastic ViewProvider for the document object"
 __author__ = "FrontISTR Commons"
 __url__ = "https://www.frontistr.com/"
 
+## @package view_material_viscoelastic_fistr
+#  \ingroup FEM
+#  \brief view provider for FrontISTR material viscoelastic object
 
-from femtools import membertools
+import FreeCAD
+import task_material_viscoelastic_fistr
+from femviewprovider import view_base_femconstraint
 
 
-class AnalysisMemberfistr(membertools.AnalysisMember):
+class VPMaterialViscoelasticFrontISTR(view_base_femconstraint.VPBaseFemConstraint):
+    """
+    A View Provider for the FrontISTR material viscoelastic object
+    """
 
-    def __init__(self, analysis):
-        super().__init__(analysis)
-        """
-        # members of the analysis. All except solvers and the mesh
+    def getIcon(self):
+        return FreeCAD.getUserAppDataDir()+ "Mod/FEM_FrontISTR/Resources/FrontISTR_MaterialViscoelastic.svg"
 
-        constraints:
-        constraints_temperature_fistr : list of dictionaries
-            list of temperatures for the FrontISTR thermal stress analysis.
-            [{"Object":temperature_obj, "xxxxxxxx":value}, {}, ...]
-        """
-
-        # get member
-        # materials
-        # see `material_viscoelastic_fistr.py`
-        self.mats_visco_fistr = super().get_several_member(
-            "Fem::MaterialViscoelasticFISTR"
-        )
-
-        # constraints
-        # see `constraints_temperature_fistr.py`
-        self.cons_temperature_fistr = super().get_several_member(
-            "Fem::ConstraintTemperatureFISTR"
+    def setEdit(self, vobj, mode=0):
+        view_base_femconstraint.VPBaseFemConstraint.setEdit(
+            self,
+            vobj,
+            mode,
+            task_material_viscoelastic_fistr._TaskPanel
         )
