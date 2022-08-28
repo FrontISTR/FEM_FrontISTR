@@ -71,3 +71,19 @@ def makeMaterialViscoelasticFrontISTR(
         import view_material_viscoelastic_fistr
         view_material_viscoelastic_fistr.VPMaterialViscoelasticFrontISTR(obj.ViewObject)
     return obj
+
+def makeMaterialCreepFrontISTR(
+    doc,
+    base_material,
+    name="MaterialCreepFrontISTR"
+):
+    """makeMaterialCreepFrontISTR(document, base_material, [name]):
+    makes a FrontISTR material creep object"""
+    obj = doc.addObject("Fem::FeaturePython", name)
+    import material_creep_fistr
+    material_creep_fistr.MaterialCreepFISTR(obj)
+    obj.LinearBaseMaterial = base_material
+    if FreeCAD.GuiUp:
+        import view_material_creep_fistr
+        view_material_creep_fistr. VPMaterialCreepFrontISTR(obj.ViewObject)
+    return obj

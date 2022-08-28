@@ -97,6 +97,7 @@ class FemInputWriterfistr(writerbase.FemInputWriter):
 
         self.temperature_fistr_objects = member.cons_temperature_fistr
         self.material_visco_objects = member.mats_visco_fistr
+        self.material_creep_objects = member.mats_creep_fistr
 
     # ********************************************************************************************
     # write FrontISTR input
@@ -987,6 +988,8 @@ class FemInputWriterfistr(writerbase.FemInputWriter):
         f.write("0.25,  5\n")
 
         stepline = "!STEP,"
+        if self.material_visco_objects or self.material_creep_objects:
+            stepline += " TYPE=VISCO,"
         if self.solver_obj.IncrementType == "auto":
             stepline += " INC_TYPE=AUTO"
         else:
@@ -1506,23 +1509,34 @@ class FemInputWriterfistr(writerbase.FemInputWriter):
                         ))
                     fcnt.write("\n")
                 # creep
-                # for nlfemobj in self.material_visco_objects:
-                #     nl_mat_obj = nlfemobj["Object"]
-                #     if nl_mat_obj.LinearBaseMaterial == mat_obj:
-                #         if not nl_mat_obj.TemperatureEnabled:
-                #             fcnt.write("!CREEP\n")
-                #             fcnt.write(" {}, {}\n".format(
-                #                 nl_mat_obj.ShearRelaxationModulus,
-                #                 nl_mat_obj.RelaxationTime
-                #             ))
-                #         elif nl_mat_obj.TempeartureEnabled:
-                #             fcnt.write("!CREEP, DEPENDENCIES=1\n")
-                #             fcnt.write(" {}, {}, {}".format(
-                #                 nl_mat_obj.ShearRelaxationModulus,
-                #                 nl_mat_obj.RelaxationTime,
-                #                 nl_mat_obj.Tempearture
-                #             ))
-                #     fcnt.write("\n")
+                for nlfemobj in self.material_creep_objects:
+                    nl_mat_obj = nlfemobj["Object"]
+                    if nl_mat_obj.LinearBaseMaterial == mat_obj:
+                        try:
+                            creep_rate_coeff_float = float(nl_mat_obj.CreepRateCoeff)
+                        except ValueError:
+                            creep_rate_coeff_float = 1.0e-10
+                            converting_string = "Converting creep rate coefficient value {} to float failed. Using default value 1.0E-10.".format(nl_mat_obj.CreepRateCoeff)
+                            FreeCAD.Console.PrintWarning(converting_string + "\n")
+                            if FreeCAD.GuiUp:
+                                from PySide import QtGui
+                                QtGui.QMessageBox.warning(None, "Converting value failed", converting_string)
+                        if not nl_mat_obj.TemperatureEnabled:
+                            fcnt.write("!CREEP, TYPE=NORTON, DEPENDENCIES=0\n")
+                            fcnt.write(" {:E}, {}, {}\n".format(
+                                creep_rate_coeff_float,
+                                nl_mat_obj.StressExponent,
+                                nl_mat_obj.TimeExponent
+                            ))
+                        elif nl_mat_obj.TemperatureEnabled:
+                            fcnt.write("!CREEP, TYPE=NORTON, DEPENDENCIES=1\n")
+                            fcnt.write(" {:E}, {}, {}, {}\n".format(
+                                creep_rate_coeff_float,
+                                nl_mat_obj.StressExponent,
+                                nl_mat_obj.TimeExponent,
+                                nl_mat_obj.Temperature
+                            ))
+                    fcnt.write("\n")
 
     def write_femelementsets(self, f):
         f.write("\n***********************************************************\n")
