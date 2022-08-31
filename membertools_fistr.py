@@ -1,6 +1,7 @@
 # ***************************************************************************
-# *   Copyright (c) 2016 Bernd Hahnebach <bernd@bimstatik.org>              *
-# *   Copyright (c) 2020 FrontISTR Commons <https://www.frontistr.com/>     *
+# *   Copyright (c) 2017 Markus Hovorka <m.hovorka@live.de>                 *
+# *   Copyright (c) 2018 Bernd Hahnebach <bernd@bimstatik.org>              *
+# *   Copyright (c) 2022 FrontISTR Commons <https://www.frontistr.com/>     *
 # *                                                                         *
 # *   This file is part of the FreeCAD CAx development system.              *
 # *                                                                         *
@@ -22,36 +23,31 @@
 # *                                                                         *
 # ***************************************************************************
 
-__title__ = "Objects FrontISTR"
+
+__title__ = "FrontISTR analysis tools"
 __author__ = "FrontISTR Commons"
 __url__ = "https://www.frontistr.com/"
 
-import FreeCAD
 
-def makeSolverFrontISTRTools(
-    doc,
-    name="SolverFISTRTools"
-):
-    """makeSolverFrontISTRTools(document, [name]):
-    makes a FrontISTR solver object for the fistr tools module"""
-    obj = doc.addObject("Fem::FemSolverObjectPython", name)
-    import solver_fistrtools
-    solver_fistrtools.SolverFISTRTools(obj)
-    if FreeCAD.GuiUp:
-        import view_solver_fistrtools
-        view_solver_fistrtools.VPSolverFrontISTRTools(obj.ViewObject)
-    return obj
+from femtools import membertools
 
-def makeConstraintTemperatureFrontISTR(
-    doc,
-    name="ConstraintTemperatureFrontISTR"
-):
-    """makeConstraintTemperatureFrontISTR(document, [name]):
-    makes a FrontISTR constraint temperature object for thermal stress analyses"""
-    obj = doc.addObject("Fem::ConstraintPython", name)
-    import constraint_temperature_fistr
-    constraint_temperature_fistr.ConstraintTemperatureFISTR(obj)
-    if FreeCAD.GuiUp:
-        import view_constraint_temperature_fistr
-        view_constraint_temperature_fistr.VPConstraintTemperatureFrontISTR(obj.ViewObject)
-    return obj
+
+class AnalysisMemberfistr(membertools.AnalysisMember):
+
+    def __init__(self, analysis):
+        super().__init__(analysis)
+        """
+        # members of the analysis. All except solvers and the mesh
+
+        constraints:
+        constraints_temperature_fistr : list of dictionaries
+            list of temperatures for the FrontISTR thermal stress analysis.
+            [{"Object":temperature_obj, "xxxxxxxx":value}, {}, ...]
+        """
+
+        # get member
+        # constraints
+        # see `constraints_temperature_fistr.py`
+        self.cons_temperature_fistr = super().get_several_member(
+            "Fem::ConstraintTemperatureFISTR"
+        )

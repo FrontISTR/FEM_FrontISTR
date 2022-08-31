@@ -1,6 +1,6 @@
 # ***************************************************************************
-# *   Copyright (c) 2016 Bernd Hahnebach <bernd@bimstatik.org>              *
-# *   Copyright (c) 2020 FrontISTR Commons <https://www.frontistr.com/>     *
+# *   Copyright (c) 2015 Bernd Hahnebach <bernd@bimstatik.org>              *
+# *   Copyright (c) 2022 FrontISTR Commons <https://www.frontistr.com/>     *
 # *                                                                         *
 # *   This file is part of the FreeCAD CAx development system.              *
 # *                                                                         *
@@ -22,36 +22,25 @@
 # *                                                                         *
 # ***************************************************************************
 
-__title__ = "Objects FrontISTR"
+__title__ = "FrontISTR constraint temperature document object"
 __author__ = "FrontISTR Commons"
 __url__ = "https://www.frontistr.com/"
 
-import FreeCAD
+from femobjects import base_fempythonobject
 
-def makeSolverFrontISTRTools(
-    doc,
-    name="SolverFISTRTools"
-):
-    """makeSolverFrontISTRTools(document, [name]):
-    makes a FrontISTR solver object for the fistr tools module"""
-    obj = doc.addObject("Fem::FemSolverObjectPython", name)
-    import solver_fistrtools
-    solver_fistrtools.SolverFISTRTools(obj)
-    if FreeCAD.GuiUp:
-        import view_solver_fistrtools
-        view_solver_fistrtools.VPSolverFrontISTRTools(obj.ViewObject)
-    return obj
 
-def makeConstraintTemperatureFrontISTR(
-    doc,
-    name="ConstraintTemperatureFrontISTR"
-):
-    """makeConstraintTemperatureFrontISTR(document, [name]):
-    makes a FrontISTR constraint temperature object for thermal stress analyses"""
-    obj = doc.addObject("Fem::ConstraintPython", name)
-    import constraint_temperature_fistr
-    constraint_temperature_fistr.ConstraintTemperatureFISTR(obj)
-    if FreeCAD.GuiUp:
-        import view_constraint_temperature_fistr
-        view_constraint_temperature_fistr.VPConstraintTemperatureFrontISTR(obj.ViewObject)
-    return obj
+class ConstraintTemperatureFISTR(base_fempythonobject.BaseFemPythonObject):
+    """
+    The ConstraintTemperatureFISTR object
+    """
+
+    Type = "Fem::ConstraintTemperatureFISTR"
+
+    def __init__(self, obj):
+        super(ConstraintTemperatureFISTR, self).__init__(obj)
+        obj.addProperty(
+            "App::PropertyFloat",
+            "Temperature",
+            "Parameter",
+            "Target temperature"
+        )

@@ -106,11 +106,11 @@ class _TaskPanel:
 #            QtCore.SIGNAL("clicked()"),
 #            self.select_frequency_analysis
 #        )
-#        QtCore.QObject.connect(
-#            self.form.rb_thermomech_analysis,
-#            QtCore.SIGNAL("clicked()"),
-#            self.select_thermomech_analysis
-#        )
+        QtCore.QObject.connect(
+            self.form.rb_thermomech_analysis,
+            QtCore.SIGNAL("clicked()"),
+            self.select_thermomech_analysis
+        )
         QtCore.QObject.connect(
             self.form.rb_check_mesh,
             QtCore.SIGNAL("clicked()"),

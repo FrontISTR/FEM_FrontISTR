@@ -45,7 +45,7 @@ class FrontISTR(Workbench):
 
         def QT_TRANSLATE_NOOP(scope, text): return text
         #FreeCADGui.addCommand("FEM_SolverFrontISTR",_SolverFrontISTR())
-        self.fstrtools = ["FISTR_solver"]
+        self.fstrtools = ["FISTR_solver", "FISTR_ConstraintTemperature"]
         self.appendToolbar(QT_TRANSLATE_NOOP("Workbench","FrontISTR tools"),self.fstrtools)
         
         #self.appendToolbar(QT_TRANSLATE_NOOP("Workbench","E.M. FastHenry tools"),self.emfhtools)
