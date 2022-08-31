@@ -97,7 +97,7 @@ class FemInputWriterfistr(writerbase.FemInputWriter):
 
         self.temperature_fistr_objects = member.cons_temperature_fistr
 
-        if int(self.fc_ver[0]) == 0 and int(self.fc_ver[1]) == 20:
+        if int(self.fc_ver[0]) == 0 and int(self.fc_ver[1]) > 19:
             self.analysis_obj = analysis_obj
             self.solver_obj = solver_obj
             self.mesh_obj = mesh_obj
@@ -1428,7 +1428,7 @@ class FemInputWriterfistr(writerbase.FemInputWriter):
                 fistr_elset["mat_obj_name"] = mat_obj.Name
                 fistr_elset["fistr_mat_name"] = mat_obj.Material["Name"]
                 self.fistr_elsets.append(fistr_elset)
-        elif int(self.fc_ver[0]) == 0 and int(self.fc_ver[1]) == 20:
+        else:
             # see https://github.com/FreeCAD/FreeCAD/blob/releases/FreeCAD-0-20/src/Mod/Fem/femtools/ccxtools.py#L380
             from femmesh import meshsetsgetter
             meshdatagetter = meshsetsgetter.MeshSetsGetter(
