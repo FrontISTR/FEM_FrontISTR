@@ -434,13 +434,18 @@ class FemToolsFISTR(QtCore.QRunnable, QtCore.QObject):
             # Windows workaround to avoid blinking terminal window
             startup_info = subprocess.STARTUPINFO()
             startup_info.dwFlags = subprocess.STARTF_USESHOWWINDOW
+            cmd = [self.partitioner_binary]
+            shellcmd = False
+        elif system() in ("Linux", "Darwin"):
+            cmd = "unset LD_LIBRARY_PATH; "+self.partitioner_binary
+            shellcmd = True
 
         p = subprocess.Popen(
-            [self.partitioner_binary],
+            cmd,
             cwd=self.working_dir,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
-            shell=False,
+            shell=shellcmd,
             startupinfo=startup_info
         )
         part_stdout, part_stderr = p.communicate()
@@ -478,7 +483,7 @@ class FemToolsFISTR(QtCore.QRunnable, QtCore.QObject):
                 self.partitioner_binary = partitioner_path
                 self.mpiexec_binary = mpiexec_path
             elif system() in ("Linux", "Darwin"):
-                p1 = subprocess.Popen(["which", "fistr1"], stdout=subprocess.PIPE)
+                p1 = subprocess.Popen("unset LD_LIBRARY_PATH; which fistr1", stdout=subprocess.PIPE, shell=True)
                 if p1.wait() == 0:
                     if sys.version_info.major >= 3:
                         fistr_path = p1.stdout.read().decode("utf8").split("\n")[0]
@@ -496,7 +501,7 @@ class FemToolsFISTR(QtCore.QRunnable, QtCore.QObject):
                     raise Exception(error_message)
                 self.fistr_binary = fistr_path
 
-                p2 = subprocess.Popen(["which", "hecmw_part1"], stdout=subprocess.PIPE)
+                p2 = subprocess.Popen("unset LD_LIBRARY_PATH; which hecmw_part1", stdout=subprocess.PIPE, shell=True)
                 if p2.wait() == 0:
                     if sys.version_info.major >= 3:
                         partitioner_path = p2.stdout.read().decode("utf8").split("\n")[0]
@@ -512,7 +517,7 @@ class FemToolsFISTR(QtCore.QRunnable, QtCore.QObject):
                     raise Exception(error_message)
                 self.partitioner_binary = partitioner_path
 
-                p3 = subprocess.Popen(["which", "mpirun"], stdout=subprocess.PIPE)
+                p3 = subprocess.Popen("unset LD_LIBRARY_PATH; which mpirun", stdout=subprocess.PIPE, shell=True)
                 if p3.wait() == 0:
                     if sys.version_info.major >= 3:
                         mpiexec_path = p3.stdout.read().decode("utf8").split("\n")[0]
@@ -552,18 +557,25 @@ class FemToolsFISTR(QtCore.QRunnable, QtCore.QObject):
             # Windows workaround to avoid blinking terminal window
             startup_info = subprocess.STARTUPINFO()
             startup_info.dwFlags = subprocess.STARTF_USESHOWWINDOW
+            cmd = [self.fistr_binary]
+            shellcmd = False
+        elif system() in ("Linux", "Darwin"):
+            cmd = "unset LD_LIBRARY_PATH; "+self.fistr_binary+" -v"
+            shellcmd = True
+
         fistr_stdout = None
         fistr_stderr = None
         try:
             p = subprocess.Popen(
-                [self.fistr_binary, "-v"],
+                cmd,
                 cwd=self.working_dir,
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
-                shell=False,
+                shell=shellcmd,
                 startupinfo=startup_info
             )
             fistr_stdout, fistr_stderr = p.communicate()
+
             if fistr_binary_sig in str(fistr_stdout):
                 self.fistr_binary_present = True
             else:
@@ -665,13 +677,18 @@ class FemToolsFISTR(QtCore.QRunnable, QtCore.QObject):
             # Windows workaround to avoid blinking terminal window
             startup_info = subprocess.STARTUPINFO()
             startup_info.dwFlags = subprocess.STARTF_USESHOWWINDOW
+            cmd = [self.mpiexec_binary,"-n",n_pe,self.fistr_binary]
+            shellcmd = False
+        elif system() in ("Linux", "Darwin"):
+            cmd = "unset LD_LIBRARY_PATH; "+self.mpiexec_binary+"-n"+n_pe+self.fistr_binary
+            shellcmd = True
 
         p = subprocess.Popen(
-            [self.mpiexec_binary,"-n",n_pe,self.fistr_binary],
+            cmd,
             cwd=self.working_dir,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
-            shell=False,
+            shell=shellcmd,
             startupinfo=startup_info
         )
         self.fistr_stdout, self.fistr_stderr = p.communicate()
@@ -699,15 +716,21 @@ class FemToolsFISTR(QtCore.QRunnable, QtCore.QObject):
             # Windows workaround to avoid blinking terminal window
             startup_info = subprocess.STARTUPINFO()
             startup_info.dwFlags = subprocess.STARTF_USESHOWWINDOW
+            cmd = [self.fistr_binary, "-v"]
+            shellcmd = False
+        elif system() in ("Linux", "Darwin"):
+            cmd = "unset LD_LIBRARY_PATH; "+self.fistr_binary+" -v"
+            shellcmd = True
+
         fistr_stdout = None
         fistr_stderr = None
         # Now extract the version number
         p = subprocess.Popen(
-            [self.fistr_binary, "-v"],
+            cmd,
             cwd=self.working_dir,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
-            shell=False,
+            shell=shellcmd,
             startupinfo=startup_info
         )
         fistr_stdout, fistr_stderr = p.communicate()

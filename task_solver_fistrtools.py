@@ -340,13 +340,18 @@ class _TaskPanel:
                     # Windows workaround to avoid blinking terminal window
                     startup_info = subprocess.STARTUPINFO()
                     startup_info.dwFlags = subprocess.STARTF_USESHOWWINDOW
+                    cmd = [self.fea.partitioner_binary]
+                    shellcmd = False
+                elif system() in ("Linux", "Darwin"):
+                    cmd = "unset LD_LIBRARY_PATH; "+self.fea.partitioner_binary
+                    shellcmd = True
 
                 p = subprocess.Popen(
-                    [self.fea.partitioner_binary],
+                    cmd,
                     cwd=self.fea.working_dir,
                     stdout=subprocess.PIPE,
                     stderr=subprocess.PIPE,
-                    shell=False,
+                    shell=shellcmd,
                     startupinfo=startup_info
                 )
                 part_stdout, part_stderr = p.communicate()                
@@ -440,9 +445,12 @@ class _TaskPanel:
         if self.fea.solver.n_process > 1:
             os.environ["OMP_NUM_THREADS"] = str(1)
             os.environ["MKL_NUM_THREADS"] = str(1)
+        os.environ.pop('LD_LIBRARY_PATH')
         self.FrontISTR.setStandardOutputFile(self.logfile)
-        self.FrontISTR.start(self.fea.mpiexec_binary,["-n",n_pe,self.fea.fistr_binary])
-
+        self.FrontISTR.setStandardErrorFile(self.logfile)
+        # self.FrontISTR.start(self.fea.mpiexec_binary,["-n",n_pe,self.fea.fistr_binary])
+        self.FrontISTR.start('mpirun',["-n",n_pe,self.fea.fistr_binary])
+        
         if ont_backup_available:
             os.environ["OMP_NUM_THREADS"] = str(ont_backup)
 
