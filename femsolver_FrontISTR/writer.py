@@ -99,6 +99,12 @@ class FemInputWriterfistr(writerbase.FemInputWriter):
         self.material_visco_objects = member.mats_visco_fistr
         self.material_creep_objects = member.mats_creep_fistr
 
+        if int(self.fc_ver[0]) == 0 and int(self.fc_ver[1]) > 19:
+            self.analysis_obj = analysis_obj
+            self.solver_obj = solver_obj
+            self.mesh_obj = mesh_obj
+            self.member = member
+
     # ********************************************************************************************
     # write FrontISTR input
     def write_FrontISTR_input_file(self):
@@ -1056,7 +1062,7 @@ class FemInputWriterfistr(writerbase.FemInputWriter):
             self.get_element_geometry1D_elements()
 
         # get the element ids for material objects and write them into the material object
-        if len(self.material_objects) > 1:
+        if len(self.material_objects) > 1 and int(self.fc_ver[0]) == 0 and int(self.fc_ver[1]) < 20: # for ver 0.19
             self.get_material_elements()
 
         # create the fistr_elsets
@@ -1385,19 +1391,79 @@ class FemInputWriterfistr(writerbase.FemInputWriter):
         self.fistr_elsets.append(fistr_elset)
 
     def get_fistr_elsets_multiple_mat_solid(self):
-        for mat_data in self.material_objects:
-            mat_obj = mat_data["Object"]
-            elset_data = mat_data["FEMElements"]
-            names = [
-                {"long": mat_obj.Name, "short": mat_data["ShortName"]},
-                {"long": "Solid", "short": "Solid"}
+        """
+        << FreeCAD 0.19 >>
+        self.material_objects = [
+            {
+                "Object": <App::MaterialObjectPython object>,
+                "RefShapeType": "Solid",
+                "ShortName", "Mx"
+                "FEMElements": (elem0, elem1, ...)
+            },
+            {
+                ...
+            },
+            ...
+        ]
+
+        << FreeCAD 0.20 >>
+        self.material_objects = [
+            {
+                "Object": <App::MaterialObjectPython object>,
+                "RefShapeType": "Solid"
+            },
+            {
+                ...
+            },
+            ...
+        ]
+        """
+        if int(self.fc_ver[0]) == 0 and int(self.fc_ver[1]) < 20: # for ver 0.19
+            for mat_data in self.material_objects:
+                mat_obj = mat_data["Object"]
+                elset_data = mat_data["FEMElements"]
+                names = [
+                    {"long": mat_obj.Name, "short": mat_data["ShortName"]},
+                    {"long": "Solid", "short": "Solid"}
+                ]
+                fistr_elset = {}
+                fistr_elset["fistr_elset"] = elset_data
+                fistr_elset["fistr_elset_name"] = get_fistr_elset_name_standard(names)
+                fistr_elset["mat_obj_name"] = mat_obj.Name
+                fistr_elset["fistr_mat_name"] = mat_obj.Material["Name"]
+                self.fistr_elsets.append(fistr_elset)
+        else:
+            # see https://github.com/FreeCAD/FreeCAD/blob/releases/FreeCAD-0-20/src/Mod/Fem/femtools/ccxtools.py#L380
+            from femmesh import meshsetsgetter
+            meshdatagetter = meshsetsgetter.MeshSetsGetter(
+                self.analysis_obj,
+                self.solver_obj,
+                self.mesh_obj,
+                self.member
+            )
+            meshdatagetter.get_mesh_sets()
+            mat_geo_sets = meshdatagetter.mat_geo_sets
+            """
+            mat_geo_sets = [
+                {
+                    "ccx_elset": (elem0, elem1, ...),
+                    "ccx_elset_name": name of element set,
+                    "mat_obj_name": name of material object,
+                    "ccx_mat_name": name of material
+                },
+                {
+                    ...
+                },
+                ...
             ]
-            fistr_elset = {}
-            fistr_elset["fistr_elset"] = elset_data
-            fistr_elset["fistr_elset_name"] = get_fistr_elset_name_standard(names)
-            fistr_elset["mat_obj_name"] = mat_obj.Name
-            fistr_elset["fistr_mat_name"] = mat_obj.Material["Name"]
-            self.fistr_elsets.append(fistr_elset)
+            """
+            for mat_geo_set in mat_geo_sets:
+                fistr_elset = {}
+                fistr_elset["fistr_elset"] = mat_geo_set["ccx_elset"]
+                fistr_elset["fistr_elset_name"] = mat_geo_set["ccx_elset_name"]
+                fistr_elset["mat_obj_name"] = mat_geo_set["mat_obj_name"]
+                fistr_elset["fistr_mat_name"] = mat_geo_set["ccx_mat_name"]
+                self.fistr_elsets.append(fistr_elset)
 
     def write_materials(self, f, fcnt):
         f.write("\n***********************************************************\n")
@@ -1599,8 +1665,10 @@ class FemInputWriterfistr(writerbase.FemInputWriter):
                     f.write(section_def)
                     f.write(section_geo)
                 else:  # solid mesh
-                    elsetdef = "ELSET=ALL, "
-                    #elsetdef = "ELSET=" + fistr_elset["fistr_elset_name"] + ", "
+                    if len(self.fistr_elsets) == 1:
+                        elsetdef = "ELSET=ALL, "
+                    elif len(self.fistr_elsets) > 1:
+                        elsetdef = "ELSET=" + fistr_elset["fistr_elset_name"] + ", "
                     material = "MATERIAL=" + fistr_elset["mat_obj_name"]
                     section_def = "*SOLID SECTION, " + elsetdef + material + "\n"
                     f.write(section_def)
