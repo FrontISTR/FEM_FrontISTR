@@ -200,9 +200,10 @@ class _CommandFISTRMaterialViscoelastic:
                 # since we do not know which one to take
                 solver_object = None
         FreeCADGui.Selection.clearSelection()
-        FreeCADGui.doCommand(
-            "FreeCADGui.ActiveDocument.setEdit(FreeCAD.ActiveDocument.ActiveObject.Name)"
-        )
+        ### if use taskpanel for viscoelastic
+        # FreeCADGui.doCommand(
+        #     "FreeCADGui.ActiveDocument.setEdit(FreeCAD.ActiveDocument.ActiveObject.Name)"
+        # )
         FreeCAD.ActiveDocument.recompute()
 
 
