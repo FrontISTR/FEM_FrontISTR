@@ -31,7 +31,6 @@ __url__ = "https://www.frontistr.com/"
 #  \brief view provider for FrontISTR material viscoelastic object
 
 import FreeCAD
-import task_material_viscoelastic_fistr
 from femviewprovider import view_base_femconstraint
 
 
@@ -42,12 +41,3 @@ class VPMaterialViscoelasticFrontISTR(view_base_femconstraint.VPBaseFemConstrain
 
     def getIcon(self):
         return FreeCAD.getUserAppDataDir()+ "Mod/FEM_FrontISTR/Resources/FrontISTR_MaterialViscoelastic.svg"
-
-    ### if use taskpanel for viscoelastic
-    # def setEdit(self, vobj, mode=0):
-    #     view_base_femconstraint.VPBaseFemConstraint.setEdit(
-    #         self,
-    #         vobj,
-    #         mode,
-    #         task_material_viscoelastic_fistr._TaskPanel
-    #     )

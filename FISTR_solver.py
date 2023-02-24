@@ -158,7 +158,7 @@ class _CommandFISTRMaterialViscoelastic:
             return False
 
     def Activated(self):
-        # see https://github.com/FreeCAD/FreeCAD/blob/master/src/Mod/Fem/femcommands/commands.py#L573
+        # see https://github.com/FreeCAD/FreeCAD/blob/040f86c4d55de150d6f56b7c6110f578d4d42a2c/src/Mod/Fem/femcommands/commands.py#L573
         # test if there is a viscoelastic material which has the selected material as base material
         for o in self.selobj.Document.Objects:
             if (
@@ -246,7 +246,7 @@ class _CommandFISTRMaterialCreep:
             return False
 
     def Activated(self):
-        # see https://github.com/FreeCAD/FreeCAD/blob/master/src/Mod/Fem/femcommands/commands.py#L573
+        # see https://github.com/FreeCAD/FreeCAD/blob/040f86c4d55de150d6f56b7c6110f578d4d42a2c/src/Mod/Fem/femcommands/commands.py#L573
         # test if there is a creep material which has the selected material as base material
         for o in self.selobj.Document.Objects:
             if (

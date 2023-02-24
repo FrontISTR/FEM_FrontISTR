@@ -31,7 +31,6 @@ __url__ = "https://www.frontistr.com/"
 #  \brief view provider for FrontISTR material creep object
 
 import FreeCAD
-import task_material_creep_fistr
 from femviewprovider import view_base_femconstraint
 
 

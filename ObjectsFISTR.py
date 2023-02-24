@@ -85,5 +85,5 @@ def makeMaterialCreepFrontISTR(
     obj.LinearBaseMaterial = base_material
     if FreeCAD.GuiUp:
         import view_material_creep_fistr
-        view_material_creep_fistr. VPMaterialCreepFrontISTR(obj.ViewObject)
+        view_material_creep_fistr.VPMaterialCreepFrontISTR(obj.ViewObject)
     return obj
