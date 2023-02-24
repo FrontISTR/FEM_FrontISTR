@@ -445,11 +445,11 @@ class _TaskPanel:
         if self.fea.solver.n_process > 1:
             os.environ["OMP_NUM_THREADS"] = str(1)
             os.environ["MKL_NUM_THREADS"] = str(1)
-        os.environ.pop('LD_LIBRARY_PATH')
+        os.environ.pop('LD_LIBRARY_PATH', None)
         self.FrontISTR.setStandardOutputFile(self.logfile)
         self.FrontISTR.setStandardErrorFile(self.logfile)
-        # self.FrontISTR.start(self.fea.mpiexec_binary,["-n",n_pe,self.fea.fistr_binary])
-        self.FrontISTR.start('mpirun',["-n",n_pe,self.fea.fistr_binary])
+        self.FrontISTR.start(self.fea.mpiexec_binary,["-n",n_pe,self.fea.fistr_binary])
+        # self.FrontISTR.start('mpirun',["-n",n_pe,self.fea.fistr_binary])
         
         if ont_backup_available:
             os.environ["OMP_NUM_THREADS"] = str(ont_backup)
