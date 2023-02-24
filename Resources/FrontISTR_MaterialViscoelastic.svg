@@ -7,7 +7,7 @@
    id="svg2816"
    version="1.1"
    sodipodi:docname="FEM_MaterialViscoelastic.svg"
-   inkscape:version="1.1.1 (c3084ef, 2021-09-22)"
+   inkscape:version="1.2.2 (b0a84865, 2022-12-01)"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:xlink="http://www.w3.org/1999/xlink"
@@ -25,15 +25,17 @@
      inkscape:pageopacity="0.0"
      inkscape:pagecheckerboard="0"
      showgrid="true"
-     inkscape:zoom="7.6673392"
-     inkscape:cx="38.148827"
-     inkscape:cy="37.235864"
+     inkscape:zoom="13.765625"
+     inkscape:cx="45.039728"
+     inkscape:cy="45.69353"
      inkscape:window-width="1440"
-     inkscape:window-height="847"
+     inkscape:window-height="834"
      inkscape:window-x="0"
      inkscape:window-y="25"
-     inkscape:window-maximized="1"
-     inkscape:current-layer="svg2816">
+     inkscape:window-maximized="0"
+     inkscape:current-layer="svg2816"
+     inkscape:showpageshadow="2"
+     inkscape:deskcolor="#d1d1d1">
     <inkscape:grid
        type="xygrid"
        id="grid142" />
@@ -338,8 +340,32 @@
        d="m 48.597521,39.95837 a 20.956074,20.956074 0 1 1 -41.9121477,0 20.956074,20.956074 0 1 1 41.9121477,0 z"
        transform="matrix(1.383847,0,0,1.383847,-6.2515342,-23.29627)" />
   </g>
-  <path
-     style="fill:#d3d7cf;fill-opacity:1;stroke:#2e3436;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-     d="m 35,32 h 4 l 9,24 9,-24 h 4.000004 L 51,61 H 45 L 35,32"
-     id="path4872" />
+  <g
+     id="g1450"
+     transform="translate(1.9980368,13.440439)">
+    <g
+       aria-label="V"
+       id="text275-3"
+       style="font-size:41.91px;line-height:1.25;font-family:Arial;-inkscape-font-specification:Arial;fill:#2e3436;fill-opacity:1;stroke-width:1.04775"
+       transform="translate(0,-7.4423915)">
+      <path
+         id="path354"
+         sodipodi:type="inkscape:offset"
+         inkscape:radius="1.9989525"
+         inkscape:original="M 30 24 L 41.623047 54 L 45.695312 54 L 57.441406 24 L 53.390625 24 L 45.287109 45.794922 C 44.673193 47.432031 44.133769 49.067969 43.669922 50.705078 C 43.247002 49.177109 42.721309 47.541172 42.09375 45.794922 L 34.296875 24 L 30 24 z "
+         d="m 30,22.001953 a 1.9991524,1.9991524 0 0 0 -1.863281,2.720703 l 11.623047,30 a 1.9991524,1.9991524 0 0 0 1.863281,1.275391 h 4.072265 a 1.9991524,1.9991524 0 0 0 1.861329,-1.269531 l 11.746093,-30 a 1.9991524,1.9991524 0 0 0 -1.861328,-2.726563 h -4.050781 a 1.9991524,1.9991524 0 0 0 -1.873047,1.300781 L 43.697266,44.337891 36.179688,23.326172 a 1.9991524,1.9991524 0 0 0 -1.882813,-1.324219 z"
+         style="fill:#2e3436;fill-opacity:1" />
+    </g>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:41.91px;line-height:1.25;font-family:Arial;-inkscape-font-specification:Arial;fill:#d3d7cf;fill-opacity:1;stroke:none;stroke-width:1.04775"
+       x="29.815668"
+       y="46.557625"
+       id="text275"><tspan
+         sodipodi:role="line"
+         id="tspan273"
+         x="29.815668"
+         y="46.557625"
+         style="fill:#d3d7cf;fill-opacity:1;stroke-width:1.04775">V</tspan></text>
+  </g>
 </svg>
