@@ -141,6 +141,9 @@ class FemInputWriterfistr(writerbase.FemInputWriter):
         # global settings
         self.write_global_setting(cntfile)
 
+        # eigen settings
+        self.write_eigen_setting(cntfile)
+
         # element and material sets
         self.write_element_sets_material_and_femelement_type(mshfile)
 
@@ -872,6 +875,21 @@ class FemInputWriterfistr(writerbase.FemInputWriter):
                                     i[1],
                                     heatflux_obj.DFlux * 0.001
                                 ))
+
+    # ********************************************************************************************
+    # eigen settings
+    def write_eigen_setting(self, f):
+        if not self.analysis_type == "eigen":
+            return
+
+        f.write("## Eigenvalue analysis setting\n")
+        f.write("## written by {} function\n".format(sys._getframe().f_code.co_name))
+        f.write("!EIGEN\n")
+        f.write(" {:d}, {:E}, {:d}\n".format(
+            self.solver_obj.NumEigenvalues,
+            self.solver_obj.EigenConvergenceResidual,
+            self.solver_obj.EigenMaximumIteration
+        ))
 
     # ********************************************************************************************
     # global settings
