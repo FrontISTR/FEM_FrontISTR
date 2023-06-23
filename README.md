@@ -57,33 +57,39 @@ FrontISTR is a nonlinear structural analysis solver with the following capabilit
 - [FreeCAD v0.19 or later](https://github.com/FreeCAD/FreeCAD/releases/)
 - [Paraview](https://www.paraview.org/) (optional)
 
-### Automatic Install
-
-1. Install FreeCAD.
-2. Install the FEM\_FrontISTR workbench from the FreeCAD [Addon Manager](https://wiki.freecad.org/Std_AddonMgr). This can be done via the Tools → 'Addon Manager' drop down menu.
-3. Restart FreeCAD  
-  Result: The `FrontISTR` workbench will be available in the workbench dropdown menu.
-
 ### Windows
 
-Running the FEM_FrontISTR is fully supported on windows. 
+1. Start FreeCAD and install the FEM\_FrontISTR workbench using ['Addon Manager'](https://wiki.freecad.org/Std_AddonMgr) in the tools menu.
+2. Restart FreeCAD.
+3. Switch to the FrontISTR workbench and open the first FrontISTR solver object. The FrontISTR binaries will be automatically downloaded and installed during the initial run.
+
 <details>
     <summary>
-        <i>Directions for manual install of FEM_FrontISTR if unsuccessful via Addon Manager</i>
+        <i>Directions for manual install of FEM_FrontISTR if unsuccessful</i>
     </summary>
 <br/>
 
 If Installation via the FreeCAD Addon Manager is unsucessful, download or `git clone` this repository to `C:/Users/user_name/AppData/Roaming/FreeCAD/Mod/FEM_FrontISTR`
 
-FrontISTR binaries will be automatically downloaded and installed on the first run. If the download does not proceed, please follow the steps below to install the solver.
+If the automatic download of FrontISTR binaries does not proceed, please follow the steps below to install the solver.
 1. Download [FrontISTR-latest.zip](https://www.frontistr.com/download/link.php?https://frontistr-commons.gitlab.io/FrontISTR/release/x86_64-w64-mingw32-msmpi/FrontISTR-latest.zip)
 2. Create directory `FEM_FrontISTR/bin`
 3. Extract `FrontISTR-latest.zip` and put all files in the `FEM_FrontISTR/bin` directory.
 
 </details>
+
 ### Linux
 
-Under preparation.
+- Ubuntu 20.04 is supported.
+- It is recommended to use FreeCAD AppImages.
+
+1. Download and install the FrontISTR official deb package using the following command:
+  ```
+  curl https://frontistr-commons.gitlab.io/FrontISTR/release/deb/FrontISTR_master-0+ubuntu2004_amd64.deb -O
+  sudo apt-get install -y ./FrontISTR_master-0+ubuntu2004_amd64.deb
+  ```
+2. Start FreeCAD and install the FEM\_FrontISTR workbench using ['Addon Manager'](https://wiki.freecad.org/Std_AddonMgr) in the tools menu.
+3. Restart FreeCAD.
 
 ### MacOS
 
