@@ -109,7 +109,11 @@ Under preparation.
 
 ## Documentation
 
-### FEM_FrontISTR manual and tutorial
+### Tutorial on Youtube
+
+  - https://www.youtube.com/playlist?list=PL9uFDa8KycPTmmh1eyEsXRL-XABFVAktc
+
+### Manual and tutorial
 
   - English: https://frontistr-commons.gitlab.io/FEM_FrontISTR/en/
   - 日本語: https://frontistr-commons.gitlab.io/FEM_FrontISTR/ja/
