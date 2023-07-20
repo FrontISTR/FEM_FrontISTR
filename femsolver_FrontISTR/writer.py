@@ -1479,8 +1479,9 @@ class FemInputWriterfistr(writerbase.FemInputWriter):
         #             self.analysis_type == "thermomech"
         #             and not self.solver_obj.ThermoMechSteadyState
         #         ):
-        #     f.write("** Density\'s unit is t/mm^3\n")
-        #     fcnt.write("## Density\'s unit is t/mm^3\n")
+        if self.selfweight_objects:
+            f.write("** Density\'s unit is t/mm^3\n")
+            fcnt.write("## Density\'s unit is t/mm^3\n")
         if self.analysis_type == "thermomech":
             f.write("** Thermal conductivity unit is kW/mm/K = t*mm/K*s^3\n")
             f.write("** Specific Heat unit is kJ/t/K = mm^2/s^2/K\n")
@@ -1503,8 +1504,9 @@ class FemInputWriterfistr(writerbase.FemInputWriter):
             #             self.analysis_type == "thermomech"
             #             and not self.solver_obj.ThermoMechSteadyState
             #         ):
-            #     density = FreeCAD.Units.Quantity(mat_obj.Material["Density"])
-            #     density_in_tonne_per_mm3 = float(density.getValueAs("t/mm^3"))
+            if self.selfweight_objects:
+                density = FreeCAD.Units.Quantity(mat_obj.Material["Density"])
+                density_in_tonne_per_mm3 = float(density.getValueAs("t/mm^3"))
             if self.analysis_type == "thermomech":
                 TC = FreeCAD.Units.Quantity(mat_obj.Material["ThermalConductivity"])
                 # SvdW: Add factor to force units to results base units
@@ -1538,10 +1540,11 @@ class FemInputWriterfistr(writerbase.FemInputWriter):
             #             self.analysis_type == "thermomech"
             #             and not self.solver_obj.ThermoMechSteadyState
             #         ):
-            #     f.write("*DENSITY\n")
-            #     f.write("{0:.3e}\n".format(density_in_tonne_per_mm3))
-            #     fcnt.write("!DENSITY\n")
-            #     fcnt.write("{0:.3e}\n".format(density_in_tonne_per_mm3))
+            if self.selfweight_objects:
+                f.write("*DENSITY\n")
+                f.write("{0:.3e}\n".format(density_in_tonne_per_mm3))
+                fcnt.write("!DENSITY\n")
+                fcnt.write("{0:.3e}\n".format(density_in_tonne_per_mm3))
             if self.analysis_type == "thermomech":
                 if mat_obj.Category == "Solid":
                     # f.write("*CONDUCTIVITY\n")
