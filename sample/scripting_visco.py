@@ -42,10 +42,10 @@ doc.recompute()
 
 # create body
 body_obj = doc.addObject("Part::Loft", "Loft")
-body_obj.Sections=[doc.Sketch, doc.Sketch001, ]
-body_obj.Solid=True
-body_obj.Ruled=False
-body_obj.Closed=False
+body_obj.Sections = [sketch_obj0, skecth_obj1, ]
+body_obj.Solid = True
+body_obj.Ruled = False
+body_obj.Closed = False
 doc.recompute()
 sketch_obj0.Visibility = False
 skecth_obj1.Visibility = False
@@ -74,28 +74,28 @@ doc.recompute()
 cons_fix = ObjectsFem.makeConstraintDisplacement(doc, "ConsFIX")
 cons_fix.zFree = False
 cons_fix.zFix = True
-cons_fix.References = [(doc.Loft, "Face5")]
+cons_fix.References = [(body_obj, "Face5")]
 analysis_obj.addObject(cons_fix)
 
 # constraint LOADS
 cons_loads = ObjectsFem.makeConstraintDisplacement(doc, "ConsLOADS")
 cons_loads.zDisplacement = -7.000000
 cons_loads.zFree = False
-cons_loads.References = [(doc.Loft, "Face4")]
+cons_loads.References = [(body_obj, "Face4")]
 analysis_obj.addObject(cons_loads)
 
 # constraint XSYMM
 cons_xsymm = ObjectsFem.makeConstraintDisplacement(doc, "ConsXSYMM")
 cons_xsymm.xFree = False
 cons_xsymm.xFix = True
-cons_xsymm.References = [(doc.Loft, "Face2")]
+cons_xsymm.References = [(body_obj, "Face2")]
 analysis_obj.addObject(cons_xsymm)
 
 # constraint YSYMM
 cons_ysymm = ObjectsFem.makeConstraintDisplacement(doc, "ConsYSYMM")
 cons_ysymm.yFree = False
 cons_ysymm.yFix = True
-cons_ysymm.References = [(doc.Loft, "Face3")]
+cons_ysymm.References = [(body_obj, "Face3")]
 analysis_obj.addObject(cons_ysymm)
 
 # recompute
