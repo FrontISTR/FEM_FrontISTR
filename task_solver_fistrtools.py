@@ -413,6 +413,13 @@ class _TaskPanel:
         FemGui.open(cntinp_file_name)
 
     def runFrontISTR(self):
+        if self.FrontISTR.state() == QtCore.QProcess.ProcessState.Running:
+            self.FrontISTR.kill()
+            self.FrontISTR.setProcessState(QtCore.QProcess.ProcessState.NotRunning)
+            self.form.pb_run_fistr.setText("Re-run FrontISTR")
+            QApplication.restoreOverrideCursor()
+            return
+
         # print("runFrontISTR")
         self.Start = time.time()
 
@@ -458,6 +465,9 @@ class _TaskPanel:
         self.FrontISTR.start(self.fea.mpiexec_binary,["-n",n_pe,self.fea.fistr_binary])
         # self.FrontISTR.start('mpirun',["-n",n_pe,self.fea.fistr_binary])
         
+        if not self.Timer.isActive():
+            self.Timer.start(300)
+
         if ont_backup_available:
             os.environ["OMP_NUM_THREADS"] = str(ont_backup)
 
