@@ -884,12 +884,22 @@ class FemInputWriterfistr(writerbase.FemInputWriter):
         if not self.analysis_type == "eigen":
             return
 
+        try:
+            eigen_converge_residual_float = float(self.solver_obj.EigenConvergeResidual)
+        except ValueError:
+            eigen_converge_residual_float = 1.0e-8
+            converting_string = "Converting Eigen Converge Residual value {} to float failed. Using default value 1.0E-8.".format(self.solver_obj.EigenConvergeResidual)
+            FreeCAD.Console.PrintWarning(converting_string + "\n")
+            if FreeCAD.GuiUp:
+                from PySide import QtGui
+                QtGui.QMessageBox.warning(None, "Converting value failed", converting_string)
+
         f.write("## Eigenvalue analysis setting\n")
         f.write("## written by {} function\n".format(sys._getframe().f_code.co_name))
         f.write("!EIGEN\n")
         f.write(" {:d}, {:E}, {:d}\n".format(
             self.solver_obj.NumEigenvalues,
-            self.solver_obj.EigenConvergeResidual,
+            eigen_converge_residual_float,
             self.solver_obj.EigenMaximumIteration
         ))
 
