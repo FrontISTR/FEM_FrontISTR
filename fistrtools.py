@@ -261,9 +261,9 @@ class FemToolsFISTR(QtCore.QRunnable, QtCore.QObject):
                 .format(self.working_dir)
             )
         if int(self.fc_ver[0]) == 0 and int(self.fc_ver[1]) < 20: # for ver 0.19
-            from femtools.checksanalysis import check_analysismember as checker
+            from femtools_FrontISTR.checksanalysis_19 import check_analysismember as checker
         else:
-            from femtools.checksanalysis import check_member_for_solver_calculix as checker
+            from femtools_FrontISTR.checksanalysis_20 import check_member_for_solver_fistr as checker
         message += checker(
             self.analysis,
             self.solver,
