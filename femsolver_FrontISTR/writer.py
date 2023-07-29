@@ -889,7 +889,7 @@ class FemInputWriterfistr(writerbase.FemInputWriter):
         f.write("!EIGEN\n")
         f.write(" {:d}, {:E}, {:d}\n".format(
             self.solver_obj.NumEigenvalues,
-            self.solver_obj.EigenConvergenceResidual,
+            self.solver_obj.EigenConvergeResidual,
             self.solver_obj.EigenMaximumIteration
         ))
 
