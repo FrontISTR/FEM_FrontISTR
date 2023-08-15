@@ -352,8 +352,8 @@ def extract_surface(nodes,
         s.append((ve[3],ve[2],ve[6],ve[7]))
         s.append((ve[0],ve[3],ve[7],ve[4]))
         s.append((ve[5],ve[4],ve[7],ve[6]))
-        for i in range(4):
-            hash = make_hash_tri(s[i])
+        for i in range(6):
+            hash = make_hash_quad(s[i])
             try:
                 table_quad4[hash].append(s[i])
             except:
