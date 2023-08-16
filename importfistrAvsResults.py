@@ -694,8 +694,8 @@ def read_avs_result(
             mode_pstress[nid] = pstr
 
     n_nodes = len(nodes.keys())
-    n_elems = len(elements_tria3.keys())+len(elements_tria6.keys()) \
-        + len(elements_quad4.keys())
+    n_elems = len(elements_tria3.keys()) + len(elements_tria6.keys())  \
+        + len(elements_quad4.keys()) + len(elements_quad8.keys())
 
     mode_results["disp"] = mode_disp
     mode_results["stress"] = mode_stress
