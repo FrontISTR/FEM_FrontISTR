@@ -380,30 +380,6 @@ def extract_surface(nodes,
             for nid in elements_quad4[count]:
                 used_nid.append(nid)
 
-    # extract surface of hexa8 elements
-    table_quad4 = {}
-    for eid in elements_hexa8.keys():
-        ve = elements_hexa8[eid]
-        s = []
-        s.append((ve[0],ve[1],ve[2],ve[3]))
-        s.append((ve[1],ve[0],ve[4],ve[5]))
-        s.append((ve[2],ve[1],ve[5],ve[6]))
-        s.append((ve[3],ve[2],ve[6],ve[7]))
-        s.append((ve[0],ve[3],ve[7],ve[4]))
-        s.append((ve[5],ve[4],ve[7],ve[6]))
-        for i in range(6):
-            hash = make_hash_quad(s[i])
-            try:
-                table_quad4[hash].append(s[i])
-            except:
-                table_quad4[hash] = [s[i]]
-    for k in table_quad4.keys():
-        if len(table_quad4[k]) == 1:
-            count += 1
-            elements_quad4[count] = table_quad4[k][0]
-            for nid in elements_quad4[count]:
-                used_nid.append(nid)
-
     # extract surface of hexa20 elements
     table_quad8 = {}
     for eid in elements_hexa20.keys():
@@ -426,6 +402,30 @@ def extract_surface(nodes,
             count += 1
             elements_quad8[count] = table_quad8[k][0]
             for nid in elements_quad8[count]:
+                used_nid.append(nid)
+
+    # extract surface of hexa8 elements
+    table_quad4 = {}
+    for eid in elements_hexa8.keys():
+        ve = elements_hexa8[eid]
+        s = []
+        s.append((ve[0],ve[1],ve[2],ve[3]))
+        s.append((ve[1],ve[0],ve[4],ve[5]))
+        s.append((ve[2],ve[1],ve[5],ve[6]))
+        s.append((ve[3],ve[2],ve[6],ve[7]))
+        s.append((ve[0],ve[3],ve[7],ve[4]))
+        s.append((ve[5],ve[4],ve[7],ve[6]))
+        for i in range(6):
+            hash = make_hash_quad(s[i])
+            try:
+                table_quad4[hash].append(s[i])
+            except:
+                table_quad4[hash] = [s[i]]
+    for k in table_quad4.keys():
+        if len(table_quad4[k]) == 1:
+            count += 1
+            elements_quad4[count] = table_quad4[k][0]
+            for nid in elements_quad4[count]:
                 used_nid.append(nid)
 
     used_nid = list(set(used_nid))
