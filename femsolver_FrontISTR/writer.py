@@ -1507,7 +1507,8 @@ class FemInputWriterfistr(writerbase.FemInputWriter):
         #             self.analysis_type == "thermomech"
         #             and not self.solver_obj.ThermoMechSteadyState
         #         ):
-        if self.selfweight_objects:
+        if self.selfweight_objects \
+                or self.analysis_type == "eigen":
             f.write("** Density\'s unit is t/mm^3\n")
             fcnt.write("## Density\'s unit is t/mm^3\n")
         if self.analysis_type == "thermomech":
@@ -1532,7 +1533,8 @@ class FemInputWriterfistr(writerbase.FemInputWriter):
             #             self.analysis_type == "thermomech"
             #             and not self.solver_obj.ThermoMechSteadyState
             #         ):
-            if self.selfweight_objects:
+            if self.selfweight_objects \
+                    or self.analysis_type == "eigen":
                 density = FreeCAD.Units.Quantity(mat_obj.Material["Density"])
                 density_in_tonne_per_mm3 = float(density.getValueAs("t/mm^3"))
             if self.analysis_type == "thermomech":
@@ -1568,7 +1570,8 @@ class FemInputWriterfistr(writerbase.FemInputWriter):
             #             self.analysis_type == "thermomech"
             #             and not self.solver_obj.ThermoMechSteadyState
             #         ):
-            if self.selfweight_objects:
+            if self.selfweight_objects \
+                    or self.analysis_type == "eigen":
                 f.write("*DENSITY\n")
                 f.write("{0:.3e}\n".format(density_in_tonne_per_mm3))
                 fcnt.write("!DENSITY\n")
