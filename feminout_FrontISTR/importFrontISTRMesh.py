@@ -201,7 +201,7 @@ def read_msh_fistr(filename):
                     elm_2nd_line = True
                     break
 
-        elif line[:8].upper() == "!SECTION":
+        elif line[:4].upper() == "!END":
             model_definition = False
     if error_seg3 is True:  # to print "not supported"
         FreeCAD.Console.PrintError("Error: seg3 (3-node beam element type) not supported, yet.\n")
