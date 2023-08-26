@@ -155,7 +155,7 @@ def read_msh_fistr(filename):
             elif elm_type in ["241", "741"]:
                 elm_category = elements.quad4
                 number_of_nodes = 4
-            elif elm_type == "242":
+            elif elm_type == ["242", "742"]:
                 elm_category = elements.quad8
                 number_of_nodes = 8
             elif elm_type == "341":
@@ -179,7 +179,7 @@ def read_msh_fistr(filename):
             elif elm_type in ["111", "611"]:
                 elm_category = elements.seg2
                 number_of_nodes = 2
-            elif elm_type == "112":
+            elif elm_type == ["112", "612"]:
                 elm_category = elements.seg3
                 number_of_nodes = 3
                 error_seg3 = True  # to print "not supported"
