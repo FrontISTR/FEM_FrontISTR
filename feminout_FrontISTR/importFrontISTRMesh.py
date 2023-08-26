@@ -68,27 +68,6 @@ def read(filename):
     return importToolsFem.make_femmesh(mesh_data)
 
 
-def convert(femmesh, mesh_name):
-    import Mesh
-    import Part
-    from femmesh.femmesh2mesh import femmesh_2_mesh
-    out_mesh = femmesh_2_mesh(femmesh)
-    mesh_object = FreeCAD.ActiveDocument.addObject("Mesh::Feature", mesh_name + "_mesh")
-    mesh_object.Mesh = Mesh.Mesh(out_mesh)
-    shell_object = FreeCAD.ActiveDocument.addObject('Part::Feature', mesh_name + '_shell')
-    __shape__ = Part.Shape()
-    __shape__.makeShapeFromMesh(mesh_object.Mesh.Topology, 0.100000, True)
-    shell_object.Shape = __shape__
-    del __shape__
-    __s__ = shell_object.Shape
-    __s__ = Part.Solid(__s__)
-    __o__ = FreeCAD.ActiveDocument.addObject("Part::Feature", mesh_name + "_solid")
-    __o__.Shape = __s__
-    del __s__, __o__
-    FreeCAD.ActiveDocument.removeObject(mesh_object.Label)
-    FreeCAD.ActiveDocument.removeObject(shell_object.Label)
-
-
 def import_msh_fistr(filename):
     '''read a FEM mesh from a msh mesh file and insert a FreeCAD FEM Mesh object in the ActiveDocument
     '''
@@ -97,7 +76,6 @@ def import_msh_fistr(filename):
     if femmesh:
         mesh_object = FreeCAD.ActiveDocument.addObject('Fem::FemMeshObject', mesh_name)
         mesh_object.FemMesh = femmesh
-        # convert(femmesh, mesh_name)
         FreeCAD.ActiveDocument.recompute()
 
 
