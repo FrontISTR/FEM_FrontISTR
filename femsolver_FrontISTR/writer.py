@@ -1572,20 +1572,20 @@ class FemInputWriterfistr(writerbase.FemInputWriter):
                 for nlfemobj in self.material_hyper_objects:
                     nl_mat_obj = nlfemobj["Object"]
                     if nl_mat_obj.LinearBaseMaterial == mat_obj:
-                        if nl_mat_obj.HyperelasticModel == "NEOHOOKE":
+                        if nl_mat_obj.MaterialModelHyperelastic == "NEOHOOKE":
                             fcnt.write("!HYPERELASTIC, TYPE=NEOHOOKE\n")
                             fcnt.write(" {}, {}\n".format(
                                 nl_mat_obj.Constant_C10,
                                 nl_mat_obj.Constant_D
                             ))
-                        elif nl_mat_obj.HyperelasticModel == "MOONEY-RIVLIN":
+                        elif nl_mat_obj.MaterialModelHyperelastic == "MOONEY-RIVLIN":
                             fcnt.write("!HYPERELASTIC, TYPE=MOONEY-RIVLIN\n")
                             fcnt.write(" {}, {}, {}\n".format(
                                 nl_mat_obj.Constant_C10,
                                 nl_mat_obj.Constant_C01,
                                 nl_mat_obj.Constant_D
                             ))
-                        elif nl_mat_obj.HyperelasticModel == "ARRUDA-BOYCE":
+                        elif nl_mat_obj.MaterialModelHyperelastic == "ARRUDA-BOYCE":
                             fcnt.write("!HYPERELASTIC, TYPE=ARRUDA-BOYCE\n")
                             fcnt.write(" {}, {}, {}\n".format(
                                 nl_mat_obj.Constant_mu,
