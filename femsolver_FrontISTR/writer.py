@@ -96,6 +96,7 @@ class FemInputWriterfistr(writerbase.FemInputWriter):
         self.isactive_boundary = False
 
         self.temperature_fistr_objects = member.cons_temperature_fistr
+        self.material_hyper_objects = member.mats_hyper_fistr
         self.material_visco_objects = member.mats_visco_fistr
         self.material_creep_objects = member.mats_creep_fistr
 
@@ -1567,6 +1568,31 @@ class FemInputWriterfistr(writerbase.FemInputWriter):
                             if nl_mat_obj.YieldPoint1:
                                 f.write(nl_mat_obj.YieldPoint1 + ", 0.0\n")
                     f.write("\n")
+                # hyperelastic
+                for nlfemobj in self.material_hyper_objects:
+                    nl_mat_obj = nlfemobj["Object"]
+                    if nl_mat_obj.LinearBaseMaterial == mat_obj:
+                        if nl_mat_obj.HyperelasticModel == "NEOHOOKE":
+                            fcnt.write("!HYPERELASTIC, TYPE=NEOHOOKE\n")
+                            fcnt.write(" {}, {}\n".format(
+                                nl_mat_obj.Constant_C10,
+                                nl_mat_obj.Constant_D
+                            ))
+                        elif nl_mat_obj.HyperelasticModel == "MOONEY-RIVLIN":
+                            fcnt.write("!HYPERELASTIC, TYPE=MOONEY-RIVLIN\n")
+                            fcnt.write(" {}, {}, {}\n".format(
+                                nl_mat_obj.Constant_C10,
+                                nl_mat_obj.Constant_C01,
+                                nl_mat_obj.Constant_D
+                            ))
+                        elif nl_mat_obj.HyperelasticModel == "ARRUDA-BOYCE":
+                            fcnt.write("!HYPERELASTIC, TYPE=ARRUDA-BOYCE\n")
+                            fcnt.write(" {}, {}, {}\n".format(
+                                nl_mat_obj.Constant_mu,
+                                nl_mat_obj.Constant_lambda,
+                                nl_mat_obj.Constant_D
+                            ))
+                    fcnt.write("\n")
                 # viscoelastic
                 for nlfemobj in self.material_visco_objects:
                     nl_mat_obj = nlfemobj["Object"]

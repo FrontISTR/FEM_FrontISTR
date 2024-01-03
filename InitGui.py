@@ -47,6 +47,7 @@ class FrontISTR(Workbench):
         #FreeCADGui.addCommand("FEM_SolverFrontISTR",_SolverFrontISTR())
         self.fstrtools = [
             "FISTR_solver", "FISTR_ConstraintTemperature",
+            "FISTR_MaterialHyperelastic",
             "FISTR_MaterialViscoelastic", "FISTR_MaterialCreep"
         ]
         self.appendToolbar(QT_TRANSLATE_NOOP("Workbench","FrontISTR tools"),self.fstrtools)
