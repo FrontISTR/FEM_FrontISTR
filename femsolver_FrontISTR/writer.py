@@ -1559,15 +1559,37 @@ class FemInputWriterfistr(writerbase.FemInputWriter):
 
             # nonlinear material properties
             if self.solver_obj.Nonlinearity == "yes":
+                # plastic
                 for nlfemobj in self.material_nonlinear_objects:
                     # femobj --> dict, FreeCAD document object is nlfemobj["Object"]
                     nl_mat_obj = nlfemobj["Object"]
                     if nl_mat_obj.LinearBaseMaterial == mat_obj:
                         if nl_mat_obj.MaterialModelNonlinearity == "simple hardening":
-                            fcnt.write("!PLASTIC,YIELD=MISES,HARDEN=MULTILINEAR\n")
-                            if nl_mat_obj.YieldPoint1:
-                                f.write(nl_mat_obj.YieldPoint1 + ", 0.0\n")
-                    f.write("\n")
+                            if int(self.fc_ver[0]) == 0 and int(self.fc_ver[1]) < 20: # for ver 0.19
+                                # only for temperature independent case
+                                fcnt.write("!PLASTIC, YIELD=MISES, HARDEN=MULTILINEAR\n")
+                                if nl_mat_obj.YieldPoint1:
+                                    fcnt.write("{}\n".format(nl_mat_obj.YieldPoint1))
+                                if nl_mat_obj.YieldPoint2:
+                                    fcnt.write("{}\n".format(nl_mat_obj.YieldPoint2))
+                                if nl_mat_obj.YieldPoint3:
+                                    fcnt.write("{}\n".format(nl_mat_obj.YieldPoint3))
+                            else:
+                                list_yield_point0 = nl_mat_obj.YieldPoints[0].replace(" ", "").split(",")
+                                if len(list_yield_point0) == 3:
+                                    fcnt.write("!PLASTIC, YIELD=MISES, HARDEN=MULTILINEAR, DEPENDENCIES=1\n")
+                                elif len(list_yield_point0) == 2:
+                                    fcnt.write("!PLASTIC, YIELD=MISES, HARDEN=MULTILINEAR\n")
+                                else:
+                                    fcnt.write("!PLASTIC, YIELD=MISES, HARDEN=MULTILINEAR\n")
+                                    FreeCAD.Console.PrintWarning(
+                                        "A yield point has {} components. "
+                                        "Please take care of the parameters of !PLASTIC.\n"
+                                        .format(len(list_yield_point0))
+                                    )
+                                for yield_point in nl_mat_obj.YieldPoints:
+                                    fcnt.write("{}\n".format(yield_point))
+                    fcnt.write("\n")
                 # hyperelastic
                 for nlfemobj in self.material_hyper_objects:
                     nl_mat_obj = nlfemobj["Object"]
