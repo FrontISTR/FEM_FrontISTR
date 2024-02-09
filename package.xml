@@ -5,7 +5,7 @@
   <date>2021-08-28</date>
   <description>A FreeCAD addon that enables a parallel nonliner FEM solver FrontISTR.</description>
   <maintainer email="freecad_support@frontistr.org">FrontISTR-Commons</maintainer>
-  <license file="LICENSE">LGPLv2.1</license>
+  <license file="LICENSE">LGPL-2.1-or-later</license>
   <url type="repository" branch="master">https://github.com/FrontISTR/FEM_FrontISTR</url>
   <url type="bugtracker">https://github.com/FrontISTR/FEM_FrontISTR/issues</url>
   <url type="documentation">https://frontistr-commons.gitlab.io/FEM_FrontISTR/en/</url>
