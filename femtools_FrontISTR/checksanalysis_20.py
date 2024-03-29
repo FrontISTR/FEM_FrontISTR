@@ -55,21 +55,7 @@ def check_member_for_solver_fistr(analysis, solver, mesh, member):
             message += "Frequency analysis: Solver has no EigenmodeLowLimit.\n"
         elif not hasattr(solver, "EigenmodesCount"):
             message += "Frequency analysis: Solver has no EigenmodesCount.\n"
-    if hasattr(solver, "Nonlinearity") \
-            and solver.Nonlinearity == "yes":
-        if not (member.mats_nonlinear or member.mats_visco_fistr or member.mats_creep_fistr):
-            message += (
-                "Solver is set to nonlinear materials, "
-                "but there is no nonlinear material in the analysis.\n"
-            )
-        # if solver.Proxy.Type == "Fem::SolverCcxTools" \
-        #         and solver.GeometricalNonlinearity != "nonlinear":
-        #     # nonlinear geometry --> should be set
-        #     # https://forum.freecad.org/viewtopic.php?f=18&t=23101&p=180489#p180489
-        #     message += (
-        #         "Solver CalculiX triggers nonlinear geometry for nonlinear material, "
-        #         "thus it should to be set too.\n"
-        #     )
+    # NOTE: pass for checks about nonlinearity
 
     # mesh
     if not mesh:
