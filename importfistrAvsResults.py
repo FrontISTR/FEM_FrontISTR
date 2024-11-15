@@ -248,7 +248,16 @@ def make_hash_tri(surf):
     tmp.sort()
     return str(tmp[0])+"%"+str(tmp[1])+"%"+str(tmp[2])
 
-def extract_surface(nodes,elements_tetra10,elements_tetra4,elements_tria6,elements_tria3):
+def make_hash_quad(surf):
+    tmp = [surf[0],surf[1],surf[2],surf[3]]
+    tmp.sort()
+    return str(tmp[0])+"%"+str(tmp[1])+"%"+str(tmp[2])+"%"+str(tmp[3])
+
+def extract_surface(nodes,
+                    elements_tetra10, elements_tetra4,
+                    elements_penta15, elements_penta6,
+                    elements_hexa20, elements_hexa8,
+                    elements_tria6, elements_tria3, elements_quad8, elements_quad4):
     used_nid = []
 
     # extract surface of tetra10 elements
@@ -297,6 +306,128 @@ def extract_surface(nodes,elements_tetra10,elements_tetra4,elements_tria6,elemen
             for nid in elements_tria3[count]:
                 used_nid.append(nid)
 
+    # extract surface of penta15 elements
+    table_tri6 = {}
+    table_quad8 = {}
+    for eid in elements_penta15.keys():
+        ve = elements_penta15[eid]
+        s = []
+        s.append((ve[0],ve[1],ve[2],ve[6],ve[7],ve[8]))
+        s.append((ve[3],ve[5],ve[4],ve[11],ve[10],ve[9]))
+        s.append((ve[1],ve[0],ve[3],ve[4],ve[6],ve[12],ve[9],ve[13]))
+        s.append((ve[2],ve[1],ve[4],ve[5],ve[7],ve[13],ve[10],ve[14]))
+        s.append((ve[0],ve[2],ve[5],ve[3],ve[8],ve[14],ve[11],ve[12]))
+        for i in range(2):
+            hash = make_hash_tri(s[i])
+            try:
+                table_tri6[hash].append(s[i])
+            except:
+                table_tri6[hash] = [s[i]]
+        for i in range(2, 5):
+            hash = make_hash_quad(s[i])
+            try:
+                table_quad8[hash].append(s[i])
+            except:
+                table_quad8[hash] = [s[i]]
+    count = 0
+    for k in table_tri6.keys():
+        if len(table_tri6[k]) == 1:
+            count += 1
+            elements_tria6[count] = table_tri6[k][0]
+            for nid in elements_tria6[count]:
+                used_nid.append(nid)
+    for k in table_quad8.keys():
+        if len(table_quad8[k]) == 1:
+            count += 1
+            elements_quad8[count] = table_quad8[k][0]
+            for nid in elements_quad8[count]:
+                used_nid.append(nid)
+
+    # extract surface of penta6 elements
+    table_tri3 = {}
+    table_quad4 = {}
+    for eid in elements_penta6.keys():
+        ve = elements_penta6[eid]
+        s = []
+        s.append((ve[0],ve[1],ve[2]))
+        s.append((ve[3],ve[5],ve[4]))
+        s.append((ve[1],ve[0],ve[3],ve[4]))
+        s.append((ve[2],ve[1],ve[4],ve[5]))
+        s.append((ve[0],ve[2],ve[5],ve[3]))
+        for i in range(2):
+            hash = make_hash_tri(s[i])
+            try:
+                table_tri3[hash].append(s[i])
+            except:
+                table_tri3[hash] = [s[i]]
+        for i in range(2, 5):
+            hash = make_hash_quad(s[i])
+            try:
+                table_quad4[hash].append(s[i])
+            except:
+                table_quad4[hash] = [s[i]]
+    count = 0
+    for k in table_tri3.keys():
+        if len(table_tri3[k]) == 1:
+            count += 1
+            elements_tria3[count] = table_tri3[k][0]
+            for nid in elements_tria3[count]:
+                used_nid.append(nid)
+    for k in table_quad4.keys():
+        if len(table_quad4[k]) == 1:
+            count += 1
+            elements_quad4[count] = table_quad4[k][0]
+            for nid in elements_quad4[count]:
+                used_nid.append(nid)
+
+    # extract surface of hexa20 elements
+    table_quad8 = {}
+    for eid in elements_hexa20.keys():
+        ve = elements_hexa20[eid]
+        s = []
+        s.append((ve[0],ve[1],ve[2],ve[3],ve[8],ve[9],ve[10],ve[11]))
+        s.append((ve[1],ve[0],ve[4],ve[5],ve[8],ve[16],ve[12],ve[17]))
+        s.append((ve[2],ve[1],ve[5],ve[6],ve[9],ve[17],ve[13],ve[18]))
+        s.append((ve[3],ve[2],ve[6],ve[7],ve[10],ve[18],ve[14],ve[19]))
+        s.append((ve[0],ve[3],ve[7],ve[4],ve[11],ve[19],ve[15],ve[16]))
+        s.append((ve[5],ve[4],ve[7],ve[6],ve[12],ve[15],ve[14],ve[13]))
+        for i in range(6):
+            hash = make_hash_quad(s[i])
+            try:
+                table_quad8[hash].append(s[i])
+            except:
+                table_quad8[hash] = [s[i]]
+    for k in table_quad8.keys():
+        if len(table_quad8[k]) == 1:
+            count += 1
+            elements_quad8[count] = table_quad8[k][0]
+            for nid in elements_quad8[count]:
+                used_nid.append(nid)
+
+    # extract surface of hexa8 elements
+    table_quad4 = {}
+    for eid in elements_hexa8.keys():
+        ve = elements_hexa8[eid]
+        s = []
+        s.append((ve[0],ve[1],ve[2],ve[3]))
+        s.append((ve[1],ve[0],ve[4],ve[5]))
+        s.append((ve[2],ve[1],ve[5],ve[6]))
+        s.append((ve[3],ve[2],ve[6],ve[7]))
+        s.append((ve[0],ve[3],ve[7],ve[4]))
+        s.append((ve[5],ve[4],ve[7],ve[6]))
+        for i in range(6):
+            hash = make_hash_quad(s[i])
+            try:
+                table_quad4[hash].append(s[i])
+            except:
+                table_quad4[hash] = [s[i]]
+    for k in table_quad4.keys():
+        if len(table_quad4[k]) == 1:
+            count += 1
+            elements_quad4[count] = table_quad4[k][0]
+            for nid in elements_quad4[count]:
+                used_nid.append(nid)
+
     used_nid = list(set(used_nid))
     newnodes = {}
     for nid in used_nid:
@@ -315,7 +446,7 @@ def renumber_nid(nodes):
 
     return nodes, Renumbered_nid
 
-def renumber_eid(Renumbered_nid,elements_tria6,elements_tria3):
+def renumber_eid(Renumbered_nid, elements_tria6, elements_tria3, elements_quad8, elements_quad4):
     Renumbered_eid = {}
     count = 0
     
@@ -336,8 +467,26 @@ def renumber_eid(Renumbered_nid,elements_tria6,elements_tria3):
         for nid in elements_tria3[eid]:
             nodelist.append(Renumbered_nid[nid])
         elements_tria3_new[count] = nodelist
+
+    elements_quad8_new = {}
+    for eid in list(elements_quad8.keys()):
+        count += 1
+        Renumbered_eid[eid] = count
+        nodelist = []
+        for nid in elements_quad8[eid]:
+            nodelist.append(Renumbered_nid[nid])
+        elements_quad8_new[count] = nodelist
+
+    elements_quad4_new = {}
+    for eid in list(elements_quad4.keys()):
+        count += 1
+        Renumbered_eid[eid] = count
+        nodelist = []
+        for nid in elements_quad4[eid]:
+            nodelist.append(Renumbered_nid[nid])
+        elements_quad4_new[count] = nodelist
     
-    return elements_tria6_new, elements_tria3_new, Renumbered_eid
+    return elements_tria6_new, elements_tria3_new, elements_quad8_new, elements_quad4_new, Renumbered_eid
 
 # read a FrontISTR result file and extract the nodes
 # displacement vectors and stress values.
@@ -422,15 +571,85 @@ def read_avs_result(
             nd3 = int(line[5])
             nd4 = int(line[6])
             elements_tetra4[eid] = (nd2, nd1, nd4, nd3)
+        elif etype == 'prism2':
+            nd1 = int(line[3])
+            nd2 = int(line[4])
+            nd3 = int(line[5])
+            nd4 = int(line[6])
+            nd5 = int(line[7])
+            nd6 = int(line[8])
+            nd7 = int(line[9])
+            nd8 = int(line[10])
+            nd9 = int(line[11])
+            nd10 = int(line[12])
+            nd11 = int(line[13])
+            nd12 = int(line[14])
+            nd13 = int(line[15])
+            nd14 = int(line[16])
+            nd15 = int(line[17])
+            elements_penta15[eid] = (nd5, nd4, nd6, nd2, nd1, nd3,
+                                     nd10, nd12, nd11, nd7, nd9, nd8,
+                                     nd14, nd13, nd15)
+        elif etype == 'prism':
+            nd1 = int(line[3])
+            nd2 = int(line[4])
+            nd3 = int(line[5])
+            nd4 = int(line[6])
+            nd5 = int(line[7])
+            nd6 = int(line[8])
+            elements_penta6[eid] = (nd5, nd4, nd6, nd2, nd1, nd3)
+        elif etype == 'hex2':
+            nd1 = int(line[3])
+            nd2 = int(line[4])
+            nd3 = int(line[5])
+            nd4 = int(line[6])
+            nd5 = int(line[7])
+            nd6 = int(line[8])
+            nd7 = int(line[9])
+            nd8 = int(line[10])
+            nd9 = int(line[11])
+            nd10 = int(line[12])
+            nd11 = int(line[13])
+            nd12 = int(line[14])
+            nd13 = int(line[15])
+            nd14 = int(line[16])
+            nd15 = int(line[17])
+            nd16 = int(line[18])
+            nd17 = int(line[19])
+            nd18 = int(line[20])
+            nd19 = int(line[21])
+            nd20 = int(line[22])
+            elements_hexa20[eid] = (nd6, nd5, nd8, nd7, nd2, nd1, nd4, nd3,
+                                    nd13, nd16, nd15, nd14, nd9, nd12, nd11, nd10,
+                                    nd18, nd17, nd20, nd19)
+        elif etype == 'hex':
+            nd1 = int(line[3])
+            nd2 = int(line[4])
+            nd3 = int(line[5])
+            nd4 = int(line[6])
+            nd5 = int(line[7])
+            nd6 = int(line[8])
+            nd7 = int(line[9])
+            nd8 = int(line[10])
+            elements_hexa8[eid] = (nd6, nd5, nd8, nd7, nd2, nd1, nd4, nd3)
 
     # Extract surface
-    extract_surface(nodes,elements_tetra10,elements_tetra4,elements_tria6,elements_tria3)
+    extract_surface(nodes,
+                    elements_tetra10, elements_tetra4,
+                    elements_penta15, elements_penta6,
+                    elements_hexa20, elements_hexa8,
+                    elements_tria6, elements_tria3, elements_quad8, elements_quad4)
     elements_tetra10 = {}
     elements_tetra4 = {}
-    
+    elements_penta15 = {}
+    elements_penta6 = {}
+    elements_hexa20 = {}
+    elements_hexa8 = {}
+
     # Renumber for pipeline view
     nodes, Renumbered_nid = renumber_nid(nodes)
-    elements_tria6, elements_tria3, Renumbered_eid = renumber_eid(Renumbered_nid,elements_tria6,elements_tria3)
+    elements_tria6, elements_tria3, elements_quad8, elements_quad4, Renumbered_eid  \
+        = renumber_eid(Renumbered_nid, elements_tria6, elements_tria3, elements_quad8, elements_quad4)
 
     n_noderes, n_elemres = map(int, list(filter(None, dat.pop().split(" "))))
     if n_noderes > 0 :
@@ -475,8 +694,9 @@ def read_avs_result(
             mode_pstress[nid] = pstr
 
     n_nodes = len(nodes.keys())
-    n_elems = len(elements_tria3.keys())+len(elements_tria6.keys())
-    
+    n_elems = len(elements_tria3.keys()) + len(elements_tria6.keys())  \
+        + len(elements_quad4.keys()) + len(elements_quad8.keys())
+
     mode_results["disp"] = mode_disp
     mode_results["stress"] = mode_stress
     mode_results["mises"] = mode_mises
