@@ -725,13 +725,14 @@ class FemInputWriterfistr(writerbase.FemInputWriter):
             f.write("!DLOAD,GRPID=1\n")
             f.write(
                 # elset, GRAV, magnitude, direction x, dir y ,dir z
-                "{},GRAV,{},{},{},{}\n"
-                .format(
-                    " "+self.fistr_eall,
-                    self.gravity,  # actual magnitude of gravity vector
-                    selwei_obj.Gravity_x,  # coordinate x of normalized gravity vector
-                    selwei_obj.Gravity_y,  # y
-                    selwei_obj.Gravity_z  # z
+                "{},GRAV,{:.13G},{:.13G},{:.13G},{:.13G}\n".format(
+                    self.fistr_eall,
+                    selwei_obj.GravityAcceleration.getValueAs(
+                        "mm/s^2"
+                    ).Value,  # actual magnitude of gravity vector
+                    selwei_obj.GravityDirection.x,  # coordinate x of normalized gravity vector
+                    selwei_obj.GravityDirection.y,  # y
+                    selwei_obj.GravityDirection.z   # z
                 )
             )
             f.write("\n")
@@ -765,19 +766,20 @@ class FemInputWriterfistr(writerbase.FemInputWriter):
             # femobj --> dict, FreeCAD document object is femobj["Object"]
             f.write("## " + femobj["Object"].Label + "\n")
             direction_vec = femobj["Object"].DirectionVector
+            dir_zero_tol = 1e-15  # TODO: should this be more generally for more values?
             for ref_shape in femobj["NodeLoadTable"]:
-                f.write("## " + ref_shape[0] + "\n")
+                f.write(f"## {ref_shape[0]}\n")
                 for n in sorted(ref_shape[1]):
                     node_load = ref_shape[1][n]
-                    if (direction_vec.x != 0.0):
-                        v1 = "{:.13E}".format(direction_vec.x * node_load)
-                        f.write(str(n) + ",1," + v1 + "\n")
-                    if (direction_vec.y != 0.0):
-                        v2 = "{:.13E}".format(direction_vec.y * node_load)
-                        f.write(str(n) + ",2," + v2 + "\n")
-                    if (direction_vec.z != 0.0):
-                        v3 = "{:.13E}".format(direction_vec.z * node_load)
-                        f.write(str(n) + ",3," + v3 + "\n")
+                    if abs(direction_vec.x) > dir_zero_tol:
+                        v1 = f"{(direction_vec.x * node_load).Value:.13G}"
+                        f.write(f"{n},1,{v1}\n")
+                    if abs(direction_vec.y) > dir_zero_tol:
+                        v2 = f"{(direction_vec.y * node_load).Value:.13G}"
+                        f.write(f"{n},2,{v2}\n")
+                    if abs(direction_vec.z) > dir_zero_tol:
+                        v3 = f"{(direction_vec.z * node_load).Value:.13G}"
+                        f.write(f"{n},3,{v3}\n")
                 f.write("\n")
             f.write("\n")
 
