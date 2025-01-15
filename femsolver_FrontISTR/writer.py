@@ -389,32 +389,74 @@ class FemInputWriterfistr(writerbase.FemInputWriter):
             disp_obj = femobj["Object"]
             disp_obj_name = disp_obj.Name
             f.write("!BOUNDARY,GRPID=1\n")
-            if disp_obj.xFix:
+            if int(self.fc_ver[0]) == 0 and disp_obj.xFix:
                 f.write(disp_obj_name + ",1,1\n")
             elif not disp_obj.xFree:
-                f.write(disp_obj_name + ",1,1," + str(disp_obj.xDisplacement) + "\n")
-            if disp_obj.yFix:
+                if int(self.fc_ver[0]) == 0 and int(self.fc_ver[1]) < 21: # for v0.19, v0.20
+                    f.write(disp_obj_name + ",1,1," + str(disp_obj.xDisplacement) + "\n")
+                else:
+                    f.write(
+                        "{},1,1,{}\n".format(
+                            disp_obj_name, FreeCAD.Units.Quantity(disp_obj.xDisplacement.getValueAs("mm"))
+                        )
+                    )
+            if int(self.fc_ver[0]) == 0 and disp_obj.yFix:
                 f.write(disp_obj_name + ",2,2\n")
             elif not disp_obj.yFree:
-                f.write(disp_obj_name + ",2,2," + str(disp_obj.yDisplacement) + "\n")
-            if disp_obj.zFix:
+                if int(self.fc_ver[0]) == 0 and int(self.fc_ver[1]) < 21:
+                    f.write(disp_obj_name + ",2,2," + str(disp_obj.yDisplacement) + "\n")
+                else:
+                    f.write(
+                        "{},2,2,{}\n".format(
+                            disp_obj_name, FreeCAD.Units.Quantity(disp_obj.yDisplacement.getValueAs("mm"))
+                        )
+                    )
+            if int(self.fc_ver[0]) == 0 and disp_obj.zFix:
                 f.write(disp_obj_name + ",3,3\n")
             elif not disp_obj.zFree:
-                f.write(disp_obj_name + ",3,3," + str(disp_obj.zDisplacement) + "\n")
+                if int(self.fc_ver[0]) == 0 and int(self.fc_ver[1]) < 21:
+                    f.write(disp_obj_name + ",3,3," + str(disp_obj.zDisplacement) + "\n")
+                else:
+                    f.write(
+                        "{},3,3,{}\n".format(
+                            disp_obj_name, FreeCAD.Units.Quantity(disp_obj.zDisplacement.getValueAs("mm"))
+                        )
+                    )
 
             if self.beamsection_objects or self.shellthickness_objects:
-                if disp_obj.rotxFix:
+                if int(self.fc_ver[0]) == 0 and disp_obj.rotxFix:
                     f.write(disp_obj_name + ",4,4\n")
                 elif not disp_obj.rotxFree:
-                    f.write(disp_obj_name + ",4,4," + str(disp_obj.xRotation) + "\n")
-                if disp_obj.rotyFix:
+                    if int(self.fc_ver[0]) == 0 and int(self.fc_ver[1]) < 21:
+                        f.write(disp_obj_name + ",4,4," + str(disp_obj.xRotation) + "\n")
+                    else:
+                        f.write(
+                            "{},4,4,{}\n".format(
+                                disp_obj_name, FreeCAD.Units.Quantity(disp_obj.xRotation.getValueAs("deg"))
+                            )
+                        )
+                if int(self.fc_ver[0]) == 0 and disp_obj.rotyFix:
                     f.write(disp_obj_name + ",5,5\n")
                 elif not disp_obj.rotyFree:
-                    f.write(disp_obj_name + ",5,5," + str(disp_obj.yRotation) + "\n")
-                if disp_obj.rotzFix:
+                    if int(self.fc_ver[0]) == 0 and int(self.fc_ver[1]) < 21:
+                        f.write(disp_obj_name + ",5,5," + str(disp_obj.yRotation) + "\n")
+                    else:
+                        f.write(
+                            "{},5,5,{}\n".format(
+                                disp_obj_name, FreeCAD.Units.Quantity(disp_obj.yRotation.getValueAs("deg"))
+                            )
+                        )
+                if int(self.fc_ver[0]) == 0 and disp_obj.rotzFix:
                     f.write(disp_obj_name + ",6,6\n")
                 elif not disp_obj.rotzFree:
-                    f.write(disp_obj_name + ",6,6," + str(disp_obj.zRotation) + "\n")
+                    if int(self.fc_ver[0]) == 0 and int(self.fc_ver[1]) < 21:
+                        f.write(disp_obj_name + ",6,6," + str(disp_obj.zRotation) + "\n")
+                    else:
+                        f.write(    
+                            "{},6,6,{}\n".format(
+                                disp_obj_name, FreeCAD.Units.Quantity(disp_obj.zRotation.getValueAs("deg"))
+                            )
+                        )
         f.write("\n")
 
     # ********************************************************************************************
