@@ -462,11 +462,11 @@ class FemInputWriterfistr(writerbase.FemInputWriter):
             # slave DEP
             f.write("*SURFACE, NAME=DEP{}\n".format(contact_obj.Name))
             for i in femobj["ContactSlaveFaces"]:
-                f.write("{},S{}\n".format(i[0], i[1]))
+                f.write(f"{i[0]},S{i[1]}\n")
             # master IND
             f.write("*SURFACE, NAME=IND{}\n".format(contact_obj.Name))
             for i in femobj["ContactMasterFaces"]:
-                f.write("{},S{}\n".format(i[0], i[1]))
+                f.write(f"{i[0]},S{i[1]}\n")
 
     def write_constraints_contact(self, f):
         if not self.contact_objects:
@@ -808,6 +808,9 @@ class FemInputWriterfistr(writerbase.FemInputWriter):
             prs_obj = femobj["Object"]
             f.write("## " + prs_obj.Label + "\n")
             rev = -1 if prs_obj.Reversed else 1
+            # the pressure has to be output in MPa
+            pressure_quantity = FreeCAD.Units.Quantity(prs_obj.Pressure.getValueAs("MPa"))
+            press_rev = rev * pressure_quantity
             f.write("!DLOAD,GRPID=1\n")
             for ref_shape in femobj["PressureFaces"]:
                 # the loop is needed for compatibility reason
@@ -815,15 +818,15 @@ class FemInputWriterfistr(writerbase.FemInputWriter):
                 # the face ids where per ref_shape
                 for face, fno in ref_shape[1]:
                     if fno > 0:  # solid mesh face
-                        f.write("{},P{},{}\n".format(face, fno, rev * prs_obj.Pressure))
+                        f.write(f"{face},P{fno},{press_rev}\n")
                     # on shell mesh face: fno == 0
                     # normal of element face == face normal
                     elif fno == 0:
-                        f.write("{},S,{}\n".format(face, rev * prs_obj.Pressure))
+                        f.write(f"{face},S,{press_rev}\n")
                     # on shell mesh face: fno == -1
                     # normal of element face opposite direction face normal
                     elif fno == -1:
-                        f.write("{},S,{}\n".format(face, -1 * rev * prs_obj.Pressure))
+                        f.write(f"{face},S,{-1 * press_rev}\n")
 
     # ********************************************************************************************
     # constraints heatflux
