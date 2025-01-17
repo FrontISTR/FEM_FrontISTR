@@ -112,6 +112,11 @@ class _TaskPanel:
             self.select_thermomech_analysis
         )
         QtCore.QObject.connect(
+            self.form.rb_eigen_analysis,
+            QtCore.SIGNAL("clicked()"),
+            self.select_eigen_analysis
+        )
+        QtCore.QObject.connect(
             self.form.rb_check_mesh,
             QtCore.SIGNAL("clicked()"),
             self.select_check_mesh
@@ -161,6 +166,8 @@ class _TaskPanel:
             self.form.rb_frequency_analysis.setChecked(True)
         elif self.fea.solver.AnalysisType == "thermomech":
             self.form.rb_thermomech_analysis.setChecked(True)
+        elif self.fea.solver.AnalysisType == "eigen":
+            self.form.rb_eigen_analysis.setChecked(True)
         elif self.fea.solver.AnalysisType == "check":
             self.form.rb_check_mesh.setChecked(True)
         return
@@ -480,6 +487,9 @@ class _TaskPanel:
 
     def select_thermomech_analysis(self):
         self.select_analysis_type("thermomech")
+
+    def select_eigen_analysis(self):
+        self.select_analysis_type("eigen")
 
     def select_check_mesh(self):
         self.select_analysis_type("check")

@@ -175,24 +175,26 @@ def importAvs(
                     new = time.time(); Console.PrintMessage("dtime 8:"+'%8.3f'%(new-cur)+"\n") ; cur = new
 
                 # fill vonMises
-                mstress = []
-                for nid in res_obj.NodeNumbers:
-                    mstress.append(result_set["mises"][nid])
-                res_obj.vonMises = mstress
+                if "mises" in result_set:
+                    mstress = []
+                    for nid in res_obj.NodeNumbers:
+                        mstress.append(result_set["mises"][nid])
+                    res_obj.vonMises = mstress
 
                 if TUNE:
                     new = time.time(); Console.PrintMessage("dtime 9:"+'%8.3f'%(new-cur)+"\n") ; cur = new
 
                 # fill principal stress
-                prinstress1 = []; prinstress2 = []; prinstress3 = []
-                for nid in res_obj.NodeNumbers:
-                    pstr = result_set["pstress"][nid]
-                    prinstress1.append(pstr[0])
-                    prinstress2.append(pstr[1])
-                    prinstress3.append(pstr[2])
-                res_obj.PrincipalMax = prinstress1
-                res_obj.PrincipalMed = prinstress2
-                res_obj.PrincipalMin = prinstress3
+                if "pstress" in result_set:
+                    prinstress1 = []; prinstress2 = []; prinstress3 = []
+                    for nid in res_obj.NodeNumbers:
+                        pstr = result_set["pstress"][nid]
+                        prinstress1.append(pstr[0])
+                        prinstress2.append(pstr[1])
+                        prinstress3.append(pstr[2])
+                    res_obj.PrincipalMax = prinstress1
+                    res_obj.PrincipalMed = prinstress2
+                    res_obj.PrincipalMin = prinstress3
 
                 # fill Stats
                 res_obj = resulttools.fill_femresult_stats(res_obj)
@@ -674,33 +676,37 @@ def read_avs_result(
                 nresults[labels[j]][Renumbered_nid[nid]] = linedat[dofs[j]:dofs[j+1]]
 
         # displacement
-        for nid in nodes.keys():
-            disp = nresults['DISPLACEMENT'][nid]
-            mode_disp[nid] = FreeCAD.Vector(disp[0],disp[1],disp[2])
+        if 'DISPLACEMENT' in nresults:
+            for nid in nodes.keys():
+                disp = nresults['DISPLACEMENT'][nid]
+                mode_disp[nid] = FreeCAD.Vector(disp[0],disp[1],disp[2])
+            mode_results["disp"] = mode_disp
     
         # NodalSTRESS
-        for nid in nodes.keys():
-            stress = nresults['NodalSTRESS'][nid]
-            mode_stress[nid] = (stress[0],stress[1],stress[2],stress[3],stress[5],stress[4])
+        if 'NodalSTRESS' in nresults:
+            for nid in nodes.keys():
+                stress = nresults['NodalSTRESS'][nid]
+                mode_stress[nid] = (stress[0],stress[1],stress[2],stress[3],stress[5],stress[4])
+            mode_results["stress"] = mode_stress
 
         # NodalMises
-        for nid in nodes.keys():
-            mises = nresults['NodalMISES'][nid][0]
-            mode_mises[nid] = mises
-            
+        if 'NodalMISES' in nresults:
+            for nid in nodes.keys():
+                mises = nresults['NodalMISES'][nid][0]
+                mode_mises[nid] = mises
+            mode_results["mises"] = mode_mises
+
         # NodalPrincipalSTRESS
-        for nid in nodes.keys():
-            pstr = nresults['NodalPrincipalSTRESS'][nid]
-            mode_pstress[nid] = pstr
+        if 'NodalPrincipalSTRESS' in nresults:
+            for nid in nodes.keys():
+                pstr = nresults['NodalPrincipalSTRESS'][nid]
+                mode_pstress[nid] = pstr
+            mode_results["pstress"] = mode_pstress
 
     n_nodes = len(nodes.keys())
     n_elems = len(elements_tria3.keys()) + len(elements_tria6.keys())  \
         + len(elements_quad4.keys()) + len(elements_quad8.keys())
 
-    mode_results["disp"] = mode_disp
-    mode_results["stress"] = mode_stress
-    mode_results["mises"] = mode_mises
-    mode_results["pstress"] = mode_pstress
     results.append(mode_results)
 
     return {

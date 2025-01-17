@@ -143,6 +143,9 @@ class FemInputWriterfistr(writerbase.FemInputWriter):
         # global settings
         self.write_global_setting(cntfile)
 
+        # eigen settings
+        self.write_eigen_setting(cntfile)
+
         # element and material sets
         self.write_element_sets_material_and_femelement_type(mshfile)
 
@@ -876,6 +879,31 @@ class FemInputWriterfistr(writerbase.FemInputWriter):
                                 ))
 
     # ********************************************************************************************
+    # eigen settings
+    def write_eigen_setting(self, f):
+        if not self.analysis_type == "eigen":
+            return
+
+        try:
+            eigen_converge_residual_float = float(self.solver_obj.EigenConvergeResidual)
+        except ValueError:
+            eigen_converge_residual_float = 1.0e-8
+            converting_string = "Converting Eigen Converge Residual value {} to float failed. Using default value 1.0E-8.".format(self.solver_obj.EigenConvergeResidual)
+            FreeCAD.Console.PrintWarning(converting_string + "\n")
+            if FreeCAD.GuiUp:
+                from PySide import QtGui
+                QtGui.QMessageBox.warning(None, "Converting value failed", converting_string)
+
+        f.write("## Eigenvalue analysis setting\n")
+        f.write("## written by {} function\n".format(sys._getframe().f_code.co_name))
+        f.write("!EIGEN\n")
+        f.write(" {:d}, {:E}, {:d}\n".format(
+            self.solver_obj.NumEigenvalues,
+            eigen_converge_residual_float,
+            self.solver_obj.EigenMaximumIteration
+        ))
+
+    # ********************************************************************************************
     # global settings
     def write_global_setting(self, f):
         # ANALYSIS type line
@@ -1479,7 +1507,8 @@ class FemInputWriterfistr(writerbase.FemInputWriter):
         #             self.analysis_type == "thermomech"
         #             and not self.solver_obj.ThermoMechSteadyState
         #         ):
-        if self.selfweight_objects:
+        if self.selfweight_objects \
+                or self.analysis_type == "eigen":
             f.write("** Density\'s unit is t/mm^3\n")
             fcnt.write("## Density\'s unit is t/mm^3\n")
         if self.analysis_type == "thermomech":
@@ -1504,7 +1533,8 @@ class FemInputWriterfistr(writerbase.FemInputWriter):
             #             self.analysis_type == "thermomech"
             #             and not self.solver_obj.ThermoMechSteadyState
             #         ):
-            if self.selfweight_objects:
+            if self.selfweight_objects \
+                    or self.analysis_type == "eigen":
                 density = FreeCAD.Units.Quantity(mat_obj.Material["Density"])
                 density_in_tonne_per_mm3 = float(density.getValueAs("t/mm^3"))
             if self.analysis_type == "thermomech":
@@ -1540,7 +1570,8 @@ class FemInputWriterfistr(writerbase.FemInputWriter):
             #             self.analysis_type == "thermomech"
             #             and not self.solver_obj.ThermoMechSteadyState
             #         ):
-            if self.selfweight_objects:
+            if self.selfweight_objects \
+                    or self.analysis_type == "eigen":
                 f.write("*DENSITY\n")
                 f.write("{0:.3e}\n".format(density_in_tonne_per_mm3))
                 fcnt.write("!DENSITY\n")

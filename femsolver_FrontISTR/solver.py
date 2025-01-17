@@ -42,7 +42,7 @@ from femtools import femutils
 if FreeCAD.GuiUp:
     import FemGui
 
-ANALYSIS_TYPES = ["static", "check", "thermomech"]
+ANALYSIS_TYPES = ["static", "check", "thermomech", "eigen"]
 
 
 def create(doc, name="SolverFrontISTR"):
@@ -282,3 +282,31 @@ def add_attributes(obj, fistr_prefs):
     )
     newton_iter = fistr_prefs.GetInt("NewtonMaximumIteration", 20)
     obj.NewtonMaximumIteration = newton_iter
+
+    # for eigenvalue analysis
+    obj.addProperty(
+        "App::PropertyIntegerConstraint",
+        "NumEigenvalues",
+        "Eigen",
+        "Number of eigenvalues"
+    )
+    eigen_num = fistr_prefs.GetInt("NumEigenvalues", 3)
+    obj.NumEigenvalues = eigen_num
+
+    obj.addProperty(
+        "App::PropertyString",
+        "EigenConvergeResidual",
+        "Eigen",
+        "Convergence threshold of eigenvalue analysis"
+    )
+    eigen_res = fistr_prefs.GetString("EigenConvergeResidual", "1.0e-8")
+    obj.EigenConvergeResidual = eigen_res
+
+    obj.addProperty(
+        "App::PropertyIntegerConstraint",
+        "EigenMaximumIteration",
+        "Eigen",
+        "Maximum number of iterations on eigenvalue analysis"
+    )
+    eigen_iter = fistr_prefs.GetInt("EigenMaximumIteration", 60)
+    obj.EigenMaximumIteration = eigen_iter
