@@ -56,6 +56,22 @@ def makeConstraintTemperatureFrontISTR(
         view_constraint_temperature_fistr.VPConstraintTemperatureFrontISTR(obj.ViewObject)
     return obj
 
+def makeMaterialHyperelasticFrontISTR(
+    doc,
+    base_material,
+    name="MaterialHyperelasticFrontISTR"
+):
+    """makeMaterialHyperelasticFrontISTR(document, base_material, [name]):
+    makes a FrontISTR material hyperelastic object"""
+    obj = doc.addObject("Fem::FeaturePython", name)
+    import material_hyperelastic_fistr
+    material_hyperelastic_fistr.MaterialHyperelasticFISTR(obj)
+    obj.LinearBaseMaterial = base_material
+    if FreeCAD.GuiUp:
+        import view_material_hyperelastic_fistr
+        view_material_hyperelastic_fistr.VPMaterialHyperelasticFrontISTR(obj.ViewObject)
+    return obj
+
 def makeMaterialViscoelasticFrontISTR(
     doc,
     base_material,

@@ -119,6 +119,91 @@ class _CommandFISTRConstraintTemperature:
         )
         FreeCAD.ActiveDocument.recompute()
 
+
+class _CommandFISTRMaterialHyperelastic:
+    def GetResources(self):
+        return {'Pixmap'  : FreeCAD.getUserAppDataDir()+ "Mod/FEM_FrontISTR/Resources/FrontISTR_MaterialHyperelastic.svg" ,
+                'MenuText': QT_TRANSLATE_NOOP("FISTR_MaterialHyperelastic","FrontISTR material hyperelastic"),
+                'ToolTip': QT_TRANSLATE_NOOP(
+                    "FISTR_MaterialHyperelastic",
+                    "Creates a FrontISTR material hyperelastic"
+                )}
+
+    def IsActive(self):  # is_active == "with_material_solid"
+        active = (
+            FemGui.getActiveAnalysis() is not None
+            and self.active_analysis_in_active_doc()
+            and self.material_solid_selected()
+        )
+        return active
+    
+    def active_analysis_in_active_doc(self):  # same as above
+        analysis = FemGui.getActiveAnalysis()
+        if analysis.Document is FreeCAD.ActiveDocument:
+            self.active_analysis = analysis
+            return True
+        else:
+            return False
+
+    def material_solid_selected(self):
+        sel = FreeCADGui.Selection.getSelection()
+        if (
+            len(sel) == 1
+            and sel[0].isDerivedFrom("App::MaterialObjectPython")
+            and hasattr(sel[0], "Category")
+            and sel[0].Category == "Solid"
+        ):
+            self.selobj = sel[0]
+            return True
+        else:
+            return False
+
+    def Activated(self):
+        # see https://github.com/FreeCAD/FreeCAD/blob/040f86c4d55de150d6f56b7c6110f578d4d42a2c/src/Mod/Fem/femcommands/commands.py#L573
+        # test if there is a hyperelastic material which has the selected material as base material
+        for o in self.selobj.Document.Objects:
+            if (
+                is_of_type(o, "Fem::MaterialHyperelasticFISTR")
+                and o.LinearBaseMaterial == self.selobj
+            ):
+                FreeCAD.Console.PrintError(
+                    "Hyperelastic material {} is based on the selected material {}. "
+                    "Only one hyperelastic object allowed for each material.\n"
+                    .format(o.Name, self.selobj.Name)
+                )
+                return
+
+        # add a hyperelastic material
+        string_lin_mat_obj = "FreeCAD.ActiveDocument.getObject('" + self.selobj.Name + "')"
+        command_to_run = (
+            "FemGui.getActiveAnalysis().addObject(ObjectsFISTR."
+            "makeMaterialHyperelasticFrontISTR(FreeCAD.ActiveDocument, {}))"
+            .format(string_lin_mat_obj)
+        )
+        FreeCAD.ActiveDocument.openTransaction("Create FrontISTR material hyperelastic")
+        FreeCADGui.addModule("ObjectsFISTR")
+        FreeCADGui.addModule("FemGui")
+        FreeCADGui.doCommand(command_to_run)
+        # set property of the solver to nonlinear
+        # (only if one solver is available and if this solver is a FrontISTR solver):
+        # The original code assumes that SolverCcxTools is at the top. However, SolverFISTRTools is not placed at the top.
+        solver_object = None
+        for m in self.active_analysis.Group:
+            if not solver_object and is_of_type(m, "Fem::SolverFISTRTools"):
+                solver_object = m
+                FreeCAD.Console.PrintMessage(
+                    "Set Nonlinearity to yes for {}\n"
+                    .format(solver_object.Label)
+                )
+                solver_object.Nonlinearity = "yes"
+            else:
+                # we do not change attributes if we have more than one solver
+                # since we do not know which one to take
+                solver_object = None
+        FreeCADGui.Selection.clearSelection()
+        FreeCAD.ActiveDocument.recompute()
+
+
 class _CommandFISTRMaterialViscoelastic:
     def GetResources(self):
         return {'Pixmap'  : FreeCAD.getUserAppDataDir()+ "Mod/FEM_FrontISTR/Resources/FrontISTR_MaterialViscoelastic.svg" ,
@@ -294,5 +379,6 @@ class _CommandFISTRMaterialCreep:
 if FreeCAD.GuiUp:
     FreeCADGui.addCommand('FISTR_solver',_CommandFISTRsolver())
     FreeCADGui.addCommand('FISTR_ConstraintTemperature', _CommandFISTRConstraintTemperature())
+    FreeCADGui.addCommand('FISTR_MaterialHyperelastic', _CommandFISTRMaterialHyperelastic())
     FreeCADGui.addCommand('FISTR_MaterialViscoelastic', _CommandFISTRMaterialViscoelastic())
     FreeCADGui.addCommand('FISTR_MaterialCreep', _CommandFISTRMaterialCreep())

@@ -1,6 +1,5 @@
 # ***************************************************************************
-# *   Copyright (c) 2017 Markus Hovorka <m.hovorka@live.de>                 *
-# *   Copyright (c) 2018 Bernd Hahnebach <bernd@bimstatik.org>              *
+# *   Copyright (c) 2015 Bernd Hahnebach <bernd@bimstatik.org>              *
 # *   Copyright (c) 2022 FrontISTR Commons <https://www.frontistr.com/>     *
 # *                                                                         *
 # *   This file is part of the FreeCAD CAx development system.              *
@@ -23,45 +22,22 @@
 # *                                                                         *
 # ***************************************************************************
 
-
-__title__ = "FrontISTR analysis tools"
+__title__ = "FrontISTR material hyperelastic ViewProvider for the document object"
 __author__ = "FrontISTR Commons"
 __url__ = "https://www.frontistr.com/"
 
+## @package view_material_hyperelastic_fistr
+#  \ingroup FEM
+#  \brief view provider for FrontISTR material hyperelastic object
 
-from femtools import membertools
+import FreeCAD
+from femviewprovider import view_base_femconstraint
 
 
-class AnalysisMemberfistr(membertools.AnalysisMember):
+class VPMaterialHyperelasticFrontISTR(view_base_femconstraint.VPBaseFemConstraint):
+    """
+    A View Provider for the FrontISTR material hyperelastic object
+    """
 
-    def __init__(self, analysis):
-        super().__init__(analysis)
-        """
-        # members of the analysis. All except solvers and the mesh
-
-        constraints:
-        constraints_temperature_fistr : list of dictionaries
-            list of temperatures for the FrontISTR thermal stress analysis.
-            [{"Object":temperature_obj, "xxxxxxxx":value}, {}, ...]
-        """
-
-        # get member
-        # materials
-        # see `material_hyperelastic_fistr.py`
-        self.mats_hyper_fistr = super().get_several_member(
-            "Fem::MaterialHyperelasticFISTR"
-        )
-        # see `material_viscoelastic_fistr.py`
-        self.mats_visco_fistr = super().get_several_member(
-            "Fem::MaterialViscoelasticFISTR"
-        )
-        # see `material_creep_fistr.py`
-        self.mats_creep_fistr = super().get_several_member(
-            "Fem::MaterialCreepFISTR"
-        )
-
-        # constraints
-        # see `constraints_temperature_fistr.py`
-        self.cons_temperature_fistr = super().get_several_member(
-            "Fem::ConstraintTemperatureFISTR"
-        )
+    def getIcon(self):
+        return FreeCAD.getUserAppDataDir()+ "Mod/FEM_FrontISTR/Resources/FrontISTR_MaterialHyperelastic.svg"
