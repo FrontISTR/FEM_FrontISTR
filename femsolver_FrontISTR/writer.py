@@ -393,32 +393,74 @@ class FemInputWriterfistr(writerbase.FemInputWriter):
             disp_obj = femobj["Object"]
             disp_obj_name = disp_obj.Name
             f.write("!BOUNDARY,GRPID=1\n")
-            if disp_obj.xFix:
+            if int(self.fc_ver[0]) == 0 and disp_obj.xFix:
                 f.write(disp_obj_name + ",1,1\n")
             elif not disp_obj.xFree:
-                f.write(disp_obj_name + ",1,1," + str(disp_obj.xDisplacement) + "\n")
-            if disp_obj.yFix:
+                if int(self.fc_ver[0]) == 0 and int(self.fc_ver[1]) < 21: # for v0.19, v0.20
+                    f.write(disp_obj_name + ",1,1," + str(disp_obj.xDisplacement) + "\n")
+                else:
+                    f.write(
+                        "{},1,1,{}\n".format(
+                            disp_obj_name, FreeCAD.Units.Quantity(disp_obj.xDisplacement.getValueAs("mm"))
+                        )
+                    )
+            if int(self.fc_ver[0]) == 0 and disp_obj.yFix:
                 f.write(disp_obj_name + ",2,2\n")
             elif not disp_obj.yFree:
-                f.write(disp_obj_name + ",2,2," + str(disp_obj.yDisplacement) + "\n")
-            if disp_obj.zFix:
+                if int(self.fc_ver[0]) == 0 and int(self.fc_ver[1]) < 21:
+                    f.write(disp_obj_name + ",2,2," + str(disp_obj.yDisplacement) + "\n")
+                else:
+                    f.write(
+                        "{},2,2,{}\n".format(
+                            disp_obj_name, FreeCAD.Units.Quantity(disp_obj.yDisplacement.getValueAs("mm"))
+                        )
+                    )
+            if int(self.fc_ver[0]) == 0 and disp_obj.zFix:
                 f.write(disp_obj_name + ",3,3\n")
             elif not disp_obj.zFree:
-                f.write(disp_obj_name + ",3,3," + str(disp_obj.zDisplacement) + "\n")
+                if int(self.fc_ver[0]) == 0 and int(self.fc_ver[1]) < 21:
+                    f.write(disp_obj_name + ",3,3," + str(disp_obj.zDisplacement) + "\n")
+                else:
+                    f.write(
+                        "{},3,3,{}\n".format(
+                            disp_obj_name, FreeCAD.Units.Quantity(disp_obj.zDisplacement.getValueAs("mm"))
+                        )
+                    )
 
             if self.beamsection_objects or self.shellthickness_objects:
-                if disp_obj.rotxFix:
+                if int(self.fc_ver[0]) == 0 and disp_obj.rotxFix:
                     f.write(disp_obj_name + ",4,4\n")
                 elif not disp_obj.rotxFree:
-                    f.write(disp_obj_name + ",4,4," + str(disp_obj.xRotation) + "\n")
-                if disp_obj.rotyFix:
+                    if int(self.fc_ver[0]) == 0 and int(self.fc_ver[1]) < 21:
+                        f.write(disp_obj_name + ",4,4," + str(disp_obj.xRotation) + "\n")
+                    else:
+                        f.write(
+                            "{},4,4,{}\n".format(
+                                disp_obj_name, FreeCAD.Units.Quantity(disp_obj.xRotation.getValueAs("deg"))
+                            )
+                        )
+                if int(self.fc_ver[0]) == 0 and disp_obj.rotyFix:
                     f.write(disp_obj_name + ",5,5\n")
                 elif not disp_obj.rotyFree:
-                    f.write(disp_obj_name + ",5,5," + str(disp_obj.yRotation) + "\n")
-                if disp_obj.rotzFix:
+                    if int(self.fc_ver[0]) == 0 and int(self.fc_ver[1]) < 21:
+                        f.write(disp_obj_name + ",5,5," + str(disp_obj.yRotation) + "\n")
+                    else:
+                        f.write(
+                            "{},5,5,{}\n".format(
+                                disp_obj_name, FreeCAD.Units.Quantity(disp_obj.yRotation.getValueAs("deg"))
+                            )
+                        )
+                if int(self.fc_ver[0]) == 0 and disp_obj.rotzFix:
                     f.write(disp_obj_name + ",6,6\n")
                 elif not disp_obj.rotzFree:
-                    f.write(disp_obj_name + ",6,6," + str(disp_obj.zRotation) + "\n")
+                    if int(self.fc_ver[0]) == 0 and int(self.fc_ver[1]) < 21:
+                        f.write(disp_obj_name + ",6,6," + str(disp_obj.zRotation) + "\n")
+                    else:
+                        f.write(    
+                            "{},6,6,{}\n".format(
+                                disp_obj_name, FreeCAD.Units.Quantity(disp_obj.zRotation.getValueAs("deg"))
+                            )
+                        )
         f.write("\n")
 
     # ********************************************************************************************
@@ -466,11 +508,11 @@ class FemInputWriterfistr(writerbase.FemInputWriter):
             # slave DEP
             f.write("*SURFACE, NAME=DEP{}\n".format(contact_obj.Name))
             for i in femobj["ContactSlaveFaces"]:
-                f.write("{},S{}\n".format(i[0], i[1]))
+                f.write(f"{i[0]},S{i[1]}\n")
             # master IND
             f.write("*SURFACE, NAME=IND{}\n".format(contact_obj.Name))
             for i in femobj["ContactMasterFaces"]:
-                f.write("{},S{}\n".format(i[0], i[1]))
+                f.write(f"{i[0]},S{i[1]}\n")
 
     def write_constraints_contact(self, f):
         if not self.contact_objects:
@@ -727,17 +769,31 @@ class FemInputWriterfistr(writerbase.FemInputWriter):
             selwei_obj = femobj["Object"]
             f.write("## " + selwei_obj.Label + "\n")
             f.write("!DLOAD,GRPID=1\n")
-            f.write(
-                # elset, GRAV, magnitude, direction x, dir y ,dir z
-                "{},GRAV,{},{},{},{}\n"
-                .format(
-                    " "+self.fistr_eall,
-                    self.gravity,  # actual magnitude of gravity vector
-                    selwei_obj.Gravity_x,  # coordinate x of normalized gravity vector
-                    selwei_obj.Gravity_y,  # y
-                    selwei_obj.Gravity_z  # z
+            if int(self.fc_ver[0]) >= 1:
+                f.write(
+                    # elset, GRAV, magnitude, direction x, dir y ,dir z
+                    "{},GRAV,{:.13G},{:.13G},{:.13G},{:.13G}\n".format(
+                        self.fistr_eall,
+                        selwei_obj.GravityAcceleration.getValueAs(
+                            "mm/s^2"
+                        ).Value,  # actual magnitude of gravity vector
+                        selwei_obj.GravityDirection.x,  # coordinate x of normalized gravity vector
+                        selwei_obj.GravityDirection.y,  # y
+                        selwei_obj.GravityDirection.z   # z
+                    )
                 )
-            )
+            else:
+                f.write(
+                    # elset, GRAV, magnitude, direction x, dir y ,dir z
+                    "{},GRAV,{},{},{},{}\n"
+                    .format(
+                        " "+self.fistr_eall,
+                        self.gravity,  # actual magnitude of gravity vector
+                        selwei_obj.Gravity_x,  # coordinate x of normalized gravity vector
+                        selwei_obj.Gravity_y,  # y
+                        selwei_obj.Gravity_z  # z
+                    )
+                )
             f.write("\n")
         # grav (erdbeschleunigung) is equal for all elements
         # should be only one constraint
@@ -769,19 +825,31 @@ class FemInputWriterfistr(writerbase.FemInputWriter):
             # femobj --> dict, FreeCAD document object is femobj["Object"]
             f.write("## " + femobj["Object"].Label + "\n")
             direction_vec = femobj["Object"].DirectionVector
+            dir_zero_tol = 1e-15  # TODO: should this be more generally for more values?
             for ref_shape in femobj["NodeLoadTable"]:
-                f.write("## " + ref_shape[0] + "\n")
+                f.write(f"## {ref_shape[0]}\n")
                 for n in sorted(ref_shape[1]):
                     node_load = ref_shape[1][n]
-                    if (direction_vec.x != 0.0):
-                        v1 = "{:.13E}".format(direction_vec.x * node_load)
-                        f.write(str(n) + ",1," + v1 + "\n")
-                    if (direction_vec.y != 0.0):
-                        v2 = "{:.13E}".format(direction_vec.y * node_load)
-                        f.write(str(n) + ",2," + v2 + "\n")
-                    if (direction_vec.z != 0.0):
-                        v3 = "{:.13E}".format(direction_vec.z * node_load)
-                        f.write(str(n) + ",3," + v3 + "\n")
+                    if int(self.fc_ver[0]) >= 1:
+                        if abs(direction_vec.x) > dir_zero_tol:
+                            v1 = f"{(direction_vec.x * node_load).Value:.13G}"
+                            f.write(f"{n},1,{v1}\n")
+                        if abs(direction_vec.y) > dir_zero_tol:
+                            v2 = f"{(direction_vec.y * node_load).Value:.13G}"
+                            f.write(f"{n},2,{v2}\n")
+                        if abs(direction_vec.z) > dir_zero_tol:
+                            v3 = f"{(direction_vec.z * node_load).Value:.13G}"
+                            f.write(f"{n},3,{v3}\n")
+                    else:
+                        if (direction_vec.x != 0.0):
+                            v1 = "{:.13E}".format(direction_vec.x * node_load)
+                            f.write(str(n) + ",1," + v1 + "\n")
+                        if (direction_vec.y != 0.0):
+                            v2 = "{:.13E}".format(direction_vec.y * node_load)
+                            f.write(str(n) + ",2," + v2 + "\n")
+                        if (direction_vec.z != 0.0):
+                            v3 = "{:.13E}".format(direction_vec.z * node_load)
+                            f.write(str(n) + ",3," + v3 + "\n")
                 f.write("\n")
             f.write("\n")
 
@@ -810,6 +878,12 @@ class FemInputWriterfistr(writerbase.FemInputWriter):
             prs_obj = femobj["Object"]
             f.write("## " + prs_obj.Label + "\n")
             rev = -1 if prs_obj.Reversed else 1
+            if int(self.fc_ver[0]) >= 1:
+                # the pressure has to be output in MPa
+                pressure_quantity = FreeCAD.Units.Quantity(prs_obj.Pressure.getValueAs("MPa"))
+                press_rev = rev * pressure_quantity
+            else:
+                press_rev = rev * prs_obj.Pressure
             f.write("!DLOAD,GRPID=1\n")
             for ref_shape in femobj["PressureFaces"]:
                 # the loop is needed for compatibility reason
@@ -817,15 +891,15 @@ class FemInputWriterfistr(writerbase.FemInputWriter):
                 # the face ids where per ref_shape
                 for face, fno in ref_shape[1]:
                     if fno > 0:  # solid mesh face
-                        f.write("{},P{},{}\n".format(face, fno, rev * prs_obj.Pressure))
+                        f.write(f"{face},P{fno},{press_rev}\n")
                     # on shell mesh face: fno == 0
                     # normal of element face == face normal
                     elif fno == 0:
-                        f.write("{},S,{}\n".format(face, rev * prs_obj.Pressure))
+                        f.write(f"{face},S,{press_rev}\n")
                     # on shell mesh face: fno == -1
                     # normal of element face opposite direction face normal
                     elif fno == -1:
-                        f.write("{},S,{}\n".format(face, -1 * rev * prs_obj.Pressure))
+                        f.write(f"{face},S,{-1 * press_rev}\n")
 
     # ********************************************************************************************
     # constraints heatflux
