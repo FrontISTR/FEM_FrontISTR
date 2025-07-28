@@ -349,9 +349,17 @@ class _TaskPanel:
                     startup_info.dwFlags = subprocess.STARTF_USESHOWWINDOW
                     cmd = [self.fea.partitioner_binary]
                     shellcmd = False
-                elif system() in ("Linux", "Darwin"):
-                    cmd = "unset LD_LIBRARY_PATH; "+self.fea.partitioner_binary
+                    env = os.environ.copy()
+                elif system() == "Linux":
+                    cmd = self.fea.partitioner_binary
                     shellcmd = True
+                    env = os.environ.copy()
+                    env.pop('LD_LIBRARY_PATH', None)
+                elif system() == "Darwin":
+                    cmd = [self.fea.partitioner_binary]
+                    shellcmd = False
+                    env = os.environ.copy()
+                    env.pop('LD_LIBRARY_PATH', None)
 
                 p = subprocess.Popen(
                     cmd,
@@ -359,7 +367,8 @@ class _TaskPanel:
                     stdout=subprocess.PIPE,
                     stderr=subprocess.PIPE,
                     shell=shellcmd,
-                    startupinfo=startup_info
+                    startupinfo=startup_info,
+                    env=env
                 )
                 part_stdout, part_stderr = p.communicate()                
                 self.femConsoleMessage("Writing .inp file and partitioning completed.")
