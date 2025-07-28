@@ -436,9 +436,17 @@ class FemToolsFISTR(QtCore.QRunnable, QtCore.QObject):
             startup_info.dwFlags = subprocess.STARTF_USESHOWWINDOW
             cmd = [self.partitioner_binary]
             shellcmd = False
-        elif system() in ("Linux", "Darwin"):
-            cmd = "unset LD_LIBRARY_PATH; "+self.partitioner_binary
+            env = os.environ.copy()
+        elif system() == "Linux":
+            cmd = self.partitioner_binary
             shellcmd = True
+            env = os.environ.copy()
+            env.pop('LD_LIBRARY_PATH', None)
+        elif system() == "Darwin":
+            cmd = [self.partitioner_binary]
+            shellcmd = False
+            env = os.environ.copy()
+            env.pop('LD_LIBRARY_PATH', None)
 
         p = subprocess.Popen(
             cmd,
@@ -446,7 +454,8 @@ class FemToolsFISTR(QtCore.QRunnable, QtCore.QObject):
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             shell=shellcmd,
-            startupinfo=startup_info
+            startupinfo=startup_info,
+            env=env
         )
         part_stdout, part_stderr = p.communicate()
 
@@ -483,55 +492,73 @@ class FemToolsFISTR(QtCore.QRunnable, QtCore.QObject):
                 self.partitioner_binary = partitioner_path
                 self.mpiexec_binary = mpiexec_path
             elif system() in ("Linux", "Darwin"):
-                p1 = subprocess.Popen("unset LD_LIBRARY_PATH; which fistr1", stdout=subprocess.PIPE, shell=True)
-                if p1.wait() == 0:
-                    if sys.version_info.major >= 3:
-                        fistr_path = p1.stdout.read().decode("utf8").split("\n")[0]
-                    else:
-                        fistr_path = p1.stdout.read().split("\n")[0]
-                elif p1.wait() == 1:
-                    error_message = (
-                        "FEM: FrontISTR binary fistr1 not found in "
-                        "standard system binary path. "
-                        "Please install fistr or set path to binary "
-                        "in FEM preferences tab FrontISTR.\n"
-                    )
-                    if FreeCAD.GuiUp:
-                        QtGui.QMessageBox.critical(None, error_title, error_message)
-                    raise Exception(error_message)
-                self.fistr_binary = fistr_path
+                # First check if binaries exist in local bin directory
+                module_dir = os.path.dirname(__file__)
+                local_fistr_path = os.path.join(module_dir, "bin", "fistr1")
+                local_partitioner_path = os.path.join(module_dir, "bin", "hecmw_part1")
+                local_mpiexec_path = os.path.join(module_dir, "bin", "mpirun")
+                
+                if (os.path.isfile(local_fistr_path) and 
+                    os.path.isfile(local_partitioner_path) and 
+                    os.path.isfile(local_mpiexec_path)):
+                    FreeCAD.ParamGet(
+                        "User parameter:BaseApp/Preferences/Mod/Fem/FrontISTR"
+                    ).SetString("fistrBinaryPath", local_fistr_path)
+                    # Use local binaries
+                    self.fistr_binary = local_fistr_path
+                    self.partitioner_binary = local_partitioner_path
+                    self.mpiexec_binary = local_mpiexec_path
+                else:
+                    # Fall back to system PATH search
+                    p1 = subprocess.Popen("unset LD_LIBRARY_PATH; which fistr1", stdout=subprocess.PIPE, shell=True)
+                    if p1.wait() == 0:
+                        if sys.version_info.major >= 3:
+                            fistr_path = p1.stdout.read().decode("utf8").split("\n")[0]
+                        else:
+                            fistr_path = p1.stdout.read().split("\n")[0]
+                    elif p1.wait() == 1:
+                        error_message = (
+                            "FEM: FrontISTR binary fistr1 not found in "
+                            "standard system binary path. "
+                            "Please install fistr or set path to binary "
+                            "in FEM preferences tab FrontISTR.\n"
+                        )
+                        if FreeCAD.GuiUp:
+                            QtGui.QMessageBox.critical(None, error_title, error_message)
+                        raise Exception(error_message)
+                    self.fistr_binary = fistr_path
 
-                p2 = subprocess.Popen("unset LD_LIBRARY_PATH; which hecmw_part1", stdout=subprocess.PIPE, shell=True)
-                if p2.wait() == 0:
-                    if sys.version_info.major >= 3:
-                        partitioner_path = p2.stdout.read().decode("utf8").split("\n")[0]
-                    else:
-                        partitioner_path = p2.stdout.read().split("\n")[0]
-                elif p2.wait() == 1:
-                    error_message = (
-                        "FEM: FrontISTR binary hecmw_part1 not found in "
-                        "standard system binary path.\n"
-                    )
-                    if FreeCAD.GuiUp:
-                        QtGui.QMessageBox.critical(None, error_title, error_message)
-                    raise Exception(error_message)
-                self.partitioner_binary = partitioner_path
+                    p2 = subprocess.Popen("unset LD_LIBRARY_PATH; which hecmw_part1", stdout=subprocess.PIPE, shell=True)
+                    if p2.wait() == 0:
+                        if sys.version_info.major >= 3:
+                            partitioner_path = p2.stdout.read().decode("utf8").split("\n")[0]
+                        else:
+                            partitioner_path = p2.stdout.read().split("\n")[0]
+                    elif p2.wait() == 1:
+                        error_message = (
+                            "FEM: FrontISTR binary hecmw_part1 not found in "
+                            "standard system binary path.\n"
+                        )
+                        if FreeCAD.GuiUp:
+                            QtGui.QMessageBox.critical(None, error_title, error_message)
+                        raise Exception(error_message)
+                    self.partitioner_binary = partitioner_path
 
-                p3 = subprocess.Popen("unset LD_LIBRARY_PATH; which mpirun", stdout=subprocess.PIPE, shell=True)
-                if p3.wait() == 0:
-                    if sys.version_info.major >= 3:
-                        mpiexec_path = p3.stdout.read().decode("utf8").split("\n")[0]
-                    else:
-                        mpiexec_path = p3.stdout.read().split("\n")[0]
-                elif p3.wait() == 1:
-                    error_message = (
-                        "FEM: FrontISTR binary mpirun not found in "
-                        "standard system binary path.\n"
-                    )
-                    if FreeCAD.GuiUp:
-                        QtGui.QMessageBox.critical(None, error_title, error_message)
-                    raise Exception(error_message)
-                self.mpiexec_binary = mpiexec_path
+                    p3 = subprocess.Popen("unset LD_LIBRARY_PATH; which mpirun", stdout=subprocess.PIPE, shell=True)
+                    if p3.wait() == 0:
+                        if sys.version_info.major >= 3:
+                            mpiexec_path = p3.stdout.read().decode("utf8").split("\n")[0]
+                        else:
+                            mpiexec_path = p3.stdout.read().split("\n")[0]
+                    elif p3.wait() == 1:
+                        error_message = (
+                            "FEM: FrontISTR binary mpirun not found in "
+                            "standard system binary path.\n"
+                        )
+                        if FreeCAD.GuiUp:
+                            QtGui.QMessageBox.critical(None, error_title, error_message)
+                        raise Exception(error_message)
+                    self.mpiexec_binary = mpiexec_path
         else:
             if not fistr_binary:
                 self.fistr_prefs = FreeCAD.ParamGet(
@@ -557,11 +584,19 @@ class FemToolsFISTR(QtCore.QRunnable, QtCore.QObject):
             # Windows workaround to avoid blinking terminal window
             startup_info = subprocess.STARTUPINFO()
             startup_info.dwFlags = subprocess.STARTF_USESHOWWINDOW
-            cmd = [self.fistr_binary]
+            cmd = [self.fistr_binary, "-v"]
             shellcmd = False
-        elif system() in ("Linux", "Darwin"):
-            cmd = "unset LD_LIBRARY_PATH; "+self.fistr_binary+" -v"
+            env = os.environ.copy()
+        elif system() == "Linux":
+            cmd = self.fistr_binary+" -v"
             shellcmd = True
+            env = os.environ.copy()
+            env.pop('LD_LIBRARY_PATH', None)
+        elif system() == "Darwin":
+            cmd = [self.fistr_binary, "-v"]
+            shellcmd = False
+            env = os.environ.copy()
+            env.pop('LD_LIBRARY_PATH', None)
 
         fistr_stdout = None
         fistr_stderr = None
@@ -572,7 +607,8 @@ class FemToolsFISTR(QtCore.QRunnable, QtCore.QObject):
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
                 shell=shellcmd,
-                startupinfo=startup_info
+                startupinfo=startup_info,
+                env=env
             )
             fistr_stdout, fistr_stderr = p.communicate()
 
@@ -679,9 +715,17 @@ class FemToolsFISTR(QtCore.QRunnable, QtCore.QObject):
             startup_info.dwFlags = subprocess.STARTF_USESHOWWINDOW
             cmd = [self.mpiexec_binary,"-n",n_pe,self.fistr_binary]
             shellcmd = False
-        elif system() in ("Linux", "Darwin"):
-            cmd = "unset LD_LIBRARY_PATH; "+self.mpiexec_binary+"-n"+n_pe+self.fistr_binary
+            env = os.environ.copy()
+        elif system() == "Linux":
+            cmd = self.mpiexec_binary+" -n "+n_pe+" "+self.fistr_binary
             shellcmd = True
+            env = os.environ.copy()
+            env.pop('LD_LIBRARY_PATH', None)
+        elif system() == "Darwin":
+            cmd = [self.mpiexec_binary, "-n", n_pe, self.fistr_binary]
+            shellcmd = False
+            env = os.environ.copy()
+            env.pop('LD_LIBRARY_PATH', None)
 
         p = subprocess.Popen(
             cmd,
@@ -689,7 +733,8 @@ class FemToolsFISTR(QtCore.QRunnable, QtCore.QObject):
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             shell=shellcmd,
-            startupinfo=startup_info
+            startupinfo=startup_info,
+            env=env
         )
         self.fistr_stdout, self.fistr_stderr = p.communicate()
 
@@ -718,9 +763,19 @@ class FemToolsFISTR(QtCore.QRunnable, QtCore.QObject):
             startup_info.dwFlags = subprocess.STARTF_USESHOWWINDOW
             cmd = [self.fistr_binary, "-v"]
             shellcmd = False
-        elif system() in ("Linux", "Darwin"):
-            cmd = "unset LD_LIBRARY_PATH; "+self.fistr_binary+" -v"
+            env = os.environ.copy()
+        elif system() == "Linux":
+            # Use shell command for version check on Linux
+            cmd = self.fistr_binary+" -v"
             shellcmd = True
+            env = os.environ.copy()
+            env.pop('LD_LIBRARY_PATH', None)
+        elif system() == "Darwin":
+            # Use list command for Darwin to handle paths with spaces
+            cmd = [self.fistr_binary, "-v"]
+            shellcmd = False
+            env = os.environ.copy()
+            env.pop('LD_LIBRARY_PATH', None)
 
         fistr_stdout = None
         fistr_stderr = None
@@ -731,7 +786,8 @@ class FemToolsFISTR(QtCore.QRunnable, QtCore.QObject):
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             shell=shellcmd,
-            startupinfo=startup_info
+            startupinfo=startup_info,
+            env=env
         )
         fistr_stdout, fistr_stderr = p.communicate()
         if sys.version_info.major >= 3:
