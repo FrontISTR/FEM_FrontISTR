@@ -419,7 +419,6 @@ class FemToolsFISTR(QtCore.QRunnable, QtCore.QObject):
             )
             FreeCAD.Console.PrintError("[x] Type: {type}".format(type=type(e))+"\n")
             FreeCAD.Console.PrintError("[x] Args: {args}".format(args=e.args)+"\n")
-            FreeCAD.Console.PrintError("[x] Message: {message}".format(message=e.message)+"\n")
             FreeCAD.Console.PrintError("[x] Error: {error}".format(error=e)+"\n")
             raise
 
@@ -664,7 +663,6 @@ class FemToolsFISTR(QtCore.QRunnable, QtCore.QObject):
                 )
                 FreeCAD.Console.PrintError("[x] Type: {type}".format(type=type(e))+"\n")
                 FreeCAD.Console.PrintError("[x] Args: {args}".format(args=e.args)+"\n")
-                FreeCAD.Console.PrintError("[x] Message: {message}".format(message=e.message)+"\n")
                 FreeCAD.Console.PrintError("[x] Error: {error}".format(error=e)+"\n")
 
         except Exception as e:
