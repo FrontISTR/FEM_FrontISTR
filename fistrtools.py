@@ -401,13 +401,15 @@ class FemToolsFISTR(QtCore.QRunnable, QtCore.QObject):
     def write_inp_file(self):
         import femsolver_FrontISTR.writer as iw
         self.inp_file_name = ""
+        fistr_ver = self.get_fistr_version()
         try:
             inp_writer = iw.FemInputWriterfistr(
                 self.analysis,
                 self.solver,
                 self.mesh,
                 self.member,
-                self.working_dir
+                self.working_dir,
+                fistr_ver
             )
             self.inp_file_name = inp_writer.write_FrontISTR_input_file()
             self.cnt_file_name = self.inp_file_name+".cnt"
