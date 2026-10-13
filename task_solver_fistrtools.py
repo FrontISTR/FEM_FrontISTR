@@ -152,7 +152,11 @@ class _TaskPanel:
     def getStandardButtons(self):
         # only show a close button
         # def accept() in no longer needed, since there is no OK button
-        return int(QtGui.QDialogButtonBox.Close)
+        fc_ver = FreeCAD.Version()
+        if int(fc_ver[0]) == 0:
+            return int(QtGui.QDialogButtonBox.Close)
+        else:  # for v1.0 and later
+            return QtGui.QDialogButtonBox.Close
 
     def reject(self):
         FreeCADGui.ActiveDocument.resetEdit()

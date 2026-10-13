@@ -57,7 +57,8 @@ class FemInputWriterfistr(writerbase.FemInputWriter):
         solver_obj,
         mesh_obj,
         member,
-        dir_name=None
+        dir_name=None,
+        fistr_ver=None
     ):
         writerbase.FemInputWriter.__init__(
             self,
@@ -85,6 +86,7 @@ class FemInputWriterfistr(writerbase.FemInputWriter):
         self.gravity = int(Units.Quantity(constants.gravity()).getValueAs("mm/s^2"))  # 9820 mm/s2
         # new class attributes
         self.fc_ver = FreeCAD.Version()
+        self.fistr_ver = fistr_ver  # (major, minor) or None if unknown
         self.fistr_nall = "ALL"
         self.fistr_eall = "ALL"
         self.fistr_evolumes = "Evolumes"
@@ -253,7 +255,10 @@ class FemInputWriterfistr(writerbase.FemInputWriter):
 
     def write_dat(self):
         datfile = codecs.open(self.dat_name, "w", encoding="utf-8")
-        datfile.write("!MESH, NAME=part_in,TYPE=ABAQUS\n")
+        if self.fistr_ver is not None and self.fistr_ver >= (6, 0):
+            datfile.write("!MESH, NAME=part_in,TYPE=INP\n")
+        else:  # for v5.9 and earlier, or unknown version
+            datfile.write("!MESH, NAME=part_in,TYPE=ABAQUS\n")
         datfile.write(self.mesh_name+".inp\n")
         datfile.write("!MESH, NAME=part_out,TYPE=HECMW-DIST\n")
         datfile.write(self.mesh_name+".p\n")
