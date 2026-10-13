@@ -45,6 +45,70 @@ if FreeCAD.GuiUp:
     import FemGui
 
 
+def find_unix_binary(names):
+    """Find a binary on Linux or macOS.
+
+    The bin directory of this workbench is searched first, then the system
+    path. FreeCAD started from the desktop (especially on macOS) does not
+    inherit the PATH of the login shell, thus some common install locations
+    and the PATH of the login shell are searched too.
+
+    Parameters
+    ----------
+    names : tuple of str
+        Names of the binary, in order of preference.
+
+    Returns
+    -------
+    str
+        The path to the binary or an empty string if it was not found.
+    """
+    import shutil
+
+    def is_binary(path):
+        return os.path.isfile(path) and os.access(path, os.X_OK)
+
+    local_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "bin")
+    for name in names:
+        if is_binary(os.path.join(local_dir, name)):
+            return os.path.join(local_dir, name)
+
+    for name in names:
+        path = shutil.which(name)
+        if path:
+            return path
+
+    home = os.path.expanduser("~")
+    for directory in (
+        "/opt/homebrew/bin",
+        "/usr/local/bin",
+        "/opt/local/bin",
+        os.path.join(home, ".local", "bin"),
+        os.path.join(home, "bin"),
+    ):
+        for name in names:
+            if is_binary(os.path.join(directory, name)):
+                return os.path.join(directory, name)
+
+    # last resort: ask the login shell, its PATH may be set in the profile
+    shell = os.environ.get("SHELL", "/bin/sh")
+    for name in names:
+        try:
+            out = subprocess.check_output(
+                [shell, "-l", "-c", "command -v " + name],
+                stdin=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
+                timeout=10
+            ).decode("utf8", "replace")
+        except (OSError, subprocess.SubprocessError):
+            continue
+        for line in reversed(out.splitlines()):
+            if os.path.isabs(line.strip()) and is_binary(line.strip()):
+                return line.strip()
+
+    return ""
+
+
 class FemToolsFISTR(QtCore.QRunnable, QtCore.QObject):
     """
 
@@ -494,72 +558,32 @@ class FemToolsFISTR(QtCore.QRunnable, QtCore.QObject):
                 self.mpiexec_binary = mpiexec_path
             elif system() in ("Linux", "Darwin"):
                 # First check if binaries exist in local bin directory
-                module_dir = os.path.dirname(__file__)
-                local_fistr_path = os.path.join(module_dir, "bin", "fistr1")
-                local_partitioner_path = os.path.join(module_dir, "bin", "hecmw_part1")
-                local_mpiexec_path = os.path.join(module_dir, "bin", "mpirun")
-                
-                if (os.path.isfile(local_fistr_path) and 
-                    os.path.isfile(local_partitioner_path) and 
-                    os.path.isfile(local_mpiexec_path)):
-                    FreeCAD.ParamGet(
-                        "User parameter:BaseApp/Preferences/Mod/Fem/FrontISTR"
-                    ).SetString("fistrBinaryPath", local_fistr_path)
-                    # Use local binaries
-                    self.fistr_binary = local_fistr_path
-                    self.partitioner_binary = local_partitioner_path
-                    self.mpiexec_binary = local_mpiexec_path
-                else:
-                    # Fall back to system PATH search
-                    p1 = subprocess.Popen("unset LD_LIBRARY_PATH; which fistr1", stdout=subprocess.PIPE, shell=True)
-                    if p1.wait() == 0:
-                        if sys.version_info.major >= 3:
-                            fistr_path = p1.stdout.read().decode("utf8").split("\n")[0]
-                        else:
-                            fistr_path = p1.stdout.read().split("\n")[0]
-                    elif p1.wait() == 1:
+                # then the system path
+                binaries = {}
+                for key, names in (
+                    ("fistr1", ("fistr1",)),
+                    ("hecmw_part1", ("hecmw_part1",)),
+                    ("mpirun", ("mpirun", "mpiexec")),
+                ):
+                    binaries[key] = find_unix_binary(names)
+                    if not binaries[key]:
                         error_message = (
-                            "FEM: FrontISTR binary fistr1 not found in "
+                            "FEM: FrontISTR binary {} not found in "
+                            "the bin directory of the FrontISTR workbench or in "
                             "standard system binary path. "
                             "Please install fistr or set path to binary "
                             "in FEM preferences tab FrontISTR.\n"
+                            .format(key)
                         )
                         if FreeCAD.GuiUp:
                             QtGui.QMessageBox.critical(None, error_title, error_message)
                         raise Exception(error_message)
-                    self.fistr_binary = fistr_path
-
-                    p2 = subprocess.Popen("unset LD_LIBRARY_PATH; which hecmw_part1", stdout=subprocess.PIPE, shell=True)
-                    if p2.wait() == 0:
-                        if sys.version_info.major >= 3:
-                            partitioner_path = p2.stdout.read().decode("utf8").split("\n")[0]
-                        else:
-                            partitioner_path = p2.stdout.read().split("\n")[0]
-                    elif p2.wait() == 1:
-                        error_message = (
-                            "FEM: FrontISTR binary hecmw_part1 not found in "
-                            "standard system binary path.\n"
-                        )
-                        if FreeCAD.GuiUp:
-                            QtGui.QMessageBox.critical(None, error_title, error_message)
-                        raise Exception(error_message)
-                    self.partitioner_binary = partitioner_path
-
-                    p3 = subprocess.Popen("unset LD_LIBRARY_PATH; which mpirun", stdout=subprocess.PIPE, shell=True)
-                    if p3.wait() == 0:
-                        if sys.version_info.major >= 3:
-                            mpiexec_path = p3.stdout.read().decode("utf8").split("\n")[0]
-                        else:
-                            mpiexec_path = p3.stdout.read().split("\n")[0]
-                    elif p3.wait() == 1:
-                        error_message = (
-                            "FEM: FrontISTR binary mpirun not found in "
-                            "standard system binary path.\n"
-                        )
-                        if FreeCAD.GuiUp:
-                            QtGui.QMessageBox.critical(None, error_title, error_message)
-                        raise Exception(error_message)
-                    self.mpiexec_binary = mpiexec_path
+                FreeCAD.ParamGet(
+                    "User parameter:BaseApp/Preferences/Mod/Fem/FrontISTR"
+                ).SetString("fistrBinaryPath", binaries["fistr1"])
+                self.fistr_binary = binaries["fistr1"]
+                self.partitioner_binary = binaries["hecmw_part1"]
+                self.mpiexec_binary = binaries["mpirun"]
         else:
             if not fistr_binary:
                 self.fistr_prefs = FreeCAD.ParamGet(
